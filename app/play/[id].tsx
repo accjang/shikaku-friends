@@ -1,6 +1,6 @@
 // 게임 화면. id = 스테이지("1-07") 또는 "daily"(오늘의 퍼즐).
 // 위: 머리줄(뒤로·제목·시간) → 캐릭터+말풍선 → 판 → 아래 도구(되돌리기·처음부터·힌트).
-// 다 풀면 축하 → 결과 창. "다음"을 누를 때 차례면 전면 광고(src/core/adPolicy.ts).
+// 다 풀면 축하 → 결과 창. "다음"을 누를 때 차례면 전면 광고(src/core/adPolicy.ts). 결제는 없다(광고 수익만).
 import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, AppState, Platform, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
@@ -14,9 +14,8 @@ import { characterLine, type Mood } from '@/core/i18n';
 import { unpack, type PackedPuzzle } from '@/core/levelCodec';
 import { addHints, recordDailyClear, recordLevelClear, spendHint } from '@/core/progress';
 import { coverage, validClueIndex, type Puzzle, type Rect } from '@/core/puzzle';
-import { maybeShowInterstitial, showRewarded, useAdStore } from '@/data/ads';
+import { maybeShowInterstitial, showRewarded } from '@/data/ads';
 import { useProgressStore } from '@/data/progressStore';
-import { buyAdFree, usePurchaseStore } from '@/data/purchases';
 import { Board } from '@/ui/Board';
 import { IconButton } from '@/ui/Button';
 import { buzz, playSfx } from '@/ui/feedback';
@@ -115,10 +114,6 @@ function Game({ session, t, locale, onRestart }: GameProps) {
   const insets = useSafeAreaInsets();
   const progress = useProgressStore((s) => s.progress);
   const updateProgress = useProgressStore((s) => s.update);
-  const adFree = usePurchaseStore((s) => s.adFree);
-  const purchaseMode = usePurchaseStore((s) => s.mode);
-  const price = usePurchaseStore((s) => s.price);
-  const rewardedLoaded = useAdStore((s) => s.rewardedLoaded);
 
   const [game, setGame] = useState<GameState>(newGame);
   const [mood, setMood] = useState<Mood>('start');
@@ -243,14 +238,6 @@ function Game({ session, t, locale, onRestart }: GameProps) {
     }
   };
 
-  const onBuy = async (): Promise<void> => {
-    const r = await buyAdFree();
-    if (r === 'success') {
-      setNoHint(false);
-      Alert.alert(t('purchased'));
-    } else if (r === 'error') Alert.alert(t('purchaseFailed'));
-  };
-
   const restart = (): void => {
     setShowClear(false);
     onRestart();
@@ -266,7 +253,7 @@ function Game({ session, t, locale, onRestart }: GameProps) {
 
   const goNext = async (): Promise<void> => {
     setShowClear(false);
-    await maybeShowInterstitial({ adFree, totalClears: useProgressStore.getState().progress.totalClears });
+    await maybeShowInterstitial({ totalClears: useProgressStore.getState().progress.totalClears });
     router.replace(nextTarget() as never);
   };
 
@@ -333,12 +320,8 @@ function Game({ session, t, locale, onRestart }: GameProps) {
       <NoHintSheet
         visible={noHint}
         character={character}
-        adReady={rewardedLoaded}
         adBusy={adBusy}
-        showBuy={!adFree && purchaseMode !== 'disabled'}
-        price={price}
         onWatchAd={() => void onWatchAd()}
-        onBuy={() => void onBuy()}
         onClose={() => setNoHint(false)}
       />
     </Screen>

@@ -173,11 +173,10 @@ describe('진행 기록', () => {
 });
 
 describe('광고 빈도', () => {
-  const base = { adFree: false, lastInterstitialAt: null, now: 1e9 };
+  const base = { lastInterstitialAt: null, now: 1e9 };
   test('처음 몇 번은 없고 N번마다', () => {
     expect(shouldShowInterstitial({ ...base, totalClears: AD_FREE_FIRST_CLEARS })).toBe(false);
     expect(shouldShowInterstitial({ ...base, totalClears: AD_FREE_FIRST_CLEARS + AD_INTERSTITIAL_EVERY })).toBe(true);
-    expect(shouldShowInterstitial({ ...base, totalClears: AD_FREE_FIRST_CLEARS + AD_INTERSTITIAL_EVERY, adFree: true })).toBe(false);
     expect(
       shouldShowInterstitial({ ...base, totalClears: AD_FREE_FIRST_CLEARS + AD_INTERSTITIAL_EVERY, lastInterstitialAt: base.now - 1000 }),
     ).toBe(false);

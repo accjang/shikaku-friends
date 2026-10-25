@@ -128,7 +128,7 @@ export function initAds(): Promise<boolean> {
 }
 
 /** 깬 뒤 "다음"을 누를 때: 차례이고 불러온 광고가 있으면 띄우고 닫힐 때까지 기다린다. */
-export async function maybeShowInterstitial(ctx: { adFree: boolean; totalClears: number }): Promise<void> {
+export async function maybeShowInterstitial(ctx: { totalClears: number }): Promise<void> {
   const m = adsModule();
   const now = Date.now();
   if (!m || !interstitial?.loaded) return;

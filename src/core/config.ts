@@ -1,4 +1,4 @@
-// 앱 전체 상수(매직넘버는 여기에만). 광고·결제 키는 .env(EXPO_PUBLIC_*)에서 읽는다 — docs/RELEASE.md 참고.
+// 앱 전체 상수(매직넘버는 여기에만). 광고 키는 .env(EXPO_PUBLIC_*)에서 읽는다 — docs/RELEASE.md 참고.
 import type { GenOptions } from './generator';
 
 // ── 생성기 ──
@@ -36,9 +36,6 @@ export const STORAGE_KEYS = {
   progress: 'shikaku.progress',
   settings: 'shikaku.settings',
   adState: 'shikaku.adState',
-  mockPurchases: 'shikaku.mockPurchases',
-  /** 광고 제거 권리를 한 번이라도 받았는지(보너스 힌트 중복 방지·오프라인 유지). */
-  adFreeGranted: 'shikaku.adFreeGranted',
 } as const;
 
 // ── 광고(AdMob) ──
@@ -63,18 +60,6 @@ export const ADMOB_UNIT_IDS = {
     rewarded: env(process.env.EXPO_PUBLIC_ADMOB_ANDROID_REWARDED),
   },
 } as const;
-
-// ── 결제(RevenueCat) ──
-export const REVENUECAT_API_KEY_IOS = env(process.env.EXPO_PUBLIC_REVENUECAT_API_KEY_IOS);
-export const REVENUECAT_API_KEY_ANDROID = env(process.env.EXPO_PUBLIC_REVENUECAT_API_KEY_ANDROID);
-/** App Store Connect·Play Console에 같은 ID로 만든다(비소모성). */
-export const PRODUCT_IDS = { adFree: 'shikaku_remove_ads' } as const;
-/** RevenueCat 권리(entitlement) ID. */
-export const ENTITLEMENT_ADFREE = 'ad_free';
-/** 광고 제거를 사면 함께 주는 힌트. */
-export const ADFREE_BONUS_HINTS = 10;
-/** 개발 빌드 가상 결제 가격 표시(실제 가격은 스토어에서). */
-export const MOCK_ADFREE_PRICE = '₩3,900';
 
 // ── 링크(출시 전에 채운다 — docs/RELEASE.md) ──
 /** 개인정보처리방침 주소(docs/store/privacy-policy.md를 올린 곳). 비어 있으면 설정에서 줄을 숨긴다. */

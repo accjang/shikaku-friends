@@ -1,11 +1,11 @@
-// 게임 화면의 팝업: 클리어 결과, 힌트 없음(광고 보기·광고 제거).
+// 게임 화면의 팝업: 클리어 결과, 힌트 없음(보상형 광고 보기).
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect } from 'react';
 import { ActivityIndicator, Image, Modal, StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withDelay, withRepeat, withSequence, withSpring, withTiming, ZoomIn } from 'react-native-reanimated';
 
 import type { CharacterId } from '@/core/chapters';
-import { ADFREE_BONUS_HINTS, REWARDED_HINTS } from '@/core/config';
+import { REWARDED_HINTS } from '@/core/config';
 
 import { Button } from './Button';
 import { charImage } from './characters';
@@ -101,12 +101,8 @@ export function ClearSheet(p: ClearProps) {
 interface HintProps {
   visible: boolean;
   character: CharacterId;
-  adReady: boolean;
   adBusy: boolean;
-  showBuy: boolean;
-  price: string | null;
   onWatchAd(): void;
-  onBuy(): void;
   onClose(): void;
 }
 
@@ -128,14 +124,6 @@ export function NoHintSheet(p: HintProps) {
               onPress={p.onWatchAd}
               sub={p.adBusy ? <ActivityIndicator color={colors.white} size="small" /> : null}
             />
-            {p.showBuy ? (
-              <Button
-                label={`${t('removeAds')}${p.price ? ` · ${p.price}` : ''}`}
-                icon="sparkles"
-                sub={<Text style={styles.sub}>{t('removeAdsDesc', { n: ADFREE_BONUS_HINTS })}</Text>}
-                onPress={p.onBuy}
-              />
-            ) : null}
             <Button small label={t('cancel')} color={colors.card} edge={colors.line} textColor={colors.ink} onPress={p.onClose} />
           </View>
         </Animated.View>
