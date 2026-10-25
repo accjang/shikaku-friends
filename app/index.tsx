@@ -6,6 +6,7 @@ import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withDelay, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
 
 import { levelId, type CharacterId } from '@/core/chapters';
+import { letterTileFriendly, RTL_LOCALES } from '@/core/i18n';
 import { PROP_EVERY } from '@/core/config';
 import { nextProp, PROP_IDS, stagesCleared, unlockedPropCount } from '@/core/village';
 import { dailyStreak, nextUnplayed, starCount, streakReward } from '@/core/progress';
@@ -43,24 +44,35 @@ function Bouncy({ id, size, delay }: { id: CharacterId; size: number; delay: num
 }
 
 /** 제목 글자마다 파스텔 네모 배경. */
-function Logo({ text }: { text: string }) {
+/**
+ * 제목: 단어마다 한 덩어리(줄바꿈은 단어 사이에서만).
+ * 글자를 낱개로 떼어도 되는 문자(한글·가나·한자·라틴·키릴)는 글자마다 파스텔 네모,
+ * 글자가 이어지거나 모음 기호가 붙는 문자(아랍·인도계·태국·히브리)는 단어 하나를 네모 하나에.
+ * 오른쪽에서 왼쪽으로 읽는 언어는 첫 단어가 오른쪽에 오도록 단어 순서를 뒤집는다.
+ */
+function Logo({ text, perLetter, rtl }: { text: string; perLetter: boolean; rtl: boolean }) {
+  let k = 0;
+  const tile = (content: string): React.ReactElement => {
+    const i = k++;
+    return (
+      <View key={i} style={[styles.logoTile, { backgroundColor: RECT_PALETTE[i % RECT_PALETTE.length], transform: [{ rotate: `${i % 2 ? 4 : -4}deg` }] }]}>
+        <Text style={styles.logoChar}>{content}</Text>
+      </View>
+    );
+  };
   return (
     <View style={styles.logoRow}>
-      {[...text].map((ch, i) =>
-        ch === ' ' ? (
-          <View key={i} style={{ width: 10 }} />
-        ) : (
-          <View key={i} style={[styles.logoTile, { backgroundColor: RECT_PALETTE[i % RECT_PALETTE.length], transform: [{ rotate: `${i % 2 ? 4 : -4}deg` }] }]}>
-            <Text style={styles.logoChar}>{ch}</Text>
-          </View>
-        ),
-      )}
+      {(rtl ? text.split(' ').reverse() : text.split(' ')).map((word, w) => (
+        <View key={w} style={styles.logoWord}>
+          {perLetter ? [...word.normalize('NFC')].map((ch) => tile(ch)) : tile(word)}
+        </View>
+      ))}
     </View>
   );
 }
 
 export default function Home() {
-  const { t } = useT();
+  const { t, locale } = useT();
   const progress = useProgressStore((s) => s.progress);
   if (!progress.tutorialDone) return <Redirect href="/tutorial" />;
 
@@ -87,7 +99,7 @@ export default function Home() {
       </View>
 
       <View style={styles.hero}>
-        <Logo text={t('appName')} />
+        <Logo text={t('appName')} perLetter={letterTileFriendly(locale)} rtl={RTL_LOCALES.includes(locale)} />
         <Text style={styles.tagline}>{t('tagline')}</Text>
         <View style={styles.friends}>
           <Bouncy id="duck" size={64} delay={600} />
@@ -162,7 +174,8 @@ const styles = StyleSheet.create({
     borderColor: colors.line,
   },
   hero: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: space.lg },
-  logoRow: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 4 },
+  logoRow: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', columnGap: 12, rowGap: 6 },
+  logoWord: { flexDirection: 'row', gap: 4 },
   logoTile: { minWidth: 44, height: 50, borderRadius: 12, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
   logoChar: { fontFamily: FONT.round, fontSize: 30, color: colors.ink },
   tagline: { marginTop: space.md, fontFamily: FONT.round, fontSize: 17, color: colors.inkSoft },

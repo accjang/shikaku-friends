@@ -238,8 +238,9 @@ describe('문구', () => {
     expect(pickLocale(['tl-PH'])).toBe('fil');
     expect(pickLocale(['th-TH'])).toBe('th');
     expect(pickLocale(['de-DE', 'hi-IN'])).toBe('hi');
-    expect(pickLocale(['fr-FR', 'ja-JP'])).toBe('ja');
-    expect(pickLocale(['fr'])).toBe('en');
+    expect(pickLocale(['de-DE', 'ja-JP'])).toBe('ja');
+    expect(pickLocale(['de'])).toBe('en');
+    expect(pickLocale(['fr-CA'])).toBe('fr');
     expect(translate('ko', 'hintsLeft', { n: 3 })).toBe('힌트 3개');
   });
   test('모든 언어·캐릭터·상황에 대사가 있다', () => {

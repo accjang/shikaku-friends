@@ -90,6 +90,13 @@ export function fontKindFor(locale: Locale): 'jua' | 'nunito' {
   return JUA_LOCALES.includes(locale) ? 'jua' : 'nunito';
 }
 
+/** 글자를 하나씩 떼어 그려도 모양이 유지되는 언어(홈 제목 로고). 아랍·인도계·태국·히브리 문자는 단어 단위로. */
+const LETTER_TILE_LOCALES: readonly Locale[] = ['ko', 'en', 'ja', 'zh', 'zh-Hant', 'es', 'pt', 'fr', 'id', 'ms', 'vi', 'fil', 'tr', 'uk', 'sw'];
+
+export function letterTileFriendly(locale: Locale): boolean {
+  return LETTER_TILE_LOCALES.includes(locale);
+}
+
 export function translate(locale: Locale, key: StringKey, vars?: Record<string, string | number>): string {
   const raw = BUNDLES[locale]?.ui[key] ?? en.ui[key] ?? ko.ui[key];
   if (!vars) return raw;
