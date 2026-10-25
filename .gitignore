@@ -1,0 +1,37 @@
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native(expo prebuild 생성물 — 커밋하지 않는다)
+/ios
+/android
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.pem
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+
+# macOS
+.DS_Store
+
+# local env files(결제·광고 키)
+.env
+.env*.local
+
+*.tsbuildinfo
+__pycache__/
+tools/out/

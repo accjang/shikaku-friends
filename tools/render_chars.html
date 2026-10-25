@@ -1,0 +1,31 @@
+<!doctype html><html><body style="margin:0;background:transparent">
+<canvas id="c" width="768" height="768"></canvas>
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+const c = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({ canvas: c, alpha: true, antialias: true, preserveDrawingBuffer: true });
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.setClearColor(0x000000, 0);
+const scene = new THREE.Scene();
+scene.add(new THREE.HemisphereLight(0xffffff, 0xb0a8c0, 2.2));
+const sun = new THREE.DirectionalLight(0xffffff, 1.6); sun.position.set(2, 3, 4); scene.add(sun);
+const cam = new THREE.PerspectiveCamera(30, 1, 0.01, 100);
+window.render = async (name, yaw, pitch = 0.12) => {
+  const g = await new GLTFLoader().loadAsync('/assets/source/models/' + name + '.glb');
+  const m = g.scene; scene.add(m);
+  const box = new THREE.Box3().setFromObject(m);
+  const size = box.getSize(new THREE.Vector3());
+  m.position.sub(box.getCenter(new THREE.Vector3()));
+  const r = Math.max(size.x, size.y, size.z) * 0.5;
+  const dist = (r / Math.tan(THREE.MathUtils.degToRad(15))) * 1.05;
+  cam.position.set(Math.sin(yaw) * Math.cos(pitch) * dist, Math.sin(pitch) * dist, Math.cos(yaw) * Math.cos(pitch) * dist);
+  cam.lookAt(0, 0, 0);
+  renderer.render(scene, cam);
+  const url = c.toDataURL('image/png');
+  scene.remove(m);
+  return url;
+};
+window.ready = true;
+</script></body></html>
