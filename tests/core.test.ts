@@ -3,7 +3,7 @@ import { describe, expect, test } from '@jest/globals';
 import levelsJson from '../content/levels.json';
 import { shouldOfferAdFree, shouldShowInterstitial } from '../src/core/adPolicy';
 import { CHAPTERS, levelCount, levelId, levelOptions, parseLevelId } from '../src/core/chapters';
-import { AD_FREE_FIRST_CLEARS, AD_FREE_OFFER_AFTER_INTERSTITIALS, AD_INTERSTITIAL_EVERY, CHAPTER_UNLOCK_CLEARS, START_HINTS } from '../src/core/config';
+import { LEVEL_MAX_BRANCHES, AD_FREE_FIRST_CLEARS, AD_FREE_OFFER_AFTER_INTERSTITIALS, AD_INTERSTITIAL_EVERY, CHAPTER_UNLOCK_CLEARS, START_HINTS } from '../src/core/config';
 import { dailyPuzzle, dateKey, prevDateKey } from '../src/core/daily';
 import { applyHint, clearAll, newGame, place, removeAt, undo } from '../src/core/game';
 import { generate } from '../src/core/generator';
@@ -63,7 +63,7 @@ describe('생성기', () => {
     expect(isSolved(a!, a!.solution)).toBe(true);
   });
 
-  test('스테이지 90개: 크기가 챕터 정의와 같고, 정답이 맞고, 답이 하나뿐', () => {
+  test('스테이지 200개: 크기가 챕터 정의와 같고, 정답이 맞고, 답이 하나뿐', () => {
     let n = 0;
     for (const ch of CHAPTERS) {
       for (let lv = 1; lv <= levelCount(ch); lv++) {
@@ -77,7 +77,17 @@ describe('생성기', () => {
         n++;
       }
     }
-    expect(n).toBe(90);
+    expect(n).toBe(200);
+    expect(CHAPTERS.map((c) => c.character)).toEqual(['cat', 'panda', 'rabbit', 'shiba', 'duck']);
+  });
+
+  test('챕터 안에서 난이도가 오른다(뒤 10개 평균 갈림길 ≥ 앞 10개)', () => {
+    for (const ch of CHAPTERS) {
+      const d = Array.from({ length: levelCount(ch) }, (_, i) => levels[levelId(ch.id, i + 1)].d ?? 0);
+      const avg = (a: number[]): number => a.reduce((x, y) => x + y, 0) / a.length;
+      expect(avg(d.slice(-10))).toBeGreaterThan(avg(d.slice(0, 10)));
+      expect(Math.max(...d)).toBeLessThanOrEqual(LEVEL_MAX_BRANCHES);
+    }
   });
 
   test('오늘의 퍼즐은 날짜마다 정해져 있다', () => {
@@ -207,7 +217,7 @@ describe('문구', () => {
   });
   test('모든 언어·캐릭터·상황에 대사가 있다', () => {
     for (const l of LOCALES)
-      for (const c of ['cat', 'panda', 'rabbit'] as const)
+      for (const c of ['cat', 'panda', 'rabbit', 'shiba', 'duck'] as const)
         for (const m of ['start', 'good', 'bad', 'hint', 'clear'] as const) expect(characterLine(c, l, m, 7).length).toBeGreaterThan(0);
   });
   test('모든 언어에 모든 문구가 있다', () => {

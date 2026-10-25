@@ -1,4 +1,4 @@
-// 홈: 제목 + 세 친구(통통 튀며 숨 쉼) + 이어하기·스테이지·오늘의 퍼즐 + 별·힌트 수·설정.
+// 홈: 제목 + 다섯 친구(통통 튀며 숨 쉼) + 이어하기·스테이지·오늘의 퍼즐 + 별·힌트 수·설정.
 import { Ionicons } from '@expo/vector-icons';
 import { Redirect, router } from 'expo-router';
 import { useEffect } from 'react';
@@ -16,6 +16,9 @@ import { Pill, Screen } from '@/ui/Screen';
 import { colors, FONT, RECT_PALETTE, space } from '@/ui/theme';
 import { useT } from '@/ui/useT';
 
+/** 홈 친구들이 옆 친구와 겹치는 정도(다섯 명이 좁은 화면에 들어가게). */
+const FRIEND_OVERLAP = 5;
+
 function Bouncy({ id, pose, size, delay }: { id: CharacterId; pose: Pose; size: number; delay: number }) {
   const y = useSharedValue(0);
   useEffect(() => {
@@ -23,7 +26,7 @@ function Bouncy({ id, pose, size, delay }: { id: CharacterId; pose: Pose; size: 
   }, [delay, y]);
   const style = useAnimatedStyle(() => ({ transform: [{ translateY: y.value }] }));
   return (
-    <Animated.View style={style}>
+    <Animated.View style={[{ marginHorizontal: -FRIEND_OVERLAP }, style]}>
       <Pressable
         onPress={() => {
           playSfx('place');
@@ -79,9 +82,11 @@ export default function Home() {
         <Logo text={t('appName')} />
         <Text style={styles.tagline}>{t('tagline')}</Text>
         <View style={styles.friends}>
-          <Bouncy id="cat" pose="q" size={118} delay={0} />
-          <Bouncy id="panda" pose="front" size={150} delay={200} />
-          <Bouncy id="rabbit" pose="ql" size={118} delay={400} />
+          <Bouncy id="duck" pose="q" size={64} delay={600} />
+          <Bouncy id="cat" pose="q" size={82} delay={0} />
+          <Bouncy id="panda" pose="front" size={114} delay={200} />
+          <Bouncy id="rabbit" pose="ql" size={82} delay={400} />
+          <Bouncy id="shiba" pose="ql" size={74} delay={800} />
         </View>
       </View>
 

@@ -28,6 +28,8 @@ export const CHARACTER_THEME: Record<CharacterId, { main: string; soft: string; 
   cat: { main: '#B9B0DA', soft: '#ECE8F8', dark: '#7D70AE' },
   panda: { main: '#9ED9B5', soft: '#E3F5EA', dark: '#4E9E70' },
   rabbit: { main: '#FFB3C7', soft: '#FFE8EE', dark: '#E07597' },
+  shiba: { main: '#FFC48F', soft: '#FFF0E0', dark: '#D9792E' },
+  duck: { main: '#FFE27A', soft: '#FFF9DC', dark: '#C9A21A' },
 };
 
 export const radius = { sm: 10, md: 16, lg: 24, pill: 999 } as const;

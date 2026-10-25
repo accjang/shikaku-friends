@@ -34,18 +34,21 @@ export interface SolveResult {
   count: number;
   /** 첫 해답(clues 순서). 없으면 null. */
   first: Rect[] | null;
+  /** 탐색한 갈림길 수(선택지가 2개 이상인 단계). 0이면 매번 놓을 곳이 하나뿐이라 쉬운 퍼즐, 클수록 어렵다. */
+  branches: number;
 }
 
 export function solve(puzzle: Pick<Puzzle, 'w' | 'h' | 'clues'>, limit = 2): SolveResult {
   const { w: W, h: H, clues } = puzzle;
   const total = clues.reduce((s, c) => s + c.n, 0);
-  if (total !== W * H) return { count: 0, first: null };
+  if (total !== W * H) return { count: 0, first: null, branches: 0 };
 
   const grid = new Uint8Array(W * H);
   const cands = clues.map((_, i) => candidatesFor(puzzle, i));
   const chosen: (Rect | null)[] = clues.map(() => null);
   let count = 0;
   let first: Rect[] | null = null;
+  let branches = 0;
 
   const free = (r: Rect): boolean => {
     for (let y = r.y; y < r.y + r.h; y++) for (let x = r.x; x < r.x + r.w; x++) if (grid[y * W + x]) return false;
@@ -75,6 +78,7 @@ export function solve(puzzle: Pick<Puzzle, 'w' | 'h' | 'clues'>, limit = 2): Sol
       if (!first) first = chosen.map((r) => ({ ...(r as Rect) }));
       return;
     }
+    if (bestOpts.length > 1) branches++;
     for (const r of bestOpts) {
       fill(r, 1);
       chosen[best] = r;
@@ -86,5 +90,5 @@ export function solve(puzzle: Pick<Puzzle, 'w' | 'h' | 'clues'>, limit = 2): Sol
   };
 
   step();
-  return { count, first };
+  return { count, first, branches };
 }

@@ -61,8 +61,10 @@ fg.save(os.path.join(OUT, 'adaptive-icon.png'))
 
 # 스플래시(가운데 그림만, 배경색은 app.json)
 sp = Image.new('RGBA', (1024, 1024), (0, 0, 0, 0))
-for name, cx in [('cat_q.png', 0.24), ('panda_front.png', 0.5), ('rabbit_ql.png', 0.76)]:
-    paste_char(sp, name, 0.5 if 'panda' in name else 0.44, cx, 0.8)
+# 뒤줄: 고양이·판다·토끼, 앞줄: 오리·시바(조금 작게 앞에)
+for name, h, cx, bottom in [('cat_q.png', 0.4, 0.27, 0.72), ('panda_front.png', 0.46, 0.5, 0.7), ('rabbit_ql.png', 0.4, 0.73, 0.72),
+                            ('duck_q.png', 0.27, 0.35, 0.86), ('shiba_ql.png', 0.33, 0.65, 0.88)]:
+    paste_char(sp, name, h, cx, bottom)
 sp.save(os.path.join(OUT, 'splash.png'))
 Image.open(os.path.join(OUT, 'icon.png')).resize((48, 48), Image.LANCZOS).save(os.path.join(OUT, 'favicon.png'))
 print('ok')

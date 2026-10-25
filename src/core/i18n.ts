@@ -20,6 +20,8 @@ const ko = {
   chapterTitle1: '냥이의 방',
   chapterTitle2: '판다의 대나무숲',
   chapterTitle3: '토끼의 당근밭',
+  chapterTitle4: '시바의 산책길',
+  chapterTitle5: '오리의 연못',
   locked: '잠김',
   unlockHint: '앞 챕터에서 {n}개 클리어하면 열려요',
   stage: '스테이지 {id}',
@@ -86,6 +88,8 @@ const en: Dict = {
   chapterTitle1: "Kitty's Room",
   chapterTitle2: "Panda's Bamboo Grove",
   chapterTitle3: "Bunny's Carrot Patch",
+  chapterTitle4: "Shiba's Walking Trail",
+  chapterTitle5: "Duckling's Pond",
   locked: 'Locked',
   unlockHint: 'Clear {n} stages in the previous chapter to unlock',
   stage: 'Stage {id}',
@@ -149,6 +153,8 @@ const ja: Dict = {
   chapterTitle1: 'ネコのお部屋',
   chapterTitle2: 'パンダの竹林',
   chapterTitle3: 'ウサギのにんじん畑',
+  chapterTitle4: 'シバのおさんぽ道',
+  chapterTitle5: 'アヒルの池',
   locked: 'ロック中',
   unlockHint: '前のチャプターで{n}ステージクリアすると開きます',
   stage: 'ステージ {id}',
@@ -212,6 +218,8 @@ const zh: Dict = {
   chapterTitle1: '小猫的房间',
   chapterTitle2: '熊猫的竹林',
   chapterTitle3: '兔子的萝卜田',
+  chapterTitle4: '柴犬的散步小路',
+  chapterTitle5: '小鸭的池塘',
   locked: '未解锁',
   unlockHint: '在上一章通关{n}关即可解锁',
   stage: '关卡 {id}',
@@ -285,9 +293,11 @@ export const CHARACTER_NAMES: Record<CharacterId, Record<Locale, string>> = {
   cat: { ko: '냥이', en: 'Kitty', ja: 'ニャン', zh: '小猫' },
   panda: { ko: '판다', en: 'Panda', ja: 'パンダ', zh: '熊猫' },
   rabbit: { ko: '토끼', en: 'Bunny', ja: 'ウサギ', zh: '兔兔' },
+  shiba: { ko: '시바', en: 'Shiba', ja: 'シバ', zh: '柴柴' },
+  duck: { ko: '오리', en: 'Duckling', ja: 'アヒル', zh: '小鸭' },
 };
 
-// 냥이: 츤데레, 판다: 느긋, 토끼: 발랄
+// 냥이: 츤데레, 판다: 느긋, 토끼: 발랄, 시바: 의젓한 응원단장, 오리: 엉뚱·덜렁
 const LINES: Record<CharacterId, Record<Locale, Record<Mood, string[]>>> = {
   cat: {
     ko: {
@@ -377,6 +387,66 @@ const LINES: Record<CharacterId, Record<Locale, Record<Mood, string[]>>> = {
       bad: ['哎呀，数字和格子数不一样！', '呜哇，再来一次！'],
       hint: ['看这里，这里！'],
       clear: ['蹦蹦跳跳！完成啦！', '我们最棒了！'],
+    },
+  },
+  shiba: {
+    ko: {
+      start: ['멍! 오늘도 같이 힘내자!', '산책 가기 전에 한 판 어때?'],
+      good: ['멍멍! 딱 맞았어!', '역시 내 친구야!', '꼬리가 저절로 흔들려!'],
+      bad: ['킁킁… 칸 수가 안 맞는 냄새가 나.', '멍? 다시 세어 보자!'],
+      hint: ['내 코를 믿어 봐, 여기야!'],
+      clear: ['멍멍! 해냈다! 산책 가자!', '최고의 파트너야!'],
+    },
+    en: {
+      start: ["Woof! Let's do our best today!", 'One puzzle before our walk?'],
+      good: ['Woof woof! Perfect fit!', "That's my buddy!", "My tail won't stop wagging!"],
+      bad: ["Sniff sniff... that size smells wrong.", "Woof? Let's count again!"],
+      hint: ['Trust my nose, it\'s here!'],
+      clear: ["Woof! We did it! Walk time!", "Best partner ever!"],
+    },
+    ja: {
+      start: ['ワン！今日も一緒にがんばろう！', 'おさんぽ前に一問どう？'],
+      good: ['ワンワン！ぴったり！', 'さすが相棒！', 'しっぽが勝手に動いちゃう！'],
+      bad: ['クンクン…マスの数が合わないにおい。', 'ワン？もう一回数えよう！'],
+      hint: ['ぼくの鼻を信じて、ここだよ！'],
+      clear: ['ワンワン！できた！おさんぽ行こう！', '最高の相棒だね！'],
+    },
+    zh: {
+      start: ['汪！今天也一起加油！', '散步前来一局吧？'],
+      good: ['汪汪！刚刚好！', '不愧是我的搭档！', '尾巴停不下来了！'],
+      bad: ['嗅嗅…格子数好像不对。', '汪？再数一遍吧！'],
+      hint: ['相信我的鼻子，就在这里！'],
+      clear: ['汪汪！成功啦！去散步吧！', '最棒的搭档！'],
+    },
+  },
+  duck: {
+    ko: {
+      start: ['꽥! 나 이번엔 안 헷갈릴 거야!', '연못에 빠지기 전에 풀자, 꽥!'],
+      good: ['꽥꽥! 맞았다!', '우와, 어떻게 알았어?', '물장구 칠 만큼 기뻐!'],
+      bad: ['꽥?! 나도 헷갈렸어…', '앗, 숫자랑 칸 수가 달라, 꽥!'],
+      hint: ['여기 같아… 아마도? 꽥!'],
+      clear: ['꽥꽥꽥! 다 풀었다!', '연못에서 축하 수영하자!'],
+    },
+    en: {
+      start: ["Quack! I won't get confused this time!", "Let's solve it before I fall in the pond, quack!"],
+      good: ['Quack quack! Got it!', 'Whoa, how did you know?', "I'm so happy I could splash!"],
+      bad: ['Quack?! I got confused too...', "Oops, the size doesn't match, quack!"],
+      hint: ['I think it\'s here... maybe? Quack!'],
+      clear: ['Quack quack quack! All done!', "Let's celebrate with a swim!"],
+    },
+    ja: {
+      start: ['ガァ！今度はまちがえないぞ！', '池に落ちる前に解こう、ガァ！'],
+      good: ['ガァガァ！当たり！', 'わぁ、どうしてわかったの？', '水しぶきが上がるほどうれしい！'],
+      bad: ['ガァ？！ぼくもこんがらがった…', 'あっ、数字とマスの数が違う、ガァ！'],
+      hint: ['ここ…かも？ガァ！'],
+      clear: ['ガァガァガァ！全部解けた！', '池でお祝いの水泳だ！'],
+    },
+    zh: {
+      start: ['嘎！这次我不会搞混了！', '掉进池塘之前解开吧，嘎！'],
+      good: ['嘎嘎！对啦！', '哇，你怎么知道的？', '开心得想扑腾水花！'],
+      bad: ['嘎？！我也搞糊涂了…', '哎呀，数字和格子数不一样，嘎！'],
+      hint: ['大概在这里…吧？嘎！'],
+      clear: ['嘎嘎嘎！全部解完啦！', '去池塘游泳庆祝吧！'],
     },
   },
 };

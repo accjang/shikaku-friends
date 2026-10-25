@@ -7,7 +7,7 @@ ROOT = os.path.join(os.path.dirname(__file__), '..')
 OUT = os.path.join(ROOT, 'assets', 'chars')
 BODY_PX, HEAD_PX = 384, 160
 # 머리가 끝나는 높이(몸 전체 대비, 팔이 안 들어오게)
-HEAD_RATIO = {'cat': 0.64, 'panda': 0.58, 'rabbit': 0.71}
+HEAD_RATIO = {'cat': 0.64, 'panda': 0.58, 'rabbit': 0.71, 'shiba': 0.5, 'duck': 0.56}
 os.makedirs(OUT, exist_ok=True)
 
 def square(im, bottom=True):

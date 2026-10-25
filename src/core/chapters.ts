@@ -1,7 +1,7 @@
 // 챕터(캐릭터별 세계)와 스테이지 난이도 구간. 스테이지 퍼즐 자체는 tools/gen_levels.ts가 content/levels.json으로 만든다.
 import type { GenOptions } from './generator';
 
-export type CharacterId = 'cat' | 'panda' | 'rabbit';
+export type CharacterId = 'cat' | 'panda' | 'rabbit' | 'shiba' | 'duck';
 
 export interface LevelBand {
   /** 이 구간의 스테이지 수. */
@@ -17,36 +17,57 @@ export interface Chapter {
   bands: LevelBand[];
 }
 
+// 5챕터 × 40 = 200스테이지. 챕터 안에서는 판 크기와 함께 난이도(풀이기 갈림길 수)도 점점 오른다(tools/gen_levels.ts).
 export const CHAPTERS: readonly Chapter[] = [
   {
     id: 1,
     character: 'cat',
-    seedPrefix: 'cat-v1',
+    seedPrefix: 'cat-v2',
     bands: [
       { count: 6, options: { w: 5, h: 5, minArea: 2, maxArea: 6, maxSide: 4 } },
-      { count: 9, options: { w: 6, h: 6, minArea: 2, maxArea: 8, maxSide: 4 } },
-      { count: 9, options: { w: 7, h: 7, minArea: 2, maxArea: 9, maxSide: 5 } },
-      { count: 6, options: { w: 7, h: 8, minArea: 2, maxArea: 10, maxSide: 5 } },
+      { count: 12, options: { w: 6, h: 6, minArea: 2, maxArea: 8, maxSide: 4 } },
+      { count: 12, options: { w: 7, h: 7, minArea: 2, maxArea: 9, maxSide: 5 } },
+      { count: 10, options: { w: 7, h: 8, minArea: 2, maxArea: 10, maxSide: 5 } },
     ],
   },
   {
     id: 2,
     character: 'panda',
-    seedPrefix: 'panda-v1',
+    seedPrefix: 'panda-v2',
     bands: [
-      { count: 10, options: { w: 8, h: 8, minArea: 2, maxArea: 10, maxSide: 5 } },
-      { count: 10, options: { w: 8, h: 9, minArea: 2, maxArea: 12, maxSide: 6 } },
-      { count: 10, options: { w: 9, h: 10, minArea: 3, maxArea: 12, maxSide: 6 } },
+      { count: 14, options: { w: 8, h: 8, minArea: 2, maxArea: 10, maxSide: 5 } },
+      { count: 13, options: { w: 8, h: 9, minArea: 2, maxArea: 12, maxSide: 6 } },
+      { count: 13, options: { w: 9, h: 9, minArea: 2, maxArea: 12, maxSide: 6 } },
     ],
   },
   {
     id: 3,
     character: 'rabbit',
-    seedPrefix: 'rabbit-v1',
+    seedPrefix: 'rabbit-v2',
     bands: [
-      { count: 10, options: { w: 10, h: 10, minArea: 3, maxArea: 12, maxSide: 6 } },
-      { count: 10, options: { w: 10, h: 11, minArea: 3, maxArea: 14, maxSide: 6 } },
-      { count: 10, options: { w: 10, h: 12, minArea: 3, maxArea: 16, maxSide: 7 } },
+      { count: 14, options: { w: 9, h: 10, minArea: 3, maxArea: 12, maxSide: 6 } },
+      { count: 13, options: { w: 10, h: 10, minArea: 3, maxArea: 12, maxSide: 6 } },
+      { count: 13, options: { w: 10, h: 11, minArea: 3, maxArea: 14, maxSide: 6 } },
+    ],
+  },
+  {
+    id: 4,
+    character: 'shiba',
+    seedPrefix: 'shiba-v1',
+    bands: [
+      { count: 13, options: { w: 10, h: 11, minArea: 3, maxArea: 16, maxSide: 7 } },
+      { count: 14, options: { w: 10, h: 12, minArea: 3, maxArea: 16, maxSide: 7 } },
+      { count: 13, options: { w: 10, h: 12, minArea: 4, maxArea: 18, maxSide: 7 } },
+    ],
+  },
+  {
+    id: 5,
+    character: 'duck',
+    seedPrefix: 'duck-v1',
+    bands: [
+      { count: 13, options: { w: 10, h: 12, minArea: 4, maxArea: 20, maxSide: 8 } },
+      { count: 14, options: { w: 10, h: 13, minArea: 4, maxArea: 20, maxSide: 8 } },
+      { count: 13, options: { w: 10, h: 14, minArea: 4, maxArea: 24, maxSide: 8 } },
     ],
   },
 ];

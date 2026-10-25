@@ -1,7 +1,7 @@
 # 시카쿠 프렌즈 — Claude Code 작업 지침
 
 ## 프로젝트 개요
-숫자만큼 직사각형을 그리는 논리 퍼즐 "시카쿠" 모바일 게임. 술래잡기 게임(accjang/taggame-assets)의 고양이·판다·토끼 3D 모델을 렌더한 이미지를 캐릭터로 쓴다.
+숫자만큼 직사각형을 그리는 논리 퍼즐 "시카쿠" 모바일 게임. 술래잡기 게임(accjang/taggame-assets)의 고양이·판다·토끼·시바·오리 3D 모델을 렌더한 이미지를 캐릭터로 쓴다.
 App Store·Google Play 출시용. 스택은 렐로(accjang/relo-app)와 같다: **Expo SDK 57(React Native 0.86) + TypeScript strict + expo-router + zustand + AsyncStorage**, 광고 AdMob, 결제 RevenueCat.
 이름 "시카쿠 프렌즈"·번들 ID `app.shikakufriends.mobile` 확정, 수익은 무료+광고+광고 제거 1회 구매 ₩1,900/US$1.99(2026-10-25 사용자 결정).
 게임 설명·수익 모델은 `README.md`, 출시 순서는 `docs/RELEASE.md`.

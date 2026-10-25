@@ -1,5 +1,5 @@
 // content/levels.json의 압축 형식 ↔ Puzzle.
-// { w, h, c: [[x,y,n],...], s: [[x,y,w,h],...] } — c와 s는 같은 순서.
+// { w, h, c: [[x,y,n],...], s: [[x,y,w,h],...], d } — c와 s는 같은 순서.
 import type { Puzzle } from './puzzle';
 
 export interface PackedPuzzle {
@@ -7,6 +7,8 @@ export interface PackedPuzzle {
   h: number;
   c: [number, number, number][];
   s: [number, number, number, number][];
+  /** 난이도(풀이기 갈림길 수, tools/gen_levels.ts). 화면에는 쓰지 않는다. */
+  d?: number;
 }
 
 export function pack(p: Puzzle): PackedPuzzle {

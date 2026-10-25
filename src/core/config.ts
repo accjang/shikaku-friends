@@ -6,13 +6,19 @@ import type { GenOptions } from './generator';
 export const GEN_PARTITION_RETRIES = 400;
 /** 분할 하나에서 숫자 위치를 몇 번 바꿔 볼지. */
 export const GEN_CLUE_RETRIES = 30;
+/** 스테이지 하나를 고를 때 만들어 보는 후보 퍼즐 수(tools/gen_levels.ts). */
+export const LEVEL_POOL = 12;
+/** 이보다 갈림길이 많은 후보는 버린다(찍기만 많은 퍼즐은 재미가 없다). */
+export const LEVEL_MAX_BRANCHES = 400;
+/** 챕터 첫 스테이지·마지막 스테이지가 고르는 후보 난이도 순위(0=가장 쉬움, 1=가장 어려움). 사이는 직선으로 오른다. */
+export const LEVEL_DIFFICULTY_RAMP = { from: 0.1, to: 0.9 } as const;
 
 // ── 오늘의 퍼즐 ──
 export const DAILY_OPTIONS: GenOptions = { w: 8, h: 8, minArea: 2, maxArea: 10, maxSide: 5 };
 
 // ── 진행 ──
 /** 다음 챕터를 열려면 앞 챕터에서 깨야 하는 스테이지 수. */
-export const CHAPTER_UNLOCK_CLEARS = 20;
+export const CHAPTER_UNLOCK_CLEARS = 25;
 /** 처음 주는 힌트 수. */
 export const START_HINTS = 3;
 /** 오늘의 퍼즐을 깨면 주는 힌트. */

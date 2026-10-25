@@ -30,7 +30,7 @@ import { useT } from '@/ui/useT';
 import levelsJson from '../../content/levels.json';
 
 const LEVELS = levelsJson as unknown as Record<string, PackedPuzzle>;
-const DAILY_CHARACTERS: CharacterId[] = ['cat', 'panda', 'rabbit'];
+const DAILY_CHARACTERS: CharacterId[] = ['cat', 'panda', 'rabbit', 'shiba', 'duck'];
 
 interface Session {
   key: string;
@@ -47,7 +47,7 @@ function useSession(id: string, t: ReturnType<typeof useT>['t']): Session | null
     if (id === 'daily') {
       const key = dateKey(new Date());
       const day = Number(key.slice(-2));
-      return { key, puzzle: dailyPuzzle(key), character: DAILY_CHARACTERS[day % 3], title: t('daily'), kind: 'daily', chapter: 0, level: 0 };
+      return { key, puzzle: dailyPuzzle(key), character: DAILY_CHARACTERS[day % DAILY_CHARACTERS.length], title: t('daily'), kind: 'daily', chapter: 0, level: 0 };
     }
     const parsed = parseLevelId(id);
     const packed = LEVELS[id];
