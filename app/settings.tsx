@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import { Alert, Linking, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 
 import { ADFREE_BONUS_HINTS, PRIVACY_POLICY_URL, SUPPORT_EMAIL } from '@/core/config';
-import { LOCALES, LOCALE_NAMES } from '@/core/i18n';
+import { LOCALE_NAMES } from '@/core/i18n';
 import { refreshAdPrivacyOptions, showAdPrivacyOptions, useAdStore } from '@/data/ads';
 import { buyAdFree, restorePurchases, usePurchaseStore } from '@/data/purchases';
 import { useSettingsStore } from '@/data/settingsStore';
@@ -35,6 +35,7 @@ function Row({ icon, label, right, onPress }: { icon: keyof typeof Ionicons.glyp
 export default function Settings() {
   const { t } = useT();
   const locale = useLocale();
+  const chosenLocale = useSettingsStore((st) => st.locale);
   const { sound, haptics, patch } = useSettingsStore();
   const { adFree, mode, price, busy } = usePurchaseStore();
   const privacyOptions = useAdStore((s) => s.privacyOptionsRequired);
@@ -51,13 +52,21 @@ export default function Settings() {
           <Row icon="phone-portrait" label={t('haptics')} right={<Switch value={haptics} onValueChange={(v) => patch({ haptics: v })} trackColor={{ true: colors.primary }} />} />
         </View>
 
-        <Text style={styles.section}>{t('language')}</Text>
-        <View style={[styles.card, styles.langs]}>
-          {LOCALES.map((l) => (
-            <Pressable key={l} onPress={() => patch({ locale: l })} style={[styles.lang, l === locale && styles.langOn]}>
-              <Text style={[styles.langText, l === locale && { color: colors.white }]}>{LOCALE_NAMES[l]}</Text>
-            </Pressable>
-          ))}
+        <View style={styles.card}>
+          <Row
+            icon="language"
+            label={t('language')}
+            onPress={() => router.push('/language')}
+            right={
+              <View style={styles.langRight}>
+                <Text style={styles.langValue}>
+                  {chosenLocale === null ? '📱 ' : ''}
+                  {LOCALE_NAMES[locale]}
+                </Text>
+                <Ionicons name="chevron-forward" size={18} color={colors.inkSoft} />
+              </View>
+            }
+          />
         </View>
 
         {mode !== 'disabled' ? (
@@ -113,9 +122,7 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: space.lg, minHeight: 56, gap: space.md },
   rowLabel: { flex: 1, fontFamily: FONT.round, fontSize: 17, color: colors.ink },
   section: { fontFamily: FONT.round, fontSize: 15, color: colors.inkSoft, marginLeft: space.sm, marginBottom: -space.xs },
-  langs: { flexDirection: 'row', flexWrap: 'wrap', padding: space.sm, gap: space.sm },
-  lang: { paddingHorizontal: space.lg, paddingVertical: space.sm, borderRadius: 999, backgroundColor: colors.bg },
-  langOn: { backgroundColor: colors.primary },
-  langText: { fontFamily: FONT.round, fontSize: 16, color: colors.ink },
+  langRight: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  langValue: { fontFamily: FONT.round, fontSize: 15, color: colors.inkSoft },
   version: { textAlign: 'center', fontFamily: FONT.round, color: colors.inkSoft, marginTop: space.md },
 });

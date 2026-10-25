@@ -35,8 +35,8 @@ export const CHARACTER_THEME: Record<CharacterId, { main: string; soft: string; 
 export const radius = { sm: 10, md: 16, lg: 24, pill: 999 } as const;
 export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 } as const;
 
-/** 둥근 글꼴(Jua, OFL). 한글·영문·숫자에 쓰고, 없는 글자(일·중)는 시스템 글꼴로 대신 그린다. */
-export const FONT = { round: 'Jua_400Regular' } as const;
+/** 둥근 글꼴 이름. 실제 파일은 언어에 따라 Jua 또는 Nunito(src/ui/fonts.ts, 둘 다 OFL). 없는 글자는 기기 글꼴로 대신 그린다. */
+export const FONT = { round: 'Round' } as const;
 
 export const shadow = {
   shadowColor: '#7A5C8C',

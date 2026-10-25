@@ -1,552 +1,147 @@
-// 문구(ko/en/ja/zh). 키가 빠진 언어는 영어 → 한국어 순으로 대신 쓴다. {name} 자리에 값을 넣는다.
+// 문구 등록부. 언어마다 src/core/locales/<코드>.ts 한 파일(UI 문구·캐릭터 이름·대사·소품 이름).
+// 기준은 한국어(ko.ts의 KO_UI) — 다른 언어는 같은 키를 모두 가져야 한다(LocaleBundle 타입이 강제).
+// 앱 언어는 기기 언어를 따른다(pickLocale). 지원하지 않는 언어면 영어.
 import type { CharacterId } from './chapters';
+import { ar } from './locales/ar';
+import { bn } from './locales/bn';
+import { en } from './locales/en';
+import { es } from './locales/es';
+import { fil } from './locales/fil';
+import { fr } from './locales/fr';
+import { gu } from './locales/gu';
+import { he } from './locales/he';
+import { hi } from './locales/hi';
+import { id } from './locales/id';
+import { ja } from './locales/ja';
+import { kn } from './locales/kn';
+import { ko, KO_UI } from './locales/ko';
+import { ml } from './locales/ml';
+import { mr } from './locales/mr';
+import { ms } from './locales/ms';
+import { pa } from './locales/pa';
+import { pt } from './locales/pt';
+import { sw } from './locales/sw';
+import { ta } from './locales/ta';
+import { te } from './locales/te';
+import { th } from './locales/th';
+import { tr } from './locales/tr';
+import { uk } from './locales/uk';
+import { ur } from './locales/ur';
+import { vi } from './locales/vi';
+import { zh } from './locales/zh';
+import { zhHant } from './locales/zh-Hant';
 import type { PropId } from './village';
 
-export type Locale = 'ko' | 'en' | 'ja' | 'zh';
-export const LOCALES: readonly Locale[] = ['ko', 'en', 'ja', 'zh'];
-export const LOCALE_NAMES: Record<Locale, string> = { ko: '한국어', en: 'English', ja: '日本語', zh: '简体中文' };
+export type StringKey = keyof typeof KO_UI;
+export type Mood = 'start' | 'good' | 'bad' | 'hint' | 'clear';
 
-const ko = {
-  appName: '시카쿠 프렌즈',
-  tagline: '숫자만큼 네모를 그려요',
-  village: '마을',
-  villageTitle: '친구들의 마을',
-  villageNext: '다음 소품까지 {n}스테이지',
-  villageDone: '마을을 다 꾸몄어요!',
-  villageTap: '친구나 소품을 눌러 보세요',
-  companion: '함께 다닐 친구',
-  companionAuto: '자동',
-  companionLocked: '{name}은(는) 챕터 {n}이 열리면 와요',
-  villageLocked: '스테이지 {n}개를 깨면 생겨요',
-  newProp: '새 소품을 얻었어요: {name}',
-  share: '자랑하기',
-  shareDailyTitle: '시카쿠 프렌즈 오늘의 퍼즐 #{n}',
-  shareStageTitle: '시카쿠 프렌즈 스테이지 {id} 클리어!',
-  play: '이어하기',
-  playFirst: '시작하기',
-  stages: '스테이지',
-  daily: '오늘의 퍼즐',
-  dailyDone: '오늘 완료!',
-  streak: '{n}일 연속',
-  settings: '설정',
-  howTo: '게임 방법',
-  chapter: '챕터 {n}',
-  chapterTitle1: '냥이의 방',
-  chapterTitle2: '판다의 대나무숲',
-  chapterTitle3: '토끼의 당근밭',
-  chapterTitle4: '시바의 산책길',
-  chapterTitle5: '오리의 연못',
-  locked: '잠김',
-  unlockHint: '앞 챕터에서 {n}개 클리어하면 열려요',
-  stage: '스테이지 {id}',
-  hints: '힌트',
-  hintsLeft: '힌트 {n}개',
-  undo: '되돌리기',
-  reset: '처음부터',
-  resetConfirm: '판을 비울까요?',
-  cancel: '취소',
-  ok: '확인',
-  clear: '클리어!',
-  time: '시간',
-  best: '최고 기록',
-  newBest: '신기록!',
-  next: '다음 스테이지',
-  retry: '다시 하기',
-  toStages: '스테이지 목록',
-  home: '홈',
-  chapterUnlocked: '새 챕터가 열렸어요!',
-  dailyReward: '연속 {d}일째! 힌트 +{n}',
-  dailyNext: '오늘 깨면 힌트 +{n}',
-  streakTrack: '7일 연속 보상',
-  noHints: '힌트가 없어요',
-  watchAd: '광고 보고 힌트 {n}개 받기',
-  adNotReady: '지금은 광고를 불러올 수 없어요. 잠시 후 다시 해 주세요.',
-  removeAds: '광고 제거',
-  removeAdsDesc: '전면 광고가 사라지고 힌트 {n}개를 드려요',
-  restore: '구매 복원',
-  restored: '구매를 복원했어요',
-  nothingToRestore: '복원할 구매가 없어요',
-  purchased: '구매 완료! 고마워요',
-  purchaseFailed: '구매하지 못했어요',
-  adFreeOn: '광고 제거됨',
-  sound: '효과음',
-  haptics: '진동',
-  language: '언어',
-  privacy: '개인정보처리방침',
-  adPrivacy: '광고 개인정보 옵션',
-  contact: '문의하기',
-  version: '버전 {v}',
-  rule1: '판을 네모(직사각형)로 나눠요.',
-  rule2: '네모 하나에는 숫자가 딱 하나 들어가요.',
-  rule3: '숫자 = 그 네모의 칸 수예요.',
-  ruleDrag: '칸을 드래그해서 네모를 그리고, 네모를 탭하면 지워져요.',
-  tutorialTitle: '연습해 볼까요?',
-  tutorialDone: '좋아요! 이제 진짜 시작!',
-  start: '시작',
-  skip: '건너뛰기',
-} as const;
+export interface LocaleBundle {
+  /** 언어 목록에 보이는 이름(그 언어로). */
+  name: string;
+  ui: Record<StringKey, string>;
+  names: Record<CharacterId, string>;
+  /** 캐릭터 대사(상황마다 1개 이상). 냥이 츤데레, 판다 느긋, 토끼 발랄, 시바 의젓한 응원단장, 오리 엉뚱·덜렁. */
+  lines: Record<CharacterId, Record<Mood, string[]>>;
+  props: Record<PropId, string>;
+}
 
-export type StringKey = keyof typeof ko;
-type Dict = Partial<Record<StringKey, string>>;
+/** 언어 목록 순서(설정 화면). 유럽(EEA·영국)·중국 본토 출시 제외 방침에 맞춰 그 밖의 시장 언어를 넣었다. */
+const BUNDLES = {
+  ko,
+  en,
+  ja,
+  zh,
+  'zh-Hant': zhHant,
+  es,
+  pt,
+  fr,
+  id,
+  ms,
+  th,
+  vi,
+  fil,
+  hi,
+  bn,
+  ta,
+  te,
+  mr,
+  gu,
+  kn,
+  ml,
+  pa,
+  ur,
+  ar,
+  he,
+  tr,
+  uk,
+  sw,
+} satisfies Record<string, LocaleBundle>;
 
-const en: Dict = {
-  appName: 'Shikaku Friends',
-  tagline: 'Draw boxes that match the numbers',
-  village: 'Village',
-  villageTitle: "Friends' Village",
-  villageNext: '{n} more stages to the next item',
-  villageDone: 'Your village is complete!',
-  villageTap: 'Tap a friend or an item',
-  companion: 'Your buddy',
-  companionAuto: 'Auto',
-  companionLocked: '{name} arrives when Chapter {n} opens',
-  villageLocked: 'Appears after clearing {n} stages',
-  newProp: 'New item: {name}',
-  share: 'Share',
-  shareDailyTitle: 'Shikaku Friends Daily #{n}',
-  shareStageTitle: 'Shikaku Friends — Stage {id} cleared!',
-  play: 'Continue',
-  playFirst: 'Start',
-  stages: 'Stages',
-  daily: 'Daily Puzzle',
-  dailyDone: 'Done today!',
-  streak: '{n}-day streak',
-  settings: 'Settings',
-  howTo: 'How to play',
-  chapter: 'Chapter {n}',
-  chapterTitle1: "Kitty's Room",
-  chapterTitle2: "Panda's Bamboo Grove",
-  chapterTitle3: "Bunny's Carrot Patch",
-  chapterTitle4: "Shiba's Walking Trail",
-  chapterTitle5: "Duckling's Pond",
-  locked: 'Locked',
-  unlockHint: 'Clear {n} stages in the previous chapter to unlock',
-  stage: 'Stage {id}',
-  hints: 'Hints',
-  hintsLeft: '{n} hints',
-  undo: 'Undo',
-  reset: 'Restart',
-  resetConfirm: 'Clear the board?',
-  cancel: 'Cancel',
-  ok: 'OK',
-  clear: 'Clear!',
-  time: 'Time',
-  best: 'Best',
-  newBest: 'New record!',
-  next: 'Next stage',
-  retry: 'Play again',
-  toStages: 'Stage list',
-  home: 'Home',
-  chapterUnlocked: 'A new chapter is open!',
-  dailyReward: 'Day {d} streak! +{n} hints',
-  dailyNext: 'Clear today for +{n} hints',
-  streakTrack: '7-day streak rewards',
-  noHints: 'No hints left',
-  watchAd: 'Watch an ad for {n} hints',
-  adNotReady: "Couldn't load an ad right now. Please try again later.",
-  removeAds: 'Remove ads',
-  removeAdsDesc: 'No more full-screen ads, plus {n} hints',
-  restore: 'Restore purchases',
-  restored: 'Purchases restored',
-  nothingToRestore: 'Nothing to restore',
-  purchased: 'Thank you for your purchase!',
-  purchaseFailed: "The purchase didn't go through",
-  adFreeOn: 'Ads removed',
-  sound: 'Sound effects',
-  haptics: 'Vibration',
-  language: 'Language',
-  privacy: 'Privacy policy',
-  adPrivacy: 'Ad privacy options',
-  contact: 'Contact us',
-  version: 'Version {v}',
-  rule1: 'Divide the board into rectangles.',
-  rule2: 'Each rectangle holds exactly one number.',
-  rule3: 'The number = how many cells the rectangle covers.',
-  ruleDrag: 'Drag across cells to draw. Tap a rectangle to erase it.',
-  tutorialTitle: "Let's practice!",
-  tutorialDone: "Great! Let's begin!",
-  start: 'Start',
-  skip: 'Skip',
-};
+export type Locale = keyof typeof BUNDLES;
+export const LOCALES = Object.keys(BUNDLES) as Locale[];
+export const LOCALE_NAMES = Object.fromEntries(LOCALES.map((l) => [l, BUNDLES[l].name])) as Record<Locale, string>;
+/** 오른쪽에서 왼쪽으로 쓰는 언어(글자는 기기가 알아서 RTL로 그린다. 화면 배치는 그대로). */
+export const RTL_LOCALES: readonly Locale[] = ['ar', 'he', 'ur'];
 
-const ja: Dict = {
-  appName: 'シカクフレンズ',
-  tagline: '数字の数だけ四角を描こう',
-  village: 'むら',
-  villageTitle: 'なかまのむら',
-  villageNext: '次のアイテムまであと{n}ステージ',
-  villageDone: 'むらが完成しました！',
-  villageTap: 'なかまやアイテムをタップしてね',
-  companion: 'いっしょに行くなかま',
-  companionAuto: 'おまかせ',
-  companionLocked: '{name}はチャプター{n}が開くと来るよ',
-  villageLocked: '{n}ステージクリアで登場',
-  newProp: '新しいアイテム：{name}',
-  share: 'シェア',
-  shareDailyTitle: 'シカクフレンズ 今日のパズル #{n}',
-  shareStageTitle: 'シカクフレンズ ステージ{id}クリア！',
-  play: 'つづきから',
-  playFirst: 'はじめる',
-  stages: 'ステージ',
-  daily: '今日のパズル',
-  dailyDone: '今日はクリア！',
-  streak: '{n}日連続',
-  settings: '設定',
-  howTo: '遊び方',
-  chapter: 'チャプター {n}',
-  chapterTitle1: 'ネコのお部屋',
-  chapterTitle2: 'パンダの竹林',
-  chapterTitle3: 'ウサギのにんじん畑',
-  chapterTitle4: 'シバのおさんぽ道',
-  chapterTitle5: 'アヒルの池',
-  locked: 'ロック中',
-  unlockHint: '前のチャプターで{n}ステージクリアすると開きます',
-  stage: 'ステージ {id}',
-  hints: 'ヒント',
-  hintsLeft: 'ヒント {n}',
-  undo: '戻す',
-  reset: 'やり直し',
-  resetConfirm: '盤面を消しますか？',
-  cancel: 'キャンセル',
-  ok: 'OK',
-  clear: 'クリア！',
-  time: 'タイム',
-  best: 'ベスト',
-  newBest: '新記録！',
-  next: '次のステージ',
-  retry: 'もう一度',
-  toStages: 'ステージ一覧',
-  home: 'ホーム',
-  chapterUnlocked: '新しいチャプターが開きました！',
-  dailyReward: '{d}日連続！ヒント +{n}',
-  dailyNext: '今日クリアでヒント +{n}',
-  streakTrack: '7日連続ボーナス',
-  noHints: 'ヒントがありません',
-  watchAd: '広告を見てヒント{n}個もらう',
-  adNotReady: '広告を読み込めませんでした。しばらくしてからお試しください。',
-  removeAds: '広告を削除',
-  removeAdsDesc: '全画面広告がなくなり、ヒント{n}個つき',
-  restore: '購入を復元',
-  restored: '購入を復元しました',
-  nothingToRestore: '復元する購入はありません',
-  purchased: 'ご購入ありがとうございます！',
-  purchaseFailed: '購入できませんでした',
-  adFreeOn: '広告削除済み',
-  sound: '効果音',
-  haptics: '振動',
-  language: '言語',
-  privacy: 'プライバシーポリシー',
-  adPrivacy: '広告のプライバシー設定',
-  contact: 'お問い合わせ',
-  version: 'バージョン {v}',
-  rule1: '盤面を長方形に分けます。',
-  rule2: '長方形には数字がちょうど1つ入ります。',
-  rule3: '数字 = その長方形のマスの数です。',
-  ruleDrag: 'マスをドラッグして描き、長方形をタップで消します。',
-  tutorialTitle: '練習してみよう！',
-  tutorialDone: 'いいね！本番スタート！',
-  start: 'スタート',
-  skip: 'スキップ',
-};
+/** Jua(한글·기본 영문)로 충분한 언어. 나머지는 Nunito(악센트 라틴·베트남어·키릴, src/ui/fonts.ts). */
+const JUA_LOCALES: readonly Locale[] = ['ko', 'en', 'ja', 'zh', 'zh-Hant', 'id', 'ms', 'fil', 'sw'];
 
-const zh: Dict = {
-  appName: '方块朋友',
-  tagline: '按数字画出方块',
-  village: '村庄',
-  villageTitle: '朋友们的村庄',
-  villageNext: '再过{n}关获得下一个道具',
-  villageDone: '村庄装饰完成啦！',
-  villageTap: '点点朋友或道具试试',
-  companion: '同行的朋友',
-  companionAuto: '自动',
-  companionLocked: '{name}会在第{n}章解锁后到来',
-  villageLocked: '通关{n}关后出现',
-  newProp: '获得新道具：{name}',
-  share: '分享',
-  shareDailyTitle: '方块朋友 每日谜题 #{n}',
-  shareStageTitle: '方块朋友 第{id}关通关！',
-  play: '继续',
-  playFirst: '开始',
-  stages: '关卡',
-  daily: '每日谜题',
-  dailyDone: '今日已完成！',
-  streak: '连续{n}天',
-  settings: '设置',
-  howTo: '玩法',
-  chapter: '第{n}章',
-  chapterTitle1: '小猫的房间',
-  chapterTitle2: '熊猫的竹林',
-  chapterTitle3: '兔子的萝卜田',
-  chapterTitle4: '柴犬的散步小路',
-  chapterTitle5: '小鸭的池塘',
-  locked: '未解锁',
-  unlockHint: '在上一章通关{n}关即可解锁',
-  stage: '关卡 {id}',
-  hints: '提示',
-  hintsLeft: '提示 {n}',
-  undo: '撤销',
-  reset: '重来',
-  resetConfirm: '清空棋盘吗？',
-  cancel: '取消',
-  ok: '确定',
-  clear: '通关！',
-  time: '用时',
-  best: '最佳',
-  newBest: '新纪录！',
-  next: '下一关',
-  retry: '再玩一次',
-  toStages: '关卡列表',
-  home: '首页',
-  chapterUnlocked: '新章节已解锁！',
-  dailyReward: '连续第{d}天！提示 +{n}',
-  dailyNext: '今天通关得提示 +{n}',
-  streakTrack: '7天连续奖励',
-  noHints: '没有提示了',
-  watchAd: '看广告获得{n}个提示',
-  adNotReady: '暂时无法加载广告，请稍后再试。',
-  removeAds: '去除广告',
-  removeAdsDesc: '不再显示全屏广告，并赠送{n}个提示',
-  restore: '恢复购买',
-  restored: '已恢复购买',
-  nothingToRestore: '没有可恢复的购买',
-  purchased: '感谢购买！',
-  purchaseFailed: '购买未完成',
-  adFreeOn: '已去除广告',
-  sound: '音效',
-  haptics: '振动',
-  language: '语言',
-  privacy: '隐私政策',
-  adPrivacy: '广告隐私选项',
-  contact: '联系我们',
-  version: '版本 {v}',
-  rule1: '把棋盘分成若干长方形。',
-  rule2: '每个长方形里正好有一个数字。',
-  rule3: '数字 = 该长方形的格子数。',
-  ruleDrag: '拖动格子来画长方形，点击长方形可擦除。',
-  tutorialTitle: '先练习一下吧！',
-  tutorialDone: '太棒了！正式开始！',
-  start: '开始',
-  skip: '跳过',
-};
-
-const DICTS: Record<Locale, Dict> = { ko, en, ja, zh };
+export function fontKindFor(locale: Locale): 'jua' | 'nunito' {
+  return JUA_LOCALES.includes(locale) ? 'jua' : 'nunito';
+}
 
 export function translate(locale: Locale, key: StringKey, vars?: Record<string, string | number>): string {
-  const raw = DICTS[locale][key] ?? en[key] ?? ko[key];
+  const raw = BUNDLES[locale]?.ui[key] ?? en.ui[key] ?? ko.ui[key];
   if (!vars) return raw;
   return raw.replace(/\{(\w+)\}/g, (_, k: string) => (k in vars ? String(vars[k]) : `{${k}}`));
 }
 
-/** 기기 언어 태그(예: "ko-KR", "zh-Hans-CN") → 지원 언어. 모르면 영어. */
+/** 옛 언어 코드 → 지금 코드. */
+const ALIASES: Record<string, Locale> = { iw: 'he', in: 'id', tl: 'fil', fil: 'fil' };
+const TRADITIONAL_REGIONS = ['tw', 'hk', 'mo'];
+
+/** 기기 언어 태그(예: "ko-KR", "zh-Hant-TW", "pt-BR") → 지원 언어. 모르면 영어. */
 export function pickLocale(tags: readonly string[]): Locale {
   for (const tag of tags) {
-    const base = tag.toLowerCase().split(/[-_]/)[0];
-    if ((LOCALES as readonly string[]).includes(base)) return base as Locale;
+    const parts = tag.toLowerCase().split(/[-_]/);
+    const base = parts[0];
+    if (base === 'zh') return parts.includes('hant') || parts.some((p) => TRADITIONAL_REGIONS.includes(p)) ? 'zh-Hant' : 'zh';
+    if (base in ALIASES) return ALIASES[base];
+    if ((LOCALES as string[]).includes(base)) return base as Locale;
   }
   return 'en';
 }
 
-// ── 캐릭터 이름·대사 ──
+// ── 캐릭터 이름·대사, 소품 이름 ──
 
-export type Mood = 'start' | 'good' | 'bad' | 'hint' | 'clear';
+function byLocale<K extends string>(pick: (b: LocaleBundle) => Record<K, string>, keys: readonly K[]): Record<K, Record<Locale, string>> {
+  return Object.fromEntries(keys.map((k) => [k, Object.fromEntries(LOCALES.map((l) => [l, pick(BUNDLES[l])[k]]))])) as Record<
+    K,
+    Record<Locale, string>
+  >;
+}
 
-export const CHARACTER_NAMES: Record<CharacterId, Record<Locale, string>> = {
-  cat: { ko: '냥이', en: 'Kitty', ja: 'ニャン', zh: '小猫' },
-  panda: { ko: '판다', en: 'Panda', ja: 'パンダ', zh: '熊猫' },
-  rabbit: { ko: '토끼', en: 'Bunny', ja: 'ウサギ', zh: '兔兔' },
-  shiba: { ko: '시바', en: 'Shiba', ja: 'シバ', zh: '柴柴' },
-  duck: { ko: '오리', en: 'Duckling', ja: 'アヒル', zh: '小鸭' },
-};
-
-// 냥이: 츤데레, 판다: 느긋, 토끼: 발랄, 시바: 의젓한 응원단장, 오리: 엉뚱·덜렁
-const LINES: Record<CharacterId, Record<Locale, Record<Mood, string[]>>> = {
-  cat: {
-    ko: {
-      start: ['흥, 풀 수 있겠어?', '이 정도는 쉽다냥.'],
-      good: ['…제법인걸.', '나쁘지 않다냥.', '흥, 우연이겠지.'],
-      bad: ['숫자랑 칸 수가 안 맞잖아.', '그건 아니다냥.'],
-      hint: ['이번만 알려주는 거다냥.'],
-      clear: ['…잘했어. 조금은.', '흥! 칭찬해 줄게.'],
-    },
-    en: {
-      start: ['Hmph. Think you can solve it?', 'This one is easy, meow.'],
-      good: ['...Not bad.', 'Hmph, lucky guess.', 'Acceptable, meow.'],
-      bad: ["The number and size don't match.", 'Nope, meow.'],
-      hint: ["Just this once, meow."],
-      clear: ['...Well done. A little.', 'Hmph! I suppose that was good.'],
-    },
-    ja: {
-      start: ['ふん、解けるのかニャ？', 'これくらい簡単だニャ。'],
-      good: ['…なかなかやるニャ。', 'ふん、まぐれだニャ。'],
-      bad: ['数字とマスの数が合ってないニャ。', 'それは違うニャ。'],
-      hint: ['今回だけ教えてやるニャ。'],
-      clear: ['…よくやったニャ。少しだけ。', 'ふん！ほめてやるニャ。'],
-    },
-    zh: {
-      start: ['哼，你能解开吗？', '这点小事喵。'],
-      good: ['…还不错嘛。', '哼，运气好而已喵。'],
-      bad: ['数字和格子数不对喵。', '不是这样喵。'],
-      hint: ['就告诉你这一次喵。'],
-      clear: ['…做得好。一点点。', '哼！就夸你一下喵。'],
-    },
-  },
-  panda: {
-    ko: {
-      start: ['천천히 해도 돼~', '대나무 먹으면서 풀어볼까?'],
-      good: ['오, 딱 맞아!', '좋아~ 그거야.', '음~ 깔끔해.'],
-      bad: ['음… 다시 볼까?', '숫자를 한 번 더 세어 봐~'],
-      hint: ['여기부터 해 보자~'],
-      clear: ['와~ 다 했다! 냠냠 축하해!', '최고야~'],
-    },
-    en: {
-      start: ['Take your time~', 'Shall we solve it over some bamboo?'],
-      good: ['Oh, perfect fit!', "Nice~ that's it.", 'Mm, so tidy.'],
-      bad: ['Hmm... look again?', 'Count the cells once more~'],
-      hint: ["Let's start here~"],
-      clear: ['Yay~ all done! Munch munch!', "You're the best~"],
-    },
-    ja: {
-      start: ['ゆっくりでいいよ〜', '竹を食べながら解こうか？'],
-      good: ['おっ、ぴったり！', 'いいね〜それそれ。'],
-      bad: ['うーん…もう一回見てみよう？', 'マスをもう一度数えてみて〜'],
-      hint: ['ここから始めよう〜'],
-      clear: ['わ〜い、できた！もぐもぐおめでとう！', '最高〜'],
-    },
-    zh: {
-      start: ['慢慢来~', '边吃竹子边解吧？'],
-      good: ['哦，刚刚好！', '不错~就是这样。'],
-      bad: ['嗯…再看看？', '再数一遍格子吧~'],
-      hint: ['从这里开始吧~'],
-      clear: ['哇~完成啦！吧唧吧唧恭喜！', '最棒了~'],
-    },
-  },
-  rabbit: {
-    ko: {
-      start: ['좋아좋아, 시작이다!', '깡총! 같이 풀자!'],
-      good: ['좋아좋아!', '깡총! 정답!', '와, 대단해!'],
-      bad: ['앗, 숫자랑 칸 수가 달라!', '으앗, 다시 해 보자!'],
-      hint: ['여기 봐, 여기!'],
-      clear: ['깡총깡총! 완성이다!', '우리 최고야!'],
-    },
-    en: {
-      start: ["Yay, let's go!", "Hop hop! Let's solve it together!"],
-      good: ['Yes yes!', 'Hop! Correct!', 'Wow, amazing!'],
-      bad: ["Oops, that size doesn't match!", "Eek, let's try again!"],
-      hint: ['Look here, here!'],
-      clear: ['Hop hop! Finished!', "We're the best!"],
-    },
-    ja: {
-      start: ['よーし、スタート！', 'ぴょん！一緒に解こう！'],
-      good: ['いいね いいね！', 'ぴょん！正解！'],
-      bad: ['あっ、数字とマスの数が違う！', 'うわっ、もう一回！'],
-      hint: ['ここ見て、ここ！'],
-      clear: ['ぴょんぴょん！完成！', 'わたしたち最高！'],
-    },
-    zh: {
-      start: ['好耶，开始啦！', '蹦蹦！一起解吧！'],
-      good: ['好耶好耶！', '蹦！答对了！'],
-      bad: ['哎呀，数字和格子数不一样！', '呜哇，再来一次！'],
-      hint: ['看这里，这里！'],
-      clear: ['蹦蹦跳跳！完成啦！', '我们最棒了！'],
-    },
-  },
-  shiba: {
-    ko: {
-      start: ['멍! 오늘도 같이 힘내자!', '산책 가기 전에 한 판 어때?'],
-      good: ['멍멍! 딱 맞았어!', '역시 내 친구야!', '꼬리가 저절로 흔들려!'],
-      bad: ['킁킁… 칸 수가 안 맞는 냄새가 나.', '멍? 다시 세어 보자!'],
-      hint: ['내 코를 믿어 봐, 여기야!'],
-      clear: ['멍멍! 해냈다! 산책 가자!', '최고의 파트너야!'],
-    },
-    en: {
-      start: ["Woof! Let's do our best today!", 'One puzzle before our walk?'],
-      good: ['Woof woof! Perfect fit!', "That's my buddy!", "My tail won't stop wagging!"],
-      bad: ["Sniff sniff... that size smells wrong.", "Woof? Let's count again!"],
-      hint: ['Trust my nose, it\'s here!'],
-      clear: ["Woof! We did it! Walk time!", "Best partner ever!"],
-    },
-    ja: {
-      start: ['ワン！今日も一緒にがんばろう！', 'おさんぽ前に一問どう？'],
-      good: ['ワンワン！ぴったり！', 'さすが相棒！', 'しっぽが勝手に動いちゃう！'],
-      bad: ['クンクン…マスの数が合わないにおい。', 'ワン？もう一回数えよう！'],
-      hint: ['ぼくの鼻を信じて、ここだよ！'],
-      clear: ['ワンワン！できた！おさんぽ行こう！', '最高の相棒だね！'],
-    },
-    zh: {
-      start: ['汪！今天也一起加油！', '散步前来一局吧？'],
-      good: ['汪汪！刚刚好！', '不愧是我的搭档！', '尾巴停不下来了！'],
-      bad: ['嗅嗅…格子数好像不对。', '汪？再数一遍吧！'],
-      hint: ['相信我的鼻子，就在这里！'],
-      clear: ['汪汪！成功啦！去散步吧！', '最棒的搭档！'],
-    },
-  },
-  duck: {
-    ko: {
-      start: ['꽥! 나 이번엔 안 헷갈릴 거야!', '연못에 빠지기 전에 풀자, 꽥!'],
-      good: ['꽥꽥! 맞았다!', '우와, 어떻게 알았어?', '물장구 칠 만큼 기뻐!'],
-      bad: ['꽥?! 나도 헷갈렸어…', '앗, 숫자랑 칸 수가 달라, 꽥!'],
-      hint: ['여기 같아… 아마도? 꽥!'],
-      clear: ['꽥꽥꽥! 다 풀었다!', '연못에서 축하 수영하자!'],
-    },
-    en: {
-      start: ["Quack! I won't get confused this time!", "Let's solve it before I fall in the pond, quack!"],
-      good: ['Quack quack! Got it!', 'Whoa, how did you know?', "I'm so happy I could splash!"],
-      bad: ['Quack?! I got confused too...', "Oops, the size doesn't match, quack!"],
-      hint: ['I think it\'s here... maybe? Quack!'],
-      clear: ['Quack quack quack! All done!', "Let's celebrate with a swim!"],
-    },
-    ja: {
-      start: ['ガァ！今度はまちがえないぞ！', '池に落ちる前に解こう、ガァ！'],
-      good: ['ガァガァ！当たり！', 'わぁ、どうしてわかったの？', '水しぶきが上がるほどうれしい！'],
-      bad: ['ガァ？！ぼくもこんがらがった…', 'あっ、数字とマスの数が違う、ガァ！'],
-      hint: ['ここ…かも？ガァ！'],
-      clear: ['ガァガァガァ！全部解けた！', '池でお祝いの水泳だ！'],
-    },
-    zh: {
-      start: ['嘎！这次我不会搞混了！', '掉进池塘之前解开吧，嘎！'],
-      good: ['嘎嘎！对啦！', '哇，你怎么知道的？', '开心得想扑腾水花！'],
-      bad: ['嘎？！我也搞糊涂了…', '哎呀，数字和格子数不一样，嘎！'],
-      hint: ['大概在这里…吧？嘎！'],
-      clear: ['嘎嘎嘎！全部解完啦！', '去池塘游泳庆祝吧！'],
-    },
-  },
-};
-
+export const CHARACTER_NAMES = byLocale((b) => b.names, Object.keys(ko.names) as CharacterId[]);
 /** 마을 소품 이름(src/core/village.ts PROP_IDS). */
-export const PROP_NAMES: Record<PropId, Record<Locale, string>> = {
-  flowers: { ko: '꽃밭', en: 'Flower patch', ja: 'お花畑', zh: '花丛' },
-  bunting: { ko: '깃발 줄', en: 'Bunting', ja: 'ガーランド', zh: '彩旗' },
-  bush: { ko: '동글 덤불', en: 'Round bush', ja: 'まるい茂み', zh: '圆灌木' },
-  signpost: { ko: '이정표', en: 'Signpost', ja: '道しるべ', zh: '路标' },
-  lamp: { ko: '가로등', en: 'Street lamp', ja: '街灯', zh: '路灯' },
-  bench: { ko: '벤치', en: 'Bench', ja: 'ベンチ', zh: '长椅' },
-  tree: { ko: '작은 나무', en: 'Little tree', ja: '小さな木', zh: '小树' },
-  picnic: { ko: '피크닉 바구니', en: 'Picnic basket', ja: 'ピクニックかご', zh: '野餐篮' },
-  stump: { ko: '그루터기', en: 'Tree stump', ja: '切り株', zh: '树桩' },
-  fence: { ko: '나무 울타리', en: 'Wooden fence', ja: '木のさく', zh: '木栅栏' },
-  cattails: { ko: '부들', en: 'Cattails', ja: 'ガマ', zh: '香蒲' },
-  lilypad: { ko: '연잎 탁자', en: 'Lily pad table', ja: 'ハスの葉テーブル', zh: '荷叶桌' },
-  rock: { ko: '이끼 바위', en: 'Mossy rock', ja: 'こけの岩', zh: '青苔石' },
-  barrel: { ko: '나무 물통', en: 'Water barrel', ja: '木のたる', zh: '木桶' },
-  log: { ko: '통나무', en: 'Log', ja: '丸太', zh: '圆木' },
-  bamboo: { ko: '대나무 숲', en: 'Bamboo grove', ja: '竹やぶ', zh: '竹丛' },
-  well: { ko: '우물', en: 'Well', ja: '井戸', zh: '水井' },
-  willow: { ko: '버드나무', en: 'Willow tree', ja: 'やなぎ', zh: '柳树' },
-  bigtree: { ko: '큰 나무', en: 'Big tree', ja: '大きな木', zh: '大树' },
-  house: { ko: '친구들의 집', en: "Friends' house", ja: 'なかまの家', zh: '朋友们的家' },
-};
+export const PROP_NAMES = byLocale((b) => b.props, Object.keys(ko.props) as PropId[]);
 
 export function characterLine(ch: CharacterId, locale: Locale, mood: Mood, pick: number): string {
-  const lines = LINES[ch][locale][mood];
+  const lines = (BUNDLES[locale] ?? en).lines[ch][mood];
   return lines[Math.abs(Math.floor(pick)) % lines.length];
 }
 
 /** 기준(한국어) 문구 전체(테스트용). */
 export function translateKeys(): Record<StringKey, string> {
-  return ko;
+  return KO_UI;
 }
 
-/** 그 언어에 빠진 문구 키(테스트용). */
+/** 그 언어에 빠졌거나 빈 문구 키, 자리표시자가 기준과 다른 키(테스트용). */
 export function missingKeys(locale: Locale): StringKey[] {
-  return (Object.keys(ko) as StringKey[]).filter((k) => DICTS[locale][k] === undefined);
+  const ui = BUNDLES[locale].ui as Partial<Record<StringKey, string>>;
+  const holes = (s: string): string => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort().join(',');
+  return (Object.keys(KO_UI) as StringKey[]).filter((k) => !ui[k] || holes(ui[k]!) !== holes(KO_UI[k]));
+}
+
+export function bundleOf(locale: Locale): LocaleBundle {
+  return BUNDLES[locale];
 }

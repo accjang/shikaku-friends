@@ -7,7 +7,7 @@ import { LEVEL_MAX_BRANCHES, AD_FREE_FIRST_CLEARS, AD_FREE_OFFER_AFTER_INTERSTIT
 import { dailyPuzzle, dateKey, prevDateKey } from '../src/core/daily';
 import { applyHint, clearAll, newGame, place, removeAt, undo } from '../src/core/game';
 import { generate } from '../src/core/generator';
-import { characterLine, LOCALES, missingKeys, pickLocale, translate, translateKeys } from '../src/core/i18n';
+import { characterLine, fontKindFor, LOCALES, missingKeys, pickLocale, translate, translateKeys } from '../src/core/i18n';
 import { unpack, type PackedPuzzle } from '../src/core/levelCodec';
 import {
   INITIAL_PROGRESS,
@@ -230,6 +230,14 @@ describe('광고 제거 제안', () => {
 describe('문구', () => {
   test('언어 고르기·치환', () => {
     expect(pickLocale(['zh-Hans-CN'])).toBe('zh');
+    expect(pickLocale(['zh-Hant-TW'])).toBe('zh-Hant');
+    expect(pickLocale(['zh-HK'])).toBe('zh-Hant');
+    expect(pickLocale(['pt-BR'])).toBe('pt');
+    expect(pickLocale(['es-MX'])).toBe('es');
+    expect(pickLocale(['iw-IL'])).toBe('he');
+    expect(pickLocale(['tl-PH'])).toBe('fil');
+    expect(pickLocale(['th-TH'])).toBe('th');
+    expect(pickLocale(['de-DE', 'hi-IN'])).toBe('hi');
     expect(pickLocale(['fr-FR', 'ja-JP'])).toBe('ja');
     expect(pickLocale(['fr'])).toBe('en');
     expect(translate('ko', 'hintsLeft', { n: 3 })).toBe('힌트 3개');
@@ -239,6 +247,13 @@ describe('문구', () => {
       for (const c of ['cat', 'panda', 'rabbit', 'shiba', 'duck'] as const)
         for (const m of ['start', 'good', 'bad', 'hint', 'clear'] as const) expect(characterLine(c, l, m, 7).length).toBeGreaterThan(0);
   });
+  test('언어 28개, 글꼴은 Jua(한글·기본 영문) 또는 Nunito(악센트·키릴)', () => {
+    expect(LOCALES).toHaveLength(28);
+    expect(fontKindFor('ko')).toBe('jua');
+    expect(fontKindFor('vi')).toBe('nunito');
+    expect(fontKindFor('es')).toBe('nunito');
+  });
+
   test('모든 언어에 모든 문구가 있다', () => {
     expect(Object.keys(translateKeys()).length).toBeGreaterThan(40);
     for (const l of LOCALES.filter((x) => x !== 'ko')) expect(missingKeys(l)).toEqual([]);
