@@ -46,4 +46,11 @@ write('erase', tone([600], 0.07, 0.2, 'sine', release=0.4, slide=-0.4))
 write('hint', seq([tone([E6], 0.08, 0.25), tone([G6], 0.08, 0.25), tone([C6 * 2], 0.16, 0.25)]))
 write('clear', seq([tone([C5, E5], 0.11, 0.3, 'tri'), tone([E5, G5], 0.11, 0.3, 'tri'), tone([G5, C6], 0.11, 0.3, 'tri'),
                     tone([C6, E6, G6], 0.5, 0.32, 'tri', release=1.2)]))
+# 풍선 터짐: 짧은 잡음 + 높은 음이 빠르게 떨어짐
+random.seed(7)
+pop = [(random.random() * 2 - 1) * 0.5 * max(0.0, 1 - i / (RATE * 0.05)) ** 3 for i in range(int(RATE * 0.05))]
+pop = [a + b for a, b in zip(pop, tone([1400], 0.05, 0.25, 'sine', release=0.3, slide=-0.6))]
+write('pop', pop)
+# 소품 얻음: 반짝이는 위로 올라가는 세 음
+write('reward', seq([tone([G5, C6], 0.09, 0.28, 'tri'), tone([C6, E6], 0.09, 0.28, 'tri'), tone([E6, G6, C6 * 2], 0.4, 0.3, 'tri', release=1.0)]))
 print(sorted(os.listdir(OUT)))

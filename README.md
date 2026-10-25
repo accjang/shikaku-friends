@@ -13,6 +13,9 @@ App Store와 Google Play에 같은 코드로 낸다.
   - 앞 챕터에서 25개를 깨면 다음 챕터가 열린다. 별 3개 = 힌트 없이, 2개 = 힌트 1번, 1개 = 그 이상.
 - **오늘의 퍼즐**: 날짜로 정해진 8×8 퍼즐(전 세계 같은 퍼즐), 하루 첫 클리어에 힌트 +1, 연속 일수 표시.
 - 캐릭터: 챕터마다 안내하는 친구가 달라지고, 네모를 맞게 놓으면 통통 튀고 틀리면 고개를 젓는다(냥이 츤데레·판다 느긋·토끼 발랄·시바 의젓한 응원단장·오리 엉뚱 덜렁).
+- **마을 꾸미기**: 스테이지 10개를 깰 때마다 술래잡기 게임 소품(꽃밭·깃발 줄·벤치·우물·버드나무…)을 하나씩 얻어 친구들 마을에 놓인다. 200스테이지면 20개, 마지막은 친구들의 집. 못 얻은 소품은 흐린 그림자로 보이고, 친구는 챕터가 열리면 마을에 온다. 홈에 "다음 소품까지 N스테이지" 카드.
+- **자랑하기(공유)**: 오늘의 퍼즐은 Wordle처럼 번호·시간·힌트·연속 일수(정답 모양 없음), 스테이지는 별·시간을 문구로 공유한다.
+- **클리어 연출**: 네모들이 차례로 통통 튀고, 색종이가 터지고, 별 풍선이 떠올라 "뻥" 터진 뒤 결과 창(캐릭터 기뻐하는 자세, 새 소품이면 소품 그림).
 - 첫 실행 튜토리얼(규칙 + 4×4 연습 판), 효과음·진동, 한국어·영어·일본어·중국어(간체).
 
 ## 수익 모델(2026-10-25 확정)
@@ -41,7 +44,8 @@ src/data/            저장(AsyncStorage)·광고(AdMob)·결제(RevenueCat)
 src/ui/              판(Board)·캐릭터(Mascot)·버튼·팝업·테마
 content/levels.json  미리 만든 200스테이지(tools/gen_levels.ts 생성물, 손으로 고치지 않음)
 assets/chars/        캐릭터 이미지(술래잡기 3D 모델 렌더), assets/brand/ 아이콘·스플래시, assets/sounds/ 효과음
-assets/source/models 원본 3D 모델(cat·panda·rabbit은 accjang/taggame-assets, shiba·duck은 Higgsfield 2026-10-11 생성분)
+assets/source/models 원본 3D 모델(cat·panda·rabbit은 accjang/taggame-assets, shiba·duck은 Higgsfield 2026-10-11 생성분), rigged/ 자세용 리깅 모델(Higgsfield 3D rigging)
+assets/source/props  마을 소품 원본 3D 모델(술래잡기 소품, Higgsfield Tripo) → assets/props/ PNG
 tools/               생성 스크립트(스테이지·캐릭터 렌더·아이콘·효과음)
 docs/                출시 절차(RELEASE.md), 스토어 문구·개인정보처리방침(store/)
 ```
@@ -50,7 +54,8 @@ docs/                출시 절차(RELEASE.md), 스토어 문구·개인정보�
 | 무엇 | 명령 |
 |---|---|
 | 스테이지 200개 | `npx tsx tools/gen_levels.ts` (출시 뒤에는 바꾸지 말 것 — 사용자 기록이 어긋난다) |
-| 캐릭터 이미지 | `NODE_PATH=$(npm root -g) npm run render:chars && python3 tools/crop_chars.py` |
+| 캐릭터 이미지 | `NODE_PATH=$(npm root -g) npm run render:chars && python3 tools/crop_chars.py` (자세는 `tools/char_poses.json` — 리깅 모델의 애니메이션 한 장면) |
+| 마을 소품 | `NODE_PATH=$(npm root -g) npm run render:props && python3 tools/crop_props.py` |
 | 아이콘·스플래시 | `python3 tools/gen_brand.py` |
 | 효과음 | `python3 tools/gen_sounds.py` |
 

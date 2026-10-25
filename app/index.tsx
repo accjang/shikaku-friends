@@ -6,14 +6,17 @@ import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withDelay, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
 
 import { levelId, type CharacterId } from '@/core/chapters';
+import { PROP_EVERY } from '@/core/config';
+import { nextProp, PROP_IDS, stagesCleared, unlockedPropCount } from '@/core/village';
 import { dailyStreak, nextUnplayed, starCount } from '@/core/progress';
 import { dateKey, prevDateKey } from '@/core/daily';
 import { useProgressStore } from '@/data/progressStore';
 import { Button } from '@/ui/Button';
 import { charImage, type Pose } from '@/ui/characters';
+import { propImage } from '@/ui/props';
 import { playSfx } from '@/ui/feedback';
 import { Pill, Screen } from '@/ui/Screen';
-import { colors, FONT, RECT_PALETTE, space } from '@/ui/theme';
+import { colors, FONT, radius, RECT_PALETTE, space } from '@/ui/theme';
 import { useT } from '@/ui/useT';
 
 /** 홈 친구들이 옆 친구와 겹치는 정도(다섯 명이 좁은 화면에 들어가게). */
@@ -66,6 +69,11 @@ export default function Home() {
   const doneToday = today in progress.daily;
   const streak = dailyStreak(progress, today, prevDateKey);
   const started = Object.keys(progress.levels).length > 0;
+  const cleared = stagesCleared(progress);
+  const havePropCount = unlockedPropCount(cleared);
+  const nextP = nextProp(cleared);
+  // 다음 소품까지 진행률(이번 10개 구간 안에서)
+  const villagePct = nextP ? ((PROP_EVERY - nextP.remaining) / PROP_EVERY) * 100 : 100;
 
   return (
     <Screen>
@@ -89,6 +97,29 @@ export default function Home() {
           <Bouncy id="shiba" pose="ql" size={74} delay={800} />
         </View>
       </View>
+
+      <Pressable
+        testID="village"
+        accessibilityRole="button"
+        accessibilityLabel={t('village')}
+        onPress={() => {
+          playSfx('tap');
+          router.push('/village');
+        }}
+        style={({ pressed }) => [styles.village, { transform: [{ scale: pressed ? 0.97 : 1 }] }]}
+      >
+        <Image source={propImage(nextP?.id ?? 'house')} style={styles.villageImg} resizeMode="contain" />
+        <View style={{ flex: 1 }}>
+          <Text style={styles.villageTitle}>
+            {t('village')} · {havePropCount}/{PROP_IDS.length}
+          </Text>
+          <Text style={styles.villageSub}>{nextP ? t('villageNext', { n: nextP.remaining }) : t('villageDone')}</Text>
+          <View style={styles.villageTrack}>
+            <View style={[styles.villageFill, { width: `${villagePct}%` }]} />
+          </View>
+        </View>
+        <Ionicons name="chevron-forward" size={20} color={colors.inkSoft} />
+      </Pressable>
 
       <View style={styles.buttons}>
         <Button
@@ -130,6 +161,23 @@ const styles = StyleSheet.create({
   logoChar: { fontFamily: FONT.round, fontSize: 30, color: colors.ink },
   tagline: { marginTop: space.md, fontFamily: FONT.round, fontSize: 17, color: colors.inkSoft },
   friends: { flexDirection: 'row', alignItems: 'flex-end', marginTop: space.xl },
+  village: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.md,
+    marginHorizontal: space.xl,
+    marginBottom: space.md,
+    padding: space.md,
+    backgroundColor: '#EAF6E1',
+    borderRadius: radius.lg,
+    borderWidth: 2,
+    borderColor: '#BFE0AC',
+  },
+  villageImg: { width: 52, height: 52 },
+  villageTitle: { fontFamily: FONT.round, fontSize: 17, color: colors.ink },
+  villageSub: { fontFamily: FONT.round, fontSize: 13, color: colors.inkSoft, marginTop: 1 },
+  villageTrack: { height: 6, borderRadius: 3, backgroundColor: 'rgba(75,63,107,0.1)', marginTop: 5, overflow: 'hidden' },
+  villageFill: { height: 6, borderRadius: 3, backgroundColor: '#7FCB9C' },
   buttons: { paddingHorizontal: space.xl, paddingBottom: space.xl, gap: space.md },
   sub: { color: colors.white, fontFamily: FONT.round, fontSize: 13, opacity: 0.9 },
 });

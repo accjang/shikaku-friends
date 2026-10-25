@@ -1,7 +1,7 @@
 // 게임 화면의 팝업: 클리어 결과, 힌트 없음(광고 보기·광고 제거).
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect } from 'react';
-import { ActivityIndicator, Image, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Image, Modal, Pressable, StyleSheet, Text, View, type ImageSourcePropType } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withDelay, withRepeat, withSequence, withSpring, withTiming, ZoomIn } from 'react-native-reanimated';
 
 import type { CharacterId } from '@/core/chapters';
@@ -9,6 +9,7 @@ import { ADFREE_BONUS_HINTS, REWARDED_HINTS } from '@/core/config';
 
 import { Button } from './Button';
 import { charImage } from './characters';
+import { playSfx } from './feedback';
 import { CHARACTER_THEME, colors, FONT, radius, shadow, space } from './theme';
 import { useT } from './useT';
 
@@ -41,6 +42,10 @@ interface ClearProps {
   listLabel: string;
   /** 광고 제거 제안(작은 버튼, 조건은 src/core/adPolicy.ts shouldOfferAdFree). 없으면 숨김. */
   offer?: { label: string; onPress(): void } | null;
+  /** 이번 클리어로 얻은 마을 소품(그림·문구). 없으면 숨김. */
+  reward?: { image: ImageSourcePropType; label: string } | null;
+  shareLabel: string;
+  onShare(): void;
 }
 
 export function ClearSheet(p: ClearProps) {
@@ -49,7 +54,9 @@ export function ClearSheet(p: ClearProps) {
   const y = useSharedValue(0);
   useEffect(() => {
     if (!p.visible) return;
+    if (p.reward) setTimeout(() => playSfx('reward'), 700);
     y.value = withDelay(200, withRepeat(withSequence(withTiming(-26, { duration: 220 }), withSpring(0, { damping: 7 })), 3, false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [p.visible, y]);
   const jump = useAnimatedStyle(() => ({ transform: [{ translateY: y.value }] }));
 
@@ -58,7 +65,7 @@ export function ClearSheet(p: ClearProps) {
       <View style={styles.overlay}>
         <Animated.View entering={ZoomIn.springify()} style={[styles.card, { borderColor: theme.main }]}>
           <Animated.View style={[styles.charWrap, jump]}>
-            <Image source={charImage(p.character, 'front')} style={styles.char} resizeMode="contain" />
+            <Image source={charImage(p.character, 'cheer')} style={styles.char} resizeMode="contain" />
           </Animated.View>
           <Text style={styles.clear}>{t('clear')}</Text>
           {p.stars !== null ? (
@@ -81,6 +88,12 @@ export function ClearSheet(p: ClearProps) {
               </View>
             ) : null}
           </View>
+          {p.reward ? (
+            <Animated.View entering={ZoomIn.delay(700).springify()} style={styles.reward}>
+              <Image source={p.reward.image} style={styles.rewardImage} resizeMode="contain" />
+              <Text style={styles.rewardText}>{p.reward.label}</Text>
+            </Animated.View>
+          ) : null}
           {p.newBest ? <Text style={styles.note}>🎉 {t('newBest')}</Text> : null}
           {p.notes.map((n) => (
             <Text key={n} style={styles.note}>
@@ -93,6 +106,7 @@ export function ClearSheet(p: ClearProps) {
               <Button small label={t('retry')} icon="refresh" color={colors.card} edge={colors.line} textColor={colors.ink} onPress={p.onRetry} style={{ flex: 1 }} />
               <Button small label={p.listLabel} icon="grid" color={colors.card} edge={colors.line} textColor={colors.ink} onPress={p.onList} style={{ flex: 1 }} />
             </View>
+            <Button small label={p.shareLabel} icon="share-social" color={colors.gold} edge={colors.goldDark} onPress={p.onShare} />
             {p.offer ? (
               <Pressable accessibilityRole="button" onPress={p.offer.onPress} hitSlop={8} style={styles.offer}>
                 <Ionicons name="sparkles" size={15} color={colors.primaryDark} />
@@ -177,6 +191,9 @@ const styles = StyleSheet.create({
   note: { fontFamily: FONT.round, fontSize: 15, color: colors.primaryDark, marginTop: 2 },
   actions: { alignSelf: 'stretch', gap: space.sm, marginTop: space.lg },
   row: { flexDirection: 'row', gap: space.sm },
+  reward: { alignItems: 'center', backgroundColor: '#F4FBEF', borderRadius: radius.md, paddingVertical: space.sm, paddingHorizontal: space.lg, marginTop: space.sm },
+  rewardImage: { width: 72, height: 72 },
+  rewardText: { fontFamily: FONT.round, fontSize: 15, color: '#4E9E70', marginTop: 2 },
   offer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingTop: space.sm },
   offerText: { fontFamily: FONT.round, fontSize: 15, color: colors.primaryDark, textDecorationLine: 'underline' },
   sub: { color: colors.white, fontFamily: FONT.round, fontSize: 12, opacity: 0.9 },

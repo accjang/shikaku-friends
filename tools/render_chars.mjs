@@ -11,19 +11,23 @@ import { createRequire } from 'node:module';
 const { chromium } = createRequire(import.meta.url)('playwright');
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const types = { '.html': 'text/html', '.js': 'text/javascript', '.glb': 'model/gltf-binary' };
+const types = { '.html': 'text/html', '.js': 'text/javascript', '.glb': 'model/gltf-binary', '.json': 'application/json' };
 const server = createServer((req, res) => {
   try {
     const path = join(root, decodeURIComponent(new URL(req.url, 'http://x').pathname));
+    const body = readFileSync(path);
     res.writeHead(200, { 'content-type': types[extname(path)] ?? 'application/octet-stream' });
-    res.end(readFileSync(path));
+    res.end(body);
   } catch {
     res.writeHead(404).end();
   }
 }).listen(0);
 const port = server.address().port;
 
-const ANGLES = { front: 0, q: 0.6, ql: -0.6 };
+// 자세표(tools/char_poses.json): 캐릭터마다 calm(서 있는 자세)·cheer(기뻐하는 자세)
+const POSES = JSON.parse(readFileSync(join(root, 'tools', 'char_poses.json'), 'utf8'));
+// 출력 이름 → [자세, 좌우 각도]
+const VIEWS = { front: ['calm', 0], q: ['calm', 0.55], ql: ['calm', -0.55], cheer: ['cheer', 0.2] };
 const out = join(root, 'tools', 'out');
 mkdirSync(out, { recursive: true });
 const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
@@ -31,10 +35,11 @@ const page = await browser.newPage();
 await page.goto(`http://127.0.0.1:${port}/tools/render_chars.html`);
 await page.waitForFunction('window.ready');
 for (const name of ['cat', 'panda', 'rabbit', 'shiba', 'duck']) {
-  for (const [angle, yaw] of Object.entries(ANGLES)) {
-    const url = await page.evaluate(([n, y]) => window.render(n, y), [name, yaw]);
-    writeFileSync(join(out, `${name}_${angle}.png`), Buffer.from(url.split(',')[1], 'base64'));
-    console.log(name, angle);
+  for (const [view, [pose, yaw]] of Object.entries(VIEWS)) {
+    const { model, t } = POSES[name][pose];
+    const url = await page.evaluate(([m, tt, y]) => window.render(m, tt, y), [model, t, yaw]);
+    writeFileSync(join(out, `${name}_${view}.png`), Buffer.from(url.split(',')[1], 'base64'));
+    console.log(name, view);
   }
 }
 await browser.close();

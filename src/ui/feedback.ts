@@ -12,6 +12,8 @@ const SOURCES = {
   erase: require('../../assets/sounds/erase.wav'),
   hint: require('../../assets/sounds/hint.wav'),
   clear: require('../../assets/sounds/clear.wav'),
+  pop: require('../../assets/sounds/pop.wav'),
+  reward: require('../../assets/sounds/reward.wav'),
 } as const;
 
 export type Sfx = keyof typeof SOURCES;

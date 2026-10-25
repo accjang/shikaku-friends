@@ -14,7 +14,13 @@ export const LEVEL_MAX_BRANCHES = 400;
 export const LEVEL_DIFFICULTY_RAMP = { from: 0.1, to: 0.9 } as const;
 
 // ── 오늘의 퍼즐 ──
+/** 오늘의 퍼즐 #1 날짜(공유 문구 번호). 출시 날짜에 맞춰 바꿔도 된다(출시 전에만). */
+export const DAILY_EPOCH = '2026-11-01';
 export const DAILY_OPTIONS: GenOptions = { w: 8, h: 8, minArea: 2, maxArea: 10, maxSide: 5 };
+
+// ── 마을 꾸미기 ──
+/** 스테이지를 이만큼 깰 때마다 소품 하나(src/core/village.ts). */
+export const PROP_EVERY = 10;
 
 // ── 진행 ──
 /** 다음 챕터를 열려면 앞 챕터에서 깨야 하는 스테이지 수. */
@@ -33,8 +39,17 @@ export const UNDO_LIMIT = 200;
 // ── 연출 ──
 /** 캐릭터 말풍선이 떠 있는 시간. */
 export const BUBBLE_MS = 1800;
-/** 완료 후 결과 창을 띄우기까지(축하 연출 시간). */
-export const CLEAR_DELAY_MS = 900;
+/** 완료 후 결과 창을 띄우기까지(축하 연출: 판 물결 → 색종이 → 별 풍선이 다 터질 때까지). */
+export const CLEAR_DELAY_MS = 2000;
+/** 축하 색종이 수·떨어지는 시간. */
+export const CONFETTI_COUNT = 40;
+export const CONFETTI_MS = 1600;
+/** 별 풍선 수, 떠오르는 시간, 풍선 사이 간격. */
+export const BALLOON_COUNT = 5;
+export const BALLOON_RISE_MS = 1100;
+export const BALLOON_STAGGER_MS = 180;
+/** 판이 완성되면 네모들이 차례로 통통 튀는 간격. */
+export const RECT_WAVE_STEP_MS = 45;
 
 // ── 저장소 ──
 export const STORAGE_VERSION = 1;
@@ -87,5 +102,7 @@ export const MOCK_ADFREE_PRICE = '₩1,900';
 // ── 링크(출시 전에 채운다 — docs/RELEASE.md) ──
 /** 개인정보처리방침 주소(docs/store/privacy-policy.md를 올린 곳). 비어 있으면 설정에서 줄을 숨긴다. */
 export const PRIVACY_POLICY_URL = env(process.env.EXPO_PUBLIC_PRIVACY_POLICY_URL);
+/** 공유 문구 끝에 붙는 스토어 주소(출시 뒤 채운다). 비어 있으면 붙이지 않는다. */
+export const STORE_URL = env(process.env.EXPO_PUBLIC_STORE_URL);
 /** 문의 메일 주소. 비어 있으면 설정에서 줄을 숨긴다. */
 export const SUPPORT_EMAIL = env(process.env.EXPO_PUBLIC_SUPPORT_EMAIL);

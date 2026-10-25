@@ -75,4 +75,4 @@ cd android && ./gradlew bundleRelease          # 업로드 키스토어 필요(*
 ## 6. 주의
 - **아동 대상 지정 금지(권장)**: 귀여운 캐릭터라도 Play "타겟층"에 13세 미만을 넣으면 가족 정책이 적용돼 AdMob 설정(아동 대상 처리, 인증된 광고 SDK)이 바뀌어야 하고, App Store "Kids" 카테고리는 제3자 광고·추적이 사실상 막힌다. 13세 이상으로 신고하는 것을 기본으로 했다. 아이 대상으로 바꾸려면 광고 설정부터 다시 정한다.
 - 스테이지(`content/levels.json`)는 출시 뒤 다시 만들지 않는다(기록·별이 다른 퍼즐에 붙는다). 스테이지를 늘릴 때는 `src/core/chapters.ts`에 챕터를 **추가**만 한다.
-- 3D 캐릭터는 Higgsfield에서 Tripo(고양이·판다·토끼)·Meshy(시바·오리)로 만든 모델(`assets/source/models`). 두 서비스의 상업 이용 조건(플랜별 라이선스)을 출시 전에 확인한다. 글꼴 Jua는 OFL(상업 이용 가능), 효과음은 직접 합성.
+- 3D 캐릭터는 Higgsfield에서 Tripo(고양이·판다·토끼)·Meshy(시바·오리)로 만든 모델(`assets/source/models`). 마을 소품도 Tripo, 자세는 Higgsfield 3D rigging. 두 서비스의 상업 이용 조건(플랜별 라이선스)을 출시 전에 확인한다. 글꼴 Jua는 OFL(상업 이용 가능), 효과음은 직접 합성.

@@ -1,0 +1,53 @@
+{
+  "_comment": "캐릭터 자세표(tools/render_chars.mjs). model은 assets/source/models/ 아래 경로, t는 애니메이션 위치(0~1). 리깅·애니메이션은 Higgsfield 3D rigging(2026-10-12) 결과. 오리는 리깅이 없어 원본 모델 그대로.",
+  "cat": {
+    "calm": {
+      "model": "rigged/cat_hand_on_hip.glb",
+      "t": 0
+    },
+    "cheer": {
+      "model": "rigged/cat_joyful_dance.glb",
+      "t": 0.8
+    }
+  },
+  "panda": {
+    "calm": {
+      "model": "rigged/panda_idle.glb",
+      "t": 0
+    },
+    "cheer": {
+      "model": "rigged/panda_jump_run.glb",
+      "t": 0.1
+    }
+  },
+  "rabbit": {
+    "calm": {
+      "model": "rigged/rabbit_idle.glb",
+      "t": 0
+    },
+    "cheer": {
+      "model": "rigged/rabbit_idle.glb",
+      "t": 0.9
+    }
+  },
+  "shiba": {
+    "calm": {
+      "model": "rigged/shiba_joyful_dance.glb",
+      "t": 0.05
+    },
+    "cheer": {
+      "model": "rigged/shiba_joyful_dance.glb",
+      "t": 0.4
+    }
+  },
+  "duck": {
+    "calm": {
+      "model": "duck.glb",
+      "t": 0
+    },
+    "cheer": {
+      "model": "duck.glb",
+      "t": 0
+    }
+  }
+}

@@ -1,9 +1,11 @@
 // 시카쿠 판. 칸을 드래그하면 네모 미리보기 → 손을 떼면 놓는다. 네모를 탭하면 지운다. 빈 칸을 탭하면 1칸 네모.
 // 규칙 판정은 src/core/puzzle.ts, 상태 변경은 부모(onPlace·onRemove)가 한다.
-import { useMemo, useRef, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, { ZoomIn } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue, withDelay, withSequence, withSpring, withTiming, ZoomIn } from 'react-native-reanimated';
+
+import { RECT_WAVE_STEP_MS } from '@/core/config';
 
 import { area, contains, rectAt, rectFromCorners, validClueIndex, type Puzzle, type Rect } from '@/core/puzzle';
 
@@ -18,11 +20,24 @@ interface Props {
   onRemove(x: number, y: number): void;
   /** 드래그 중 칸이 바뀔 때(가벼운 진동 등). */
   onDragStep?(): void;
+  /** 다 풀었을 때 네모들이 차례로 통통 튄다. */
+  celebrate?: boolean;
+}
+
+/** 놓은 네모 하나. 놓을 때 커지며 나타나고, wave ≥ 0이면 (wave번째 순서로) 한 번 튄다. */
+function WaveRect({ wave, style }: { wave: number; style: StyleProp<ViewStyle> }) {
+  const scale = useSharedValue(1);
+  useEffect(() => {
+    if (wave < 0) return;
+    scale.value = withDelay(wave * RECT_WAVE_STEP_MS, withSequence(withTiming(1.12, { duration: 140 }), withSpring(1, { damping: 6, stiffness: 260 })));
+  }, [wave, scale]);
+  const anim = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+  return <Animated.View entering={ZoomIn.duration(160)} style={[style, anim]} />;
 }
 
 const GAP = 2;
 
-export function Board({ puzzle, rects, cell, disabled, onPlace, onRemove, onDragStep }: Props) {
+export function Board({ puzzle, rects, cell, disabled, onPlace, onRemove, onDragStep, celebrate }: Props) {
   const W = puzzle.w * cell;
   const H = puzzle.h * cell;
   const [preview, setPreview] = useState<Rect | null>(null);
@@ -93,13 +108,13 @@ export function Board({ puzzle, rects, cell, disabled, onPlace, onRemove, onDrag
           ))}
 
           {/* 놓은 네모 */}
-          {rects.map((r) => {
+          {rects.map((r, i) => {
             const ci = validClueIndex(puzzle, r);
             const ok = ci >= 0;
             return (
-              <Animated.View
+              <WaveRect
                 key={`${r.x},${r.y},${r.w},${r.h}`}
-                entering={ZoomIn.duration(160)}
+                wave={celebrate ? i : -1}
                 style={[
                   styles.rect,
                   {

@@ -19,7 +19,8 @@
 · 드래그 한 번으로 네모 그리기, 탭하면 지우기
 · 고양이·판다·토끼·시바·오리가 칭찬도 하고 투정도 부려요
 · 200개 스테이지, 모든 퍼즐은 답이 하나뿐!
-· 매일 새로운 '오늘의 퍼즐'과 연속 기록
+· 스테이지를 깰 때마다 소품을 모아 친구들의 마을을 꾸며요
+· 매일 새로운 '오늘의 퍼즐'과 연속 기록, 결과 자랑하기
 · 막히면 힌트, 별 3개에 도전
 · 시간 제한 없이 천천히, 오프라인에서도 OK
 
@@ -45,7 +46,8 @@ Shikaku Friends brings the classic Japanese logic puzzle "Shikaku" to life with 
 · Drag to draw, tap to erase
 · Kitty, Panda, Bunny, Shiba and Duckling cheer you on (and sometimes tease you)
 · 200 stages, and every puzzle has exactly one solution
-· A new Daily Puzzle every day with streaks
+· Collect decorations as you clear stages and build your friends' village
+· A new Daily Puzzle every day with streaks — share your result
 · Hints when you're stuck, three stars to collect
 · No timers to stress you out, plays offline
 ```

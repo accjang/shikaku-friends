@@ -1,5 +1,6 @@
 // 문구(ko/en/ja/zh). 키가 빠진 언어는 영어 → 한국어 순으로 대신 쓴다. {name} 자리에 값을 넣는다.
 import type { CharacterId } from './chapters';
+import type { PropId } from './village';
 
 export type Locale = 'ko' | 'en' | 'ja' | 'zh';
 export const LOCALES: readonly Locale[] = ['ko', 'en', 'ja', 'zh'];
@@ -8,6 +9,16 @@ export const LOCALE_NAMES: Record<Locale, string> = { ko: '한국어', en: 'Engl
 const ko = {
   appName: '시카쿠 프렌즈',
   tagline: '숫자만큼 네모를 그려요',
+  village: '마을',
+  villageTitle: '친구들의 마을',
+  villageNext: '다음 소품까지 {n}스테이지',
+  villageDone: '마을을 다 꾸몄어요!',
+  villageTap: '친구나 소품을 눌러 보세요',
+  villageLocked: '스테이지 {n}개를 깨면 생겨요',
+  newProp: '새 소품을 얻었어요: {name}',
+  share: '자랑하기',
+  shareDailyTitle: '시카쿠 프렌즈 오늘의 퍼즐 #{n}',
+  shareStageTitle: '시카쿠 프렌즈 스테이지 {id} 클리어!',
   play: '이어하기',
   playFirst: '시작하기',
   stages: '스테이지',
@@ -76,6 +87,16 @@ type Dict = Partial<Record<StringKey, string>>;
 const en: Dict = {
   appName: 'Shikaku Friends',
   tagline: 'Draw boxes that match the numbers',
+  village: 'Village',
+  villageTitle: "Friends' Village",
+  villageNext: '{n} more stages to the next item',
+  villageDone: 'Your village is complete!',
+  villageTap: 'Tap a friend or an item',
+  villageLocked: 'Appears after clearing {n} stages',
+  newProp: 'New item: {name}',
+  share: 'Share',
+  shareDailyTitle: 'Shikaku Friends Daily #{n}',
+  shareStageTitle: 'Shikaku Friends — Stage {id} cleared!',
   play: 'Continue',
   playFirst: 'Start',
   stages: 'Stages',
@@ -141,6 +162,16 @@ const en: Dict = {
 const ja: Dict = {
   appName: 'シカクフレンズ',
   tagline: '数字の数だけ四角を描こう',
+  village: 'むら',
+  villageTitle: 'なかまのむら',
+  villageNext: '次のアイテムまであと{n}ステージ',
+  villageDone: 'むらが完成しました！',
+  villageTap: 'なかまやアイテムをタップしてね',
+  villageLocked: '{n}ステージクリアで登場',
+  newProp: '新しいアイテム：{name}',
+  share: 'シェア',
+  shareDailyTitle: 'シカクフレンズ 今日のパズル #{n}',
+  shareStageTitle: 'シカクフレンズ ステージ{id}クリア！',
   play: 'つづきから',
   playFirst: 'はじめる',
   stages: 'ステージ',
@@ -206,6 +237,16 @@ const ja: Dict = {
 const zh: Dict = {
   appName: '方块朋友',
   tagline: '按数字画出方块',
+  village: '村庄',
+  villageTitle: '朋友们的村庄',
+  villageNext: '再过{n}关获得下一个道具',
+  villageDone: '村庄装饰完成啦！',
+  villageTap: '点点朋友或道具试试',
+  villageLocked: '通关{n}关后出现',
+  newProp: '获得新道具：{name}',
+  share: '分享',
+  shareDailyTitle: '方块朋友 每日谜题 #{n}',
+  shareStageTitle: '方块朋友 第{id}关通关！',
   play: '继续',
   playFirst: '开始',
   stages: '关卡',
@@ -449,6 +490,30 @@ const LINES: Record<CharacterId, Record<Locale, Record<Mood, string[]>>> = {
       clear: ['嘎嘎嘎！全部解完啦！', '去池塘游泳庆祝吧！'],
     },
   },
+};
+
+/** 마을 소품 이름(src/core/village.ts PROP_IDS). */
+export const PROP_NAMES: Record<PropId, Record<Locale, string>> = {
+  flowers: { ko: '꽃밭', en: 'Flower patch', ja: 'お花畑', zh: '花丛' },
+  bunting: { ko: '깃발 줄', en: 'Bunting', ja: 'ガーランド', zh: '彩旗' },
+  bush: { ko: '동글 덤불', en: 'Round bush', ja: 'まるい茂み', zh: '圆灌木' },
+  signpost: { ko: '이정표', en: 'Signpost', ja: '道しるべ', zh: '路标' },
+  lamp: { ko: '가로등', en: 'Street lamp', ja: '街灯', zh: '路灯' },
+  bench: { ko: '벤치', en: 'Bench', ja: 'ベンチ', zh: '长椅' },
+  tree: { ko: '작은 나무', en: 'Little tree', ja: '小さな木', zh: '小树' },
+  picnic: { ko: '피크닉 바구니', en: 'Picnic basket', ja: 'ピクニックかご', zh: '野餐篮' },
+  stump: { ko: '그루터기', en: 'Tree stump', ja: '切り株', zh: '树桩' },
+  fence: { ko: '나무 울타리', en: 'Wooden fence', ja: '木のさく', zh: '木栅栏' },
+  cattails: { ko: '부들', en: 'Cattails', ja: 'ガマ', zh: '香蒲' },
+  lilypad: { ko: '연잎 탁자', en: 'Lily pad table', ja: 'ハスの葉テーブル', zh: '荷叶桌' },
+  rock: { ko: '이끼 바위', en: 'Mossy rock', ja: 'こけの岩', zh: '青苔石' },
+  barrel: { ko: '나무 물통', en: 'Water barrel', ja: '木のたる', zh: '木桶' },
+  log: { ko: '통나무', en: 'Log', ja: '丸太', zh: '圆木' },
+  bamboo: { ko: '대나무 숲', en: 'Bamboo grove', ja: '竹やぶ', zh: '竹丛' },
+  well: { ko: '우물', en: 'Well', ja: '井戸', zh: '水井' },
+  willow: { ko: '버드나무', en: 'Willow tree', ja: 'やなぎ', zh: '柳树' },
+  bigtree: { ko: '큰 나무', en: 'Big tree', ja: '大きな木', zh: '大树' },
+  house: { ko: '친구들의 집', en: "Friends' house", ja: 'なかまの家', zh: '朋友们的家' },
 };
 
 export function characterLine(ch: CharacterId, locale: Locale, mood: Mood, pick: number): string {

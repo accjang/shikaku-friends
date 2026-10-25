@@ -35,3 +35,4 @@ npm-debug.*
 *.tsbuildinfo
 __pycache__/
 tools/out/
+tools/out_props/

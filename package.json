@@ -11,7 +11,8 @@
     "lint": "expo lint",
     "test": "jest",
     "typecheck": "tsc --noEmit",
-    "render:chars": "node tools/render_chars.mjs"
+    "render:chars": "node tools/render_chars.mjs",
+    "render:props": "node tools/render_props.mjs"
   },
   "dependencies": {
     "@expo-google-fonts/jua": "^0.4.1",
