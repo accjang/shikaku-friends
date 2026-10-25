@@ -23,11 +23,48 @@ interface FullScreenAd {
 
 interface AdStore {
   lastInterstitialAt: number | null;
+  /** 지금까지 본 전면 광고 수(광고 제거 제안 조건). */
+  interstitialsShown: number;
+  /** 광고 제거 제안을 마지막으로 보인 날. */
+  lastOfferDay: string | null;
   rewardedLoaded: boolean;
   privacyOptionsRequired: boolean;
 }
 
-export const useAdStore = create<AdStore>()(() => ({ lastInterstitialAt: null, rewardedLoaded: false, privacyOptionsRequired: false }));
+export const useAdStore = create<AdStore>()(() => ({
+  lastInterstitialAt: null,
+  interstitialsShown: 0,
+  lastOfferDay: null,
+  rewardedLoaded: false,
+  privacyOptionsRequired: false,
+}));
+
+interface StoredAdState {
+  lastInterstitialAt: number | null;
+  interstitialsShown: number;
+  lastOfferDay: string | null;
+}
+
+function persistAdState(): void {
+  const { lastInterstitialAt, interstitialsShown, lastOfferDay } = useAdStore.getState();
+  void saveJson<StoredAdState>(STORAGE_KEYS.adState, { lastInterstitialAt, interstitialsShown, lastOfferDay });
+}
+
+/** 광고 빈도·제안 상태 읽기(앱 시작 때, 광고 모듈과 상관없이). */
+export async function hydrateAdState(): Promise<void> {
+  const s = await loadJson<Partial<StoredAdState> | null>(STORAGE_KEYS.adState, null);
+  useAdStore.setState({
+    lastInterstitialAt: typeof s?.lastInterstitialAt === 'number' ? s.lastInterstitialAt : null,
+    interstitialsShown: typeof s?.interstitialsShown === 'number' && s.interstitialsShown >= 0 ? s.interstitialsShown : 0,
+    lastOfferDay: typeof s?.lastOfferDay === 'string' ? s.lastOfferDay : null,
+  });
+}
+
+/** 클리어 창에 광고 제거 제안을 보였다고 기록(하루 한 번). */
+export function noteAdFreeOffered(day: string): void {
+  useAdStore.setState({ lastOfferDay: day });
+  persistAdState();
+}
 
 const isDev = (): boolean => typeof __DEV__ !== 'undefined' && __DEV__ === true;
 
@@ -107,8 +144,6 @@ export function initAds(): Promise<boolean> {
   const m = adsModule();
   if (!m || (adUnitId('interstitial') === null && adUnitId('rewarded') === null)) return Promise.resolve(false);
   initializing = (async () => {
-    const stored = await loadJson<{ lastInterstitialAt: number | null }>(STORAGE_KEYS.adState, { lastInterstitialAt: null });
-    useAdStore.setState({ lastInterstitialAt: typeof stored.lastInterstitialAt === 'number' ? stored.lastInterstitialAt : null });
     try {
       notePrivacy(await m.AdsConsent.gatherConsent());
     } catch {
@@ -128,7 +163,7 @@ export function initAds(): Promise<boolean> {
 }
 
 /** 깬 뒤 "다음"을 누를 때: 차례이고 불러온 광고가 있으면 띄우고 닫힐 때까지 기다린다. */
-export async function maybeShowInterstitial(ctx: { totalClears: number }): Promise<void> {
+export async function maybeShowInterstitial(ctx: { adFree: boolean; totalClears: number }): Promise<void> {
   const m = adsModule();
   const now = Date.now();
   if (!m || !interstitial?.loaded) return;
@@ -144,8 +179,8 @@ export async function maybeShowInterstitial(ctx: { totalClears: number }): Promi
     offs.push(ad.addAdEventListener(m.AdEventType.ERROR, done));
     ad.show().catch(done);
   });
-  useAdStore.setState({ lastInterstitialAt: now });
-  void saveJson(STORAGE_KEYS.adState, { lastInterstitialAt: now });
+  useAdStore.setState((s) => ({ lastInterstitialAt: now, interstitialsShown: s.interstitialsShown + 1 }));
+  persistAdState();
 }
 
 /** 보상형 광고. 끝까지 봐서 보상을 받았으면 true. 광고가 없으면 false. */

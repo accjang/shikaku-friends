@@ -1,9 +1,9 @@
 import { describe, expect, test } from '@jest/globals';
 
 import levelsJson from '../content/levels.json';
-import { shouldShowInterstitial } from '../src/core/adPolicy';
+import { shouldOfferAdFree, shouldShowInterstitial } from '../src/core/adPolicy';
 import { CHAPTERS, levelCount, levelId, levelOptions, parseLevelId } from '../src/core/chapters';
-import { AD_FREE_FIRST_CLEARS, AD_INTERSTITIAL_EVERY, CHAPTER_UNLOCK_CLEARS, START_HINTS } from '../src/core/config';
+import { AD_FREE_FIRST_CLEARS, AD_FREE_OFFER_AFTER_INTERSTITIALS, AD_INTERSTITIAL_EVERY, CHAPTER_UNLOCK_CLEARS, START_HINTS } from '../src/core/config';
 import { dailyPuzzle, dateKey, prevDateKey } from '../src/core/daily';
 import { applyHint, clearAll, newGame, place, removeAt, undo } from '../src/core/game';
 import { generate } from '../src/core/generator';
@@ -173,13 +173,28 @@ describe('진행 기록', () => {
 });
 
 describe('광고 빈도', () => {
-  const base = { lastInterstitialAt: null, now: 1e9 };
+  const base = { adFree: false, lastInterstitialAt: null, now: 1e9 };
   test('처음 몇 번은 없고 N번마다', () => {
     expect(shouldShowInterstitial({ ...base, totalClears: AD_FREE_FIRST_CLEARS })).toBe(false);
     expect(shouldShowInterstitial({ ...base, totalClears: AD_FREE_FIRST_CLEARS + AD_INTERSTITIAL_EVERY })).toBe(true);
+    expect(shouldShowInterstitial({ ...base, totalClears: AD_FREE_FIRST_CLEARS + AD_INTERSTITIAL_EVERY, adFree: true })).toBe(false);
     expect(
       shouldShowInterstitial({ ...base, totalClears: AD_FREE_FIRST_CLEARS + AD_INTERSTITIAL_EVERY, lastInterstitialAt: base.now - 1000 }),
     ).toBe(false);
+  });
+});
+
+describe('광고 제거 제안', () => {
+  const base = { adFree: false, canPurchase: true, interstitialsShown: AD_FREE_OFFER_AFTER_INTERSTITIALS, lastOfferDay: null, today: '2026-10-25' };
+  test('광고를 몇 번 본 뒤 하루 한 번만', () => {
+    expect(shouldOfferAdFree(base)).toBe(true);
+    expect(shouldOfferAdFree({ ...base, interstitialsShown: AD_FREE_OFFER_AFTER_INTERSTITIALS - 1 })).toBe(false);
+    expect(shouldOfferAdFree({ ...base, lastOfferDay: '2026-10-25' })).toBe(false);
+    expect(shouldOfferAdFree({ ...base, lastOfferDay: '2026-10-24' })).toBe(true);
+  });
+  test('이미 샀거나 결제를 못 쓰면 없음', () => {
+    expect(shouldOfferAdFree({ ...base, adFree: true })).toBe(false);
+    expect(shouldOfferAdFree({ ...base, canPurchase: false })).toBe(false);
   });
 });
 

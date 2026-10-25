@@ -1,13 +1,14 @@
-// 설정: 효과음·진동·언어, 게임 방법, 개인정보처리방침·광고 개인정보 옵션·문의, 버전.
+// 설정: 효과음·진동·언어, 광고 제거·구매 복원, 게임 방법, 개인정보처리방침·광고 개인정보 옵션·문의, 버전.
 import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import { router } from 'expo-router';
 import { useEffect } from 'react';
-import { Linking, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { Alert, Linking, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 
-import { PRIVACY_POLICY_URL, SUPPORT_EMAIL } from '@/core/config';
+import { ADFREE_BONUS_HINTS, PRIVACY_POLICY_URL, SUPPORT_EMAIL } from '@/core/config';
 import { LOCALES, LOCALE_NAMES } from '@/core/i18n';
 import { refreshAdPrivacyOptions, showAdPrivacyOptions, useAdStore } from '@/data/ads';
+import { buyAdFree, restorePurchases, usePurchaseStore } from '@/data/purchases';
 import { useSettingsStore } from '@/data/settingsStore';
 import { playSfx } from '@/ui/feedback';
 import { Screen } from '@/ui/Screen';
@@ -35,6 +36,7 @@ export default function Settings() {
   const { t } = useT();
   const locale = useLocale();
   const { sound, haptics, patch } = useSettingsStore();
+  const { adFree, mode, price, busy } = usePurchaseStore();
   const privacyOptions = useAdStore((s) => s.privacyOptionsRequired);
 
   useEffect(() => {
@@ -57,6 +59,40 @@ export default function Settings() {
             </Pressable>
           ))}
         </View>
+
+        {mode !== 'disabled' ? (
+          <View style={styles.card}>
+            {adFree ? (
+              <Row icon="checkmark-circle" label={t('adFreeOn')} />
+            ) : (
+              <Row
+                icon="sparkles"
+                label={`${t('removeAds')}${price ? ` · ${price}` : ''}`}
+                onPress={
+                  busy
+                    ? undefined
+                    : async () => {
+                        const r = await buyAdFree();
+                        if (r === 'success') Alert.alert(t('purchased'), t('removeAdsDesc', { n: ADFREE_BONUS_HINTS }));
+                        else if (r === 'error') Alert.alert(t('purchaseFailed'));
+                      }
+                }
+              />
+            )}
+            <Row
+              icon="refresh"
+              label={t('restore')}
+              onPress={
+                busy
+                  ? undefined
+                  : async () => {
+                      const ok = await restorePurchases();
+                      Alert.alert(ok ? t('restored') : t('nothingToRestore'));
+                    }
+              }
+            />
+          </View>
+        ) : null}
 
         <View style={styles.card}>
           <Row icon="help-circle" label={t('howTo')} onPress={() => router.push('/tutorial')} />

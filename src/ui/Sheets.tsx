@@ -1,11 +1,11 @@
-// 게임 화면의 팝업: 클리어 결과, 힌트 없음(보상형 광고 보기).
+// 게임 화면의 팝업: 클리어 결과, 힌트 없음(광고 보기·광고 제거).
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect } from 'react';
-import { ActivityIndicator, Image, Modal, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Image, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withDelay, withRepeat, withSequence, withSpring, withTiming, ZoomIn } from 'react-native-reanimated';
 
 import type { CharacterId } from '@/core/chapters';
-import { REWARDED_HINTS } from '@/core/config';
+import { ADFREE_BONUS_HINTS, REWARDED_HINTS } from '@/core/config';
 
 import { Button } from './Button';
 import { charImage } from './characters';
@@ -39,6 +39,8 @@ interface ClearProps {
   onRetry(): void;
   onList(): void;
   listLabel: string;
+  /** 광고 제거 제안(작은 버튼, 조건은 src/core/adPolicy.ts shouldOfferAdFree). 없으면 숨김. */
+  offer?: { label: string; onPress(): void } | null;
 }
 
 export function ClearSheet(p: ClearProps) {
@@ -91,6 +93,12 @@ export function ClearSheet(p: ClearProps) {
               <Button small label={t('retry')} icon="refresh" color={colors.card} edge={colors.line} textColor={colors.ink} onPress={p.onRetry} style={{ flex: 1 }} />
               <Button small label={p.listLabel} icon="grid" color={colors.card} edge={colors.line} textColor={colors.ink} onPress={p.onList} style={{ flex: 1 }} />
             </View>
+            {p.offer ? (
+              <Pressable accessibilityRole="button" onPress={p.offer.onPress} hitSlop={8} style={styles.offer}>
+                <Ionicons name="sparkles" size={15} color={colors.primaryDark} />
+                <Text style={styles.offerText}>{p.offer.label}</Text>
+              </Pressable>
+            ) : null}
           </View>
         </Animated.View>
       </View>
@@ -101,8 +109,12 @@ export function ClearSheet(p: ClearProps) {
 interface HintProps {
   visible: boolean;
   character: CharacterId;
+  adReady: boolean;
   adBusy: boolean;
+  showBuy: boolean;
+  price: string | null;
   onWatchAd(): void;
+  onBuy(): void;
   onClose(): void;
 }
 
@@ -124,6 +136,14 @@ export function NoHintSheet(p: HintProps) {
               onPress={p.onWatchAd}
               sub={p.adBusy ? <ActivityIndicator color={colors.white} size="small" /> : null}
             />
+            {p.showBuy ? (
+              <Button
+                label={`${t('removeAds')}${p.price ? ` · ${p.price}` : ''}`}
+                icon="sparkles"
+                sub={<Text style={styles.sub}>{t('removeAdsDesc', { n: ADFREE_BONUS_HINTS })}</Text>}
+                onPress={p.onBuy}
+              />
+            ) : null}
             <Button small label={t('cancel')} color={colors.card} edge={colors.line} textColor={colors.ink} onPress={p.onClose} />
           </View>
         </Animated.View>
@@ -157,5 +177,7 @@ const styles = StyleSheet.create({
   note: { fontFamily: FONT.round, fontSize: 15, color: colors.primaryDark, marginTop: 2 },
   actions: { alignSelf: 'stretch', gap: space.sm, marginTop: space.lg },
   row: { flexDirection: 'row', gap: space.sm },
+  offer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingTop: space.sm },
+  offerText: { fontFamily: FONT.round, fontSize: 15, color: colors.primaryDark, textDecorationLine: 'underline' },
   sub: { color: colors.white, fontFamily: FONT.round, fontSize: 12, opacity: 0.9 },
 });

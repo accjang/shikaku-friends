@@ -1,7 +1,7 @@
 # 시카쿠 프렌즈 (Shikaku Friends)
 
 숫자만큼 네모를 그리는 퍼즐 게임 **시카쿠**를, 술래잡기 게임의 고양이·판다·토끼 친구들과 함께 푸는 모바일 앱.
-렐로(relo-app)와 같은 스택: **Expo(React Native) + TypeScript + expo-router + zustand**, 광고는 **AdMob**. 앱 안 결제는 없다.
+렐로(relo-app)와 같은 스택: **Expo(React Native) + TypeScript + expo-router + zustand**, 광고는 **AdMob**, 결제는 **RevenueCat**.
 App Store와 Google Play에 같은 코드로 낸다.
 
 ## 게임
@@ -14,28 +14,29 @@ App Store와 Google Play에 같은 코드로 낸다.
 - 캐릭터: 챕터마다 안내하는 친구가 달라지고, 네모를 맞게 놓으면 통통 튀고 틀리면 고개를 젓는다(냥이 츤데레·판다 느긋·토끼 발랄).
 - 첫 실행 튜토리얼(규칙 + 4×4 연습 판), 효과음·진동, 한국어·영어·일본어·중국어(간체).
 
-## 수익 모델: 완전 무료 + 광고(2026-10-25 결정)
-- 앱 안 결제(광고 제거 등)는 없다. 수익은 AdMob 광고만.
-- 전면 광고: 처음 5번 클리어까지는 없음 → 이후 3번 클리어마다 "다음"을 누를 때(최소 3분 간격).
-- 보상형 광고: 힌트가 떨어지면 사용자가 골라서 보고 힌트 2개.
+## 수익 모델(2026-10-25 확정)
+- 무료 + 광고: 처음 5번 클리어까지는 광고 없음 → 이후 3번 클리어마다 "다음"을 누를 때 전면 광고(최소 3분 간격).
+- 힌트가 떨어지면 **보상형 광고**를 보고 힌트 2개(사용자가 고를 때만). 광고 제거를 사도 그대로 쓸 수 있다.
+- **광고 제거** 1회 구매(비소모성, **₩1,900 / US$1.99**): 전면 광고 없음 + 힌트 10개. 구매 복원 지원.
+- 사는 곳: 설정 화면, 힌트가 떨어졌을 때 팝업, 그리고 전면 광고를 2번 이상 본 사람에게 클리어 창 아래 작은 버튼(하루 한 번).
 - 숫자는 전부 `src/core/config.ts`에서 바꾼다.
 
 ## 실행
 ```bash
 cd shikaku
 npm install
-npx expo start              # Expo Go로 빠르게 보기(광고 없이 동작)
-npx expo run:ios            # 개발 빌드(광고 모듈 포함, Xcode 필요)
+npx expo start              # Expo Go로 빠르게 보기(광고·결제 없이 동작)
+npx expo run:ios            # 개발 빌드(광고·결제 모듈 포함, Xcode 필요)
 npx expo run:android        # 개발 빌드(Android Studio·에뮬레이터 필요)
 npm test && npm run typecheck && npm run lint
 ```
-개발 빌드에서는 구글 **테스트 광고**가 나온다.
+개발 빌드에서는 구글 **테스트 광고**와 **가상 결제**가 나온다(진짜 돈이 나가지 않는다).
 
 ## 폴더
 ```
 app/                 화면(expo-router): index 홈, stages, play/[id], tutorial, settings
 src/core/            UI 없는 로직(전부 Jest 테스트): 규칙·풀이기·생성기·진행·광고 빈도·문구
-src/data/            저장(AsyncStorage)·광고(AdMob)
+src/data/            저장(AsyncStorage)·광고(AdMob)·결제(RevenueCat)
 src/ui/              판(Board)·캐릭터(Mascot)·버튼·팝업·테마
 content/levels.json  미리 만든 90스테이지(tools/gen_levels.ts 생성물, 손으로 고치지 않음)
 assets/chars/        캐릭터 이미지(술래잡기 3D 모델 렌더), assets/brand/ 아이콘·스플래시, assets/sounds/ 효과음

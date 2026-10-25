@@ -1,5 +1,5 @@
 // 루트: 글꼴(Jua)·저장소(진행·설정)를 읽는 동안 스플래시 유지 → 스택 내비게이션.
-// 첫 실행(튜토리얼 안 함)이면 홈(app/index.tsx)이 /tutorial로 보낸다. 광고는 튜토리얼이 끝난 뒤 초기화한다.
+// 첫 실행(튜토리얼 안 함)이면 홈(app/index.tsx)이 /tutorial로 보낸다. 결제는 시작할 때, 광고는 튜토리얼이 끝난 뒤 초기화한다.
 import { Jua_400Regular, useFonts } from '@expo-google-fonts/jua';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -8,8 +8,9 @@ import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { initAds } from '@/data/ads';
+import { hydrateAdState, initAds } from '@/data/ads';
 import { useProgressStore } from '@/data/progressStore';
+import { initPurchases } from '@/data/purchases';
 import { useSettingsStore } from '@/data/settingsStore';
 import { colors } from '@/ui/theme';
 
@@ -29,7 +30,13 @@ export default function RootLayout() {
   useEffect(() => {
     void useProgressStore.getState().hydrate();
     void useSettingsStore.getState().hydrate();
+    void hydrateAdState();
   }, []);
+
+  useEffect(() => {
+    if (!progressReady) return;
+    void initPurchases();
+  }, [progressReady]);
 
   useEffect(() => {
     if (!ready) return;
