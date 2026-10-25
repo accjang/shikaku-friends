@@ -9,6 +9,7 @@ import { ADFREE_BONUS_HINTS, REWARDED_HINTS } from '@/core/config';
 
 import { Button } from './Button';
 import { charImage } from './characters';
+import { Sprite } from './Sprite';
 import { playSfx } from './feedback';
 import { CHARACTER_THEME, colors, FONT, radius, shadow, space } from './theme';
 import { useT } from './useT';
@@ -44,6 +45,8 @@ interface ClearProps {
   offer?: { label: string; onPress(): void } | null;
   /** 이번 클리어로 얻은 마을 소품(그림·문구). 없으면 숨김. */
   reward?: { image: ImageSourcePropType; label: string } | null;
+  /** 오늘의 퍼즐 7일 연속 보상 줄(오늘 위치 day는 1~7). */
+  streak?: { day: number; rewards: number[]; label: string } | null;
   shareLabel: string;
   onShare(): void;
 }
@@ -65,7 +68,7 @@ export function ClearSheet(p: ClearProps) {
       <View style={styles.overlay}>
         <Animated.View entering={ZoomIn.springify()} style={[styles.card, { borderColor: theme.main }]}>
           <Animated.View style={[styles.charWrap, jump]}>
-            <Image source={charImage(p.character, 'cheer')} style={styles.char} resizeMode="contain" />
+            <Sprite character={p.character} anim="cheer" size={140} />
           </Animated.View>
           <Text style={styles.clear}>{t('clear')}</Text>
           {p.stars !== null ? (
@@ -95,6 +98,26 @@ export function ClearSheet(p: ClearProps) {
             </Animated.View>
           ) : null}
           {p.newBest ? <Text style={styles.note}>🎉 {t('newBest')}</Text> : null}
+          {p.streak ? (
+            <View style={styles.streakBox}>
+              <Text style={styles.streakLabel}>🔥 {p.streak.label}</Text>
+              <View style={styles.streakRow}>
+                {p.streak.rewards.map((r, i) => {
+                  const done = i < p.streak!.day;
+                  const today = i === p.streak!.day - 1;
+                  return (
+                    <Animated.View
+                      key={i}
+                      entering={today ? ZoomIn.delay(600).springify() : undefined}
+                      style={[styles.streakDot, done && styles.streakDone, today && styles.streakToday, r >= 5 && !done && styles.streakBig]}
+                    >
+                      <Text style={[styles.streakText, done && { color: colors.white }]}>{done ? '✓' : `+${r}`}</Text>
+                    </Animated.View>
+                  );
+                })}
+              </View>
+            </View>
+          ) : null}
           {p.notes.map((n) => (
             <Text key={n} style={styles.note}>
               ✨ {n}
@@ -191,6 +214,23 @@ const styles = StyleSheet.create({
   note: { fontFamily: FONT.round, fontSize: 15, color: colors.primaryDark, marginTop: 2 },
   actions: { alignSelf: 'stretch', gap: space.sm, marginTop: space.lg },
   row: { flexDirection: 'row', gap: space.sm },
+  streakBox: { alignItems: 'center', marginTop: space.sm },
+  streakLabel: { fontFamily: FONT.round, fontSize: 13, color: colors.inkSoft, marginBottom: 4 },
+  streakRow: { flexDirection: 'row', gap: 5 },
+  streakDot: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: colors.line,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.card,
+  },
+  streakDone: { backgroundColor: colors.gold, borderColor: colors.goldDark },
+  streakToday: { transform: [{ scale: 1.15 }] },
+  streakBig: { borderColor: colors.primary },
+  streakText: { fontFamily: FONT.round, fontSize: 12, color: colors.ink },
   reward: { alignItems: 'center', backgroundColor: '#F4FBEF', borderRadius: radius.md, paddingVertical: space.sm, paddingHorizontal: space.lg, marginTop: space.sm },
   rewardImage: { width: 72, height: 72 },
   rewardText: { fontFamily: FONT.round, fontSize: 15, color: '#4E9E70', marginTop: 2 },

@@ -7,21 +7,23 @@ import { Alert, AppState, Platform, Share, StyleSheet, Text, useWindowDimensions
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { CHAPTERS, chapterById, levelCount, levelId, parseLevelId, type CharacterId } from '@/core/chapters';
-import { BUBBLE_MS, CLEAR_DELAY_MS, DAILY_HINT_REWARD, REWARDED_HINTS } from '@/core/config';
-import { dailyPuzzle, dateKey, prevDateKey } from '@/core/daily';
+import { BUBBLE_MS, CLEAR_DELAY_MS, DAILY_STREAK_REWARDS, REWARDED_HINTS } from '@/core/config';
+import { dailyPuzzle, dateKey } from '@/core/daily';
 import { dailyShareText, stageShareText } from '@/core/share';
-import { newlyUnlockedProp, stagesCleared, type PropId } from '@/core/village';
+import { companionFor, newlyUnlockedProp, stagesCleared, type PropId } from '@/core/village';
 import { applyHint, clearAll, newGame, place, removeAt, undo, type GameState } from '@/core/game';
 import { characterLine, PROP_NAMES, type Mood } from '@/core/i18n';
 import { unpack, type PackedPuzzle } from '@/core/levelCodec';
-import { addHints, dailyStreak, recordDailyClear, recordLevelClear, spendHint } from '@/core/progress';
+import { addHints, recordDailyClear, recordLevelClear, spendHint, streakCycleDay } from '@/core/progress';
 import { shouldOfferAdFree } from '@/core/adPolicy';
 import { coverage, validClueIndex, type Puzzle, type Rect } from '@/core/puzzle';
 import { maybeShowInterstitial, noteAdFreeOffered, showRewarded, useAdStore } from '@/data/ads';
 import { useProgressStore } from '@/data/progressStore';
+import { useSettingsStore } from '@/data/settingsStore';
 import { buyAdFree, usePurchaseStore } from '@/data/purchases';
 import { Board } from '@/ui/Board';
 import { Celebration } from '@/ui/Celebration';
+import { postcard } from '@/ui/postcards';
 import { propImage } from '@/ui/props';
 import { IconButton } from '@/ui/Button';
 import { buzz, playSfx } from '@/ui/feedback';
@@ -115,7 +117,11 @@ interface GameProps {
 }
 
 function Game({ session, t, locale, onRestart }: GameProps) {
-  const { puzzle, character } = session;
+  const { puzzle } = session;
+  // 안내 친구는 판을 시작할 때 정한다(고른 친구가 마을에 있으면 그 친구, 아니면 챕터 친구)
+  const [character] = useState(() =>
+    companionFor(useProgressStore.getState().progress, useSettingsStore.getState().companion, session.character),
+  );
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const progress = useProgressStore((s) => s.progress);
@@ -141,6 +147,8 @@ function Game({ session, t, locale, onRestart }: GameProps) {
     notes: string[];
     reward: PropId | null;
     share: string;
+    /** 오늘의 퍼즐 7일 주기 안 오늘 위치(처음 깬 날만). */
+    streakDay: number | null;
   } | null>(null);
   const ms = useStopwatch(!game.solved);
   const bubbleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -179,6 +187,7 @@ function Game({ session, t, locale, onRestart }: GameProps) {
       let best: number | null = null;
       let newBest = false;
       let share = '';
+      let streakDay: number | null = null;
       const clearedBefore = stagesCleared(progress);
       if (session.kind === 'level') {
         const out = recordLevelClear(progress, session.key, state.hintsUsed, elapsed);
@@ -192,17 +201,18 @@ function Game({ session, t, locale, onRestart }: GameProps) {
         const out = recordDailyClear(progress, session.key, elapsed);
         useProgressStore.getState().set(out.progress);
         best = out.progress.daily[session.key];
-        if (out.rewarded) notes.push(t('dailyReward', { n: DAILY_HINT_REWARD }));
+        if (out.reward > 0) notes.push(t('dailyReward', { d: out.streak, n: out.reward }));
+        streakDay = out.reward > 0 ? streakCycleDay(out.streak) : null;
         share = dailyShareText(locale, {
           dateKey: session.key,
           ms: elapsed,
           hintsUsed: state.hintsUsed,
-          streak: dailyStreak(out.progress, session.key, prevDateKey),
+          streak: out.streak,
         });
       }
       // 스테이지 10개마다 마을 소품 하나
       const reward = newlyUnlockedProp(clearedBefore, stagesCleared(useProgressStore.getState().progress));
-      setResult({ stars, ms: elapsed, best, newBest, notes, reward, share });
+      setResult({ stars, ms: elapsed, best, newBest, notes, reward, share, streakDay });
       // 광고를 몇 번 본 사람에게만 클리어 창 아래 작은 "광고 제거" 버튼(하루 한 번)
       const today = dateKey(new Date());
       const ad = useAdStore.getState();
@@ -325,7 +335,7 @@ function Game({ session, t, locale, onRestart }: GameProps) {
       }
     >
       <View style={styles.mascotRow}>
-        <Mascot character={character} mood={mood} beat={beat} line={line} size={96} pose={game.solved ? 'cheer' : 'q'} />
+        <Mascot character={character} mood={mood} beat={beat} line={line} size={96} anim={game.solved ? 'cheer' : 'idle'} />
       </View>
 
       <View style={styles.boardWrap}>
@@ -335,6 +345,7 @@ function Game({ session, t, locale, onRestart }: GameProps) {
           cell={cell}
           disabled={game.solved}
           celebrate={game.solved}
+          picture={postcard(character)}
           onPlace={onPlace}
           onRemove={onRemove}
           onDragStep={onDragStep}
@@ -377,6 +388,7 @@ function Game({ session, t, locale, onRestart }: GameProps) {
         onRetry={restart}
         listLabel={session.kind === 'daily' ? t('stages') : t('toStages')}
         reward={result?.reward ? { image: propImage(result.reward), label: t('newProp', { name: PROP_NAMES[result.reward][locale] }) } : null}
+        streak={result?.streakDay ? { day: result.streakDay, rewards: [...DAILY_STREAK_REWARDS], label: t('streakTrack') } : null}
         shareLabel={t('share')}
         onShare={() => {
           if (result?.share) void Share.share({ message: result.share }).catch(() => undefined);

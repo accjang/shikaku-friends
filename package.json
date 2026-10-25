@@ -12,7 +12,8 @@
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "render:chars": "node tools/render_chars.mjs",
-    "render:props": "node tools/render_props.mjs"
+    "render:props": "node tools/render_props.mjs",
+    "render:anims": "node tools/render_anims.mjs"
   },
   "dependencies": {
     "@expo-google-fonts/jua": "^0.4.1",

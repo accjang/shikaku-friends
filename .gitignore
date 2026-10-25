@@ -36,3 +36,4 @@ npm-debug.*
 __pycache__/
 tools/out/
 tools/out_props/
+tools/out_anims/

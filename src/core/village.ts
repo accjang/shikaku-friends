@@ -63,3 +63,8 @@ export function newlyUnlockedProp(clearedBefore: number, clearedAfter: number): 
 export function villageFriends(p: Progress): CharacterId[] {
   return CHAPTERS.filter((c) => isChapterUnlocked(p, c.id)).map((c) => c.character);
 }
+
+/** 이번 판을 안내할 친구: 고른 친구가 마을에 와 있으면 그 친구, 아니면 기본(챕터 친구). */
+export function companionFor(p: Progress, chosen: CharacterId | null, fallback: CharacterId): CharacterId {
+  return chosen && villageFriends(p).includes(chosen) ? chosen : fallback;
+}

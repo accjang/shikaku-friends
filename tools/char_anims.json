@@ -1,0 +1,19 @@
+{
+  "_comment": "캐릭터 움직임(프레임 애니메이션, tools/render_anims.mjs). from~to 구간을 frames장으로 나눠 렌더하고 앱은 왕복(핑퐁)으로 재생한다. 오리는 리깅이 없어 없음(통통 튀는 효과만).",
+  "cat": {
+    "idle": { "model": "rigged/cat_hand_on_hip.glb", "from": 0, "to": 0.95, "frames": 12 },
+    "cheer": { "model": "rigged/cat_joyful_dance.glb", "from": 0, "to": 0.9, "frames": 12 }
+  },
+  "panda": {
+    "idle": { "model": "rigged/panda_idle.glb", "from": 0, "to": 0.18, "frames": 10 },
+    "cheer": { "model": "rigged/panda_jump_run.glb", "from": 0, "to": 0.9, "frames": 12 }
+  },
+  "rabbit": {
+    "idle": { "model": "rigged/rabbit_idle.glb", "from": 0, "to": 0.18, "frames": 10 },
+    "cheer": { "model": "rigged/rabbit_hop_arms_raised.glb", "from": 0, "to": 0.9, "frames": 12 }
+  },
+  "shiba": {
+    "idle": { "model": "rigged/shiba_joyful_dance.glb", "from": 0, "to": 0.3, "frames": 10 },
+    "cheer": { "model": "rigged/shiba_boom_dance.glb", "from": 0, "to": 0.9, "frames": 12 }
+  }
+}

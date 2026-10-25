@@ -21,7 +21,7 @@ tests/          Jest 테스트
 ## 코딩 규칙
 - TypeScript strict. 매직넘버 금지: 횟수·시간·가격·ID는 `src/core/config.ts` 상수로.
 - 로직은 `src/core/`에 UI 없이 두고 Jest로 테스트한다. 화면은 로직을 호출만 한다.
-- `content/levels.json`, `assets/chars/`, `assets/props/`, `assets/brand/`, `assets/sounds/`는 `tools/` 스크립트 생성물이다. 손으로 고치지 않는다.
+- `content/levels.json`, `assets/chars/`, `assets/anims/`(+`src/ui/sprites.ts`), `assets/postcards/`, `assets/props/`, `assets/brand/`, `assets/sounds/`는 `tools/` 스크립트 생성물이다. 손으로 고치지 않는다.
 - **출시 뒤에는 기존 스테이지를 다시 생성하지 않는다**(기록이 다른 퍼즐에 붙는다). 늘릴 때는 챕터를 추가한다.
 - 문구는 `src/core/i18n.ts`에 ko/en/ja/zh 모두 넣는다(빠지면 테스트 실패).
 - 광고·결제 키는 `.env`(EXPO_PUBLIC_*)로만. `process.env.EXPO_PUBLIC_이름`을 글자 그대로 써야 빌드 때 들어간다.

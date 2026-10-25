@@ -8,11 +8,11 @@ import Animated, { useAnimatedStyle, useSharedValue, withDelay, withRepeat, with
 import { levelId, type CharacterId } from '@/core/chapters';
 import { PROP_EVERY } from '@/core/config';
 import { nextProp, PROP_IDS, stagesCleared, unlockedPropCount } from '@/core/village';
-import { dailyStreak, nextUnplayed, starCount } from '@/core/progress';
+import { dailyStreak, nextUnplayed, starCount, streakReward } from '@/core/progress';
 import { dateKey, prevDateKey } from '@/core/daily';
 import { useProgressStore } from '@/data/progressStore';
 import { Button } from '@/ui/Button';
-import { charImage, type Pose } from '@/ui/characters';
+import { Sprite } from '@/ui/Sprite';
 import { propImage } from '@/ui/props';
 import { playSfx } from '@/ui/feedback';
 import { Pill, Screen } from '@/ui/Screen';
@@ -22,7 +22,7 @@ import { useT } from '@/ui/useT';
 /** 홈 친구들이 옆 친구와 겹치는 정도(다섯 명이 좁은 화면에 들어가게). */
 const FRIEND_OVERLAP = 5;
 
-function Bouncy({ id, pose, size, delay }: { id: CharacterId; pose: Pose; size: number; delay: number }) {
+function Bouncy({ id, size, delay }: { id: CharacterId; size: number; delay: number }) {
   const y = useSharedValue(0);
   useEffect(() => {
     y.value = withDelay(delay, withRepeat(withSequence(withTiming(-10, { duration: 600 }), withTiming(0, { duration: 600 })), -1, true));
@@ -36,7 +36,7 @@ function Bouncy({ id, pose, size, delay }: { id: CharacterId; pose: Pose; size: 
           y.set(withSequence(withTiming(-40, { duration: 160 }), withTiming(0, { duration: 260 })));
         }}
       >
-        <Image source={charImage(id, pose)} style={{ width: size, height: size }} resizeMode="contain" />
+        <Sprite character={id} anim="idle" size={size} offset={delay / 100} />
       </Pressable>
     </Animated.View>
   );
@@ -90,11 +90,11 @@ export default function Home() {
         <Logo text={t('appName')} />
         <Text style={styles.tagline}>{t('tagline')}</Text>
         <View style={styles.friends}>
-          <Bouncy id="duck" pose="q" size={64} delay={600} />
-          <Bouncy id="cat" pose="q" size={82} delay={0} />
-          <Bouncy id="panda" pose="front" size={114} delay={200} />
-          <Bouncy id="rabbit" pose="ql" size={82} delay={400} />
-          <Bouncy id="shiba" pose="ql" size={74} delay={800} />
+          <Bouncy id="duck" size={64} delay={600} />
+          <Bouncy id="cat" size={82} delay={0} />
+          <Bouncy id="panda" size={114} delay={200} />
+          <Bouncy id="rabbit" size={82} delay={400} />
+          <Bouncy id="shiba" size={78} delay={800} />
         </View>
       </View>
 
@@ -135,7 +135,13 @@ export default function Home() {
           icon="calendar"
           color={colors.gold}
           edge={colors.goldDark}
-          sub={<Text style={styles.sub}>{doneToday ? `✓ ${t('dailyDone')}` : streak > 0 ? t('streak', { n: streak }) : today}</Text>}
+          sub={
+            <Text style={styles.sub}>
+              {doneToday
+                ? `✓ ${t('dailyDone')}${streak > 1 ? ` · 🔥 ${t('streak', { n: streak })}` : ''}`
+                : `${streak > 0 ? `🔥 ${t('streak', { n: streak })} · ` : ''}${t('dailyNext', { n: streakReward(streak + 1) })}`}
+            </Text>
+          }
           onPress={() => router.push('/play/daily')}
         />
       </View>

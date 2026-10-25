@@ -1,6 +1,7 @@
 // 진행 기록(UI 없음): 깬 스테이지·별·기록, 힌트 수, 오늘의 퍼즐. 저장은 src/data/progressStore.ts.
 import { CHAPTERS, chapterById, levelCount, levelId, type Chapter } from './chapters';
-import { CHAPTER_UNLOCK_CLEARS, DAILY_HINT_REWARD, START_HINTS, STAR_HINT_LIMITS } from './config';
+import { CHAPTER_UNLOCK_CLEARS, DAILY_STREAK_REWARDS, START_HINTS, STAR_HINT_LIMITS } from './config';
+import { prevDateKey } from './daily';
 
 export interface LevelRecord {
   stars: number;
@@ -108,17 +109,36 @@ export function recordLevelClear(p: Progress, id: string, hintsUsed: number, ms:
 }
 
 /** 오늘의 퍼즐 완료. 그날 처음이면 힌트 보상. */
-export function recordDailyClear(p: Progress, dateKey: string, ms: number): { progress: Progress; rewarded: boolean } {
+/** 연속 n일째(1부터)에 받는 힌트(7일 주기). */
+export function streakReward(streakDay: number): number {
+  const i = (Math.max(1, streakDay) - 1) % DAILY_STREAK_REWARDS.length;
+  return DAILY_STREAK_REWARDS[i];
+}
+
+/** 7일 주기 안에서 몇 번째 날인지(1~7). */
+export function streakCycleDay(streakDay: number): number {
+  return ((Math.max(1, streakDay) - 1) % DAILY_STREAK_REWARDS.length) + 1;
+}
+
+export interface DailyClearOutcome {
+  progress: Progress;
+  /** 그날 처음 깼으면 받은 힌트 수, 아니면 0. */
+  reward: number;
+  /** 오늘을 포함한 연속 일수. */
+  streak: number;
+}
+
+/** 오늘의 퍼즐 완료. 그날 처음이면 연속 일수에 맞는 힌트 보상. */
+export function recordDailyClear(p: Progress, dateKey: string, ms: number): DailyClearOutcome {
   const first = !(dateKey in p.daily);
   const best = first ? ms : Math.min(p.daily[dateKey], ms);
+  const daily = { ...p.daily, [dateKey]: best };
+  const streak = dailyStreak({ ...p, daily }, dateKey, prevDateKey);
+  const reward = first ? streakReward(streak) : 0;
   return {
-    progress: {
-      ...p,
-      daily: { ...p.daily, [dateKey]: best },
-      hints: p.hints + (first ? DAILY_HINT_REWARD : 0),
-      totalClears: p.totalClears + 1,
-    },
-    rewarded: first,
+    progress: { ...p, daily, hints: p.hints + reward, totalClears: p.totalClears + 1 },
+    reward,
+    streak,
   };
 }
 

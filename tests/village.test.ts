@@ -5,7 +5,7 @@ import { PROP_EVERY } from '../src/core/config';
 import { LOCALES, PROP_NAMES } from '../src/core/i18n';
 import { INITIAL_PROGRESS, recordLevelClear } from '../src/core/progress';
 import { dailyNumber, dailyShareText, hintStrip, stageShareText } from '../src/core/share';
-import { newlyUnlockedProp, nextProp, PROP_IDS, stagesCleared, unlockedProps, villageFriends } from '../src/core/village';
+import { companionFor, newlyUnlockedProp, nextProp, PROP_IDS, stagesCleared, unlockedProps, villageFriends } from '../src/core/village';
 
 describe('마을 꾸미기', () => {
   test('스테이지 10개마다 소품 하나, 200개에 20개(마지막은 집)', () => {
@@ -34,6 +34,12 @@ describe('마을 꾸미기', () => {
 
   test('친구는 챕터가 열리면 마을에 온다', () => {
     expect(villageFriends(INITIAL_PROGRESS)).toEqual(['cat']);
+  });
+
+  test('함께 다닐 친구: 마을에 온 친구만, 아니면 챕터 친구', () => {
+    expect(companionFor(INITIAL_PROGRESS, null, 'panda')).toBe('panda');
+    expect(companionFor(INITIAL_PROGRESS, 'cat', 'panda')).toBe('cat');
+    expect(companionFor(INITIAL_PROGRESS, 'duck', 'panda')).toBe('panda'); // 아직 안 옴
   });
 
   test('모든 소품에 4개 언어 이름', () => {

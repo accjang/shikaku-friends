@@ -36,5 +36,35 @@ window.render = async (model, t, yaw, pitch = 0.12) => {
   scene.remove(m);
   return url;
 };
+// 애니메이션 여러 장면을 같은 카메라로 렌더(프레임 애니메이션용, 흔들리지 않게 첫 장면 기준으로 고정).
+window.renderSeq = async (model, ts, yaw, pitch = 0.12) => {
+  const g = await new GLTFLoader().loadAsync('/assets/source/models/' + model);
+  const m = g.scene; scene.add(m);
+  const mixer = new THREE.AnimationMixer(m);
+  const clip = g.animations[0];
+  mixer.clipAction(clip).play();
+  // 모든 장면을 감싸는 상자로 카메라를 정한다
+  const box = new THREE.Box3();
+  for (const t of ts) {
+    mixer.setTime(clip.duration * t);
+    m.updateMatrixWorld(true);
+    box.union(new THREE.Box3().setFromObject(m, true));
+  }
+  const size = box.getSize(new THREE.Vector3());
+  const ctr = box.getCenter(new THREE.Vector3());
+  const r = Math.max(size.x, size.y, size.z) * 0.5;
+  const dist = (r / Math.tan(THREE.MathUtils.degToRad(15))) * 1.05;
+  cam.position.set(ctr.x + Math.sin(yaw) * Math.cos(pitch) * dist, ctr.y + Math.sin(pitch) * dist, ctr.z + Math.cos(yaw) * Math.cos(pitch) * dist);
+  cam.lookAt(ctr);
+  const urls = [];
+  for (const t of ts) {
+    mixer.setTime(clip.duration * t);
+    m.updateMatrixWorld(true);
+    renderer.render(scene, cam);
+    urls.push(c.toDataURL('image/png'));
+  }
+  scene.remove(m);
+  return urls;
+};
 window.ready = true;
 </script></body></html>

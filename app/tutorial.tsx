@@ -57,7 +57,7 @@ export default function Tutorial() {
         </Pressable>
       </View>
       <View style={styles.mascot}>
-        <Mascot character="rabbit" mood={done ? 'clear' : 'good'} beat={done ? beat : 0} line={line} size={110} pose="ql" />
+        <Mascot character="rabbit" mood={done ? 'clear' : 'good'} beat={done ? beat : 0} line={line} size={110} anim={done ? 'cheer' : 'idle'} />
       </View>
 
       {step === 'rules' ? (

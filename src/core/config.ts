@@ -27,8 +27,8 @@ export const PROP_EVERY = 10;
 export const CHAPTER_UNLOCK_CLEARS = 25;
 /** 처음 주는 힌트 수. */
 export const START_HINTS = 3;
-/** 오늘의 퍼즐을 깨면 주는 힌트. */
-export const DAILY_HINT_REWARD = 1;
+/** 오늘의 퍼즐 연속 보상(힌트): 연속 1일째~7일째, 8일째부터 다시 처음부터 반복. */
+export const DAILY_STREAK_REWARDS = [1, 1, 2, 1, 1, 2, 5] as const;
 /** 보상형 광고 한 번에 주는 힌트. */
 export const REWARDED_HINTS = 2;
 /** 별: 힌트를 이 수 이하로 썼으면 3개/2개, 그 위는 1개. */
@@ -48,8 +48,13 @@ export const CONFETTI_MS = 1600;
 export const BALLOON_COUNT = 5;
 export const BALLOON_RISE_MS = 1100;
 export const BALLOON_STAGGER_MS = 180;
+/** 캐릭터 움직임 프레임 속도(초당). */
+export const SPRITE_FPS = 9;
 /** 판이 완성되면 네모들이 차례로 통통 튀는 간격. */
 export const RECT_WAVE_STEP_MS = 45;
+/** 네모가 튄 뒤 그림 창문이 열리기까지, 열리는 시간. */
+export const PICTURE_REVEAL_DELAY_MS = 180;
+export const PICTURE_REVEAL_MS = 320;
 
 // ── 저장소 ──
 export const STORAGE_VERSION = 1;

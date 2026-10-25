@@ -4,12 +4,14 @@ import { useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSequence, withSpring, withTiming } from 'react-native-reanimated';
 
-import type { CharacterId } from '@/core/chapters';
+import { CHAPTERS, type CharacterId } from '@/core/chapters';
 import { PROP_EVERY } from '@/core/config';
 import { CHARACTER_NAMES, characterLine, PROP_NAMES } from '@/core/i18n';
 import { nextProp, PROP_IDS, stagesCleared, unlockedPropCount, villageFriends, type PropId } from '@/core/village';
 import { useProgressStore } from '@/data/progressStore';
+import { useSettingsStore } from '@/data/settingsStore';
 import { charImage } from '@/ui/characters';
+import { Sprite } from '@/ui/Sprite';
 import { buzz, playSfx } from '@/ui/feedback';
 import { propImage } from '@/ui/props';
 import { Screen } from '@/ui/Screen';
@@ -48,6 +50,8 @@ export default function Village() {
   const have = unlockedPropCount(cleared);
   const next = nextProp(cleared);
   const friends = villageFriends(progress);
+  const companion = useSettingsStore((s) => s.companion);
+  const patchSettings = useSettingsStore((s) => s.patch);
   const [message, setMessage] = useState<string | null>(null);
   const [beat, setBeat] = useState(0);
 
@@ -81,6 +85,51 @@ export default function Village() {
         </View>
         <View style={styles.track}>
           <View style={[styles.fill, { width: `${(have / PROP_IDS.length) * 100}%` }]} />
+        </View>
+
+        <Text style={styles.pickLabel}>{t('companion')}</Text>
+        <View style={styles.pickRow}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('companionAuto')}
+            onPress={() => {
+              playSfx('tap');
+              patchSettings({ companion: null });
+            }}
+            style={[styles.pick, companion === null && styles.pickOn]}
+          >
+            <Text style={[styles.pickAuto, companion === null && { color: colors.white }]}>{t('companionAuto')}</Text>
+          </Pressable>
+          {CHAPTERS.map((ch) => {
+            const here = friends.includes(ch.character);
+            const on = companion === ch.character;
+            return (
+              <Pressable
+                key={ch.character}
+                accessibilityRole="button"
+                accessibilityLabel={CHARACTER_NAMES[ch.character][locale]}
+                onPress={() => {
+                  if (!here) {
+                    playSfx('tap');
+                    say(t('companionLocked', { name: CHARACTER_NAMES[ch.character][locale], n: ch.id }));
+                    return;
+                  }
+                  playSfx('place');
+                  buzz('light');
+                  patchSettings({ companion: ch.character });
+                  say(`${CHARACTER_NAMES[ch.character][locale]}: ${characterLine(ch.character, locale, 'start', beat)}`);
+                }}
+                style={[styles.pick, on && styles.pickOn, !here && styles.pickLocked]}
+              >
+                <Image
+                  source={charImage(ch.character, 'head')}
+                  style={styles.pickHead}
+                  tintColor={here ? undefined : '#B8B0C8'}
+                  resizeMode="contain"
+                />
+              </Pressable>
+            );
+          })}
         </View>
 
         <View style={[styles.scene, { width: size.w, height: size.h }]}>
@@ -136,7 +185,7 @@ export default function Village() {
                   say(`${CHARACTER_NAMES[it.id][locale]}: ${characterLine(it.id, locale, 'good', beat + it.id.length)}`);
                 }}
               >
-                <Image source={charImage(it.id, 'front')} style={styles.fillImg} resizeMode="contain" />
+                <Sprite character={it.id} anim="idle" size={it.spot.h * size.h} offset={it.id.length * 3} />
               </Bouncer>
             ),
           )}
@@ -158,6 +207,22 @@ const styles = StyleSheet.create({
   next: { flex: 1, fontFamily: FONT.round, fontSize: 15, color: colors.inkSoft },
   track: { alignSelf: 'stretch', height: 10, borderRadius: 5, backgroundColor: 'rgba(75,63,107,0.1)', marginTop: space.sm, overflow: 'hidden' },
   fill: { height: 10, borderRadius: 5, backgroundColor: '#7FCB9C' },
+  pickLabel: { alignSelf: 'flex-start', fontFamily: FONT.round, fontSize: 14, color: colors.inkSoft, marginTop: space.md },
+  pickRow: { flexDirection: 'row', alignSelf: 'stretch', gap: 6, marginTop: 6 },
+  pick: {
+    flex: 1,
+    height: 52,
+    borderRadius: radius.md,
+    backgroundColor: colors.card,
+    borderWidth: 2,
+    borderColor: colors.line,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  pickOn: { backgroundColor: colors.primary, borderColor: colors.primaryDark },
+  pickLocked: { opacity: 0.6 },
+  pickHead: { width: 40, height: 40 },
+  pickAuto: { fontFamily: FONT.round, fontSize: 14, color: colors.ink },
   scene: { marginTop: space.md, borderRadius: radius.lg, overflow: 'hidden', borderWidth: 3, borderColor: '#CFE8C2', ...shadow },
   sky: { position: 'absolute', left: 0, right: 0, top: 0, backgroundColor: '#CFEAFB' },
   cloud: { position: 'absolute', fontSize: 38, opacity: 0.9 },

@@ -1,11 +1,11 @@
 // 시카쿠 판. 칸을 드래그하면 네모 미리보기 → 손을 떼면 놓는다. 네모를 탭하면 지운다. 빈 칸을 탭하면 1칸 네모.
 // 규칙 판정은 src/core/puzzle.ts, 상태 변경은 부모(onPlace·onRemove)가 한다.
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Image, StyleSheet, Text, View, type ImageSourcePropType, type StyleProp, type ViewStyle } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { useAnimatedStyle, useSharedValue, withDelay, withSequence, withSpring, withTiming, ZoomIn } from 'react-native-reanimated';
 
-import { RECT_WAVE_STEP_MS } from '@/core/config';
+import { PICTURE_REVEAL_DELAY_MS, PICTURE_REVEAL_MS, RECT_WAVE_STEP_MS } from '@/core/config';
 
 import { area, contains, rectAt, rectFromCorners, validClueIndex, type Puzzle, type Rect } from '@/core/puzzle';
 
@@ -22,22 +22,60 @@ interface Props {
   onDragStep?(): void;
   /** 다 풀었을 때 네모들이 차례로 통통 튄다. */
   celebrate?: boolean;
-}
-
-/** 놓은 네모 하나. 놓을 때 커지며 나타나고, wave ≥ 0이면 (wave번째 순서로) 한 번 튄다. */
-function WaveRect({ wave, style }: { wave: number; style: StyleProp<ViewStyle> }) {
-  const scale = useSharedValue(1);
-  useEffect(() => {
-    if (wave < 0) return;
-    scale.value = withDelay(wave * RECT_WAVE_STEP_MS, withSequence(withTiming(1.12, { duration: 140 }), withSpring(1, { damping: 6, stiffness: 260 })));
-  }, [wave, scale]);
-  const anim = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
-  return <Animated.View entering={ZoomIn.duration(160)} style={[style, anim]} />;
+  /** 다 풀면 네모마다 창문처럼 드러나는 그림(판 전체 크기로 맞춤). */
+  picture?: ImageSourcePropType;
 }
 
 const GAP = 2;
+const RECT_BORDER = 2.5;
 
-export function Board({ puzzle, rects, cell, disabled, onPlace, onRemove, onDragStep, celebrate }: Props) {
+interface Window {
+  source: ImageSourcePropType;
+  /** 네모 안쪽(테두리 안) 기준으로 판 그림을 얼마나 옮길지. */
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+}
+
+/** 놓은 네모 하나. 놓을 때 커지며 나타나고, wave ≥ 0이면 (wave번째 순서로) 한 번 튀며 그림 창문이 열린다. */
+function WaveRect({ wave, style, window }: { wave: number; style: StyleProp<ViewStyle>; window?: Window }) {
+  const scale = useSharedValue(1);
+  const reveal = useSharedValue(0);
+  useEffect(() => {
+    if (wave < 0) return;
+    const delay = wave * RECT_WAVE_STEP_MS;
+    scale.value = withDelay(delay, withSequence(withTiming(1.12, { duration: 140 }), withSpring(1, { damping: 6, stiffness: 260 })));
+    reveal.value = withDelay(delay + PICTURE_REVEAL_DELAY_MS, withTiming(1, { duration: PICTURE_REVEAL_MS }));
+  }, [wave, scale, reveal]);
+  const anim = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+  const pic = useAnimatedStyle(() => ({ opacity: reveal.value }));
+  return (
+    <Animated.View entering={ZoomIn.duration(160)} style={[style, styles.clip, anim]}>
+      {window && wave >= 0 ? (
+        <Animated.View style={[StyleSheet.absoluteFill, pic]}>
+          <Image
+            source={window.source}
+            style={{ position: 'absolute', left: window.left, top: window.top, width: window.width, height: window.height }}
+            resizeMode="cover"
+          />
+        </Animated.View>
+      ) : null}
+    </Animated.View>
+  );
+}
+
+/** 다 풀면 숫자가 서서히 사라진다(그림이 잘 보이게). */
+function FadeOut({ active, children }: { active: boolean; children: React.ReactNode }) {
+  const o = useSharedValue(1);
+  useEffect(() => {
+    if (active) o.value = withDelay(PICTURE_REVEAL_DELAY_MS, withTiming(0, { duration: PICTURE_REVEAL_MS * 2 }));
+  }, [active, o]);
+  const style = useAnimatedStyle(() => ({ opacity: o.value }));
+  return <Animated.View style={[StyleSheet.absoluteFill, style]}>{children}</Animated.View>;
+}
+
+export function Board({ puzzle, rects, cell, disabled, onPlace, onRemove, onDragStep, celebrate, picture }: Props) {
   const W = puzzle.w * cell;
   const H = puzzle.h * cell;
   const [preview, setPreview] = useState<Rect | null>(null);
@@ -115,6 +153,11 @@ export function Board({ puzzle, rects, cell, disabled, onPlace, onRemove, onDrag
               <WaveRect
                 key={`${r.x},${r.y},${r.w},${r.h}`}
                 wave={celebrate ? i : -1}
+                window={
+                  picture
+                    ? { source: picture, left: -(r.x * cell + GAP + RECT_BORDER), top: -(r.y * cell + GAP + RECT_BORDER), width: W, height: H }
+                    : undefined
+                }
                 style={[
                   styles.rect,
                   {
@@ -158,6 +201,7 @@ export function Board({ puzzle, rects, cell, disabled, onPlace, onRemove, onDrag
           ) : null}
 
           {/* 숫자 */}
+          <FadeOut active={!!celebrate && !!picture}>
           {puzzle.clues.map((c, i) => {
             const covered = rects.some((r) => contains(r, c.x, c.y));
             return (
@@ -182,6 +226,7 @@ export function Board({ puzzle, rects, cell, disabled, onPlace, onRemove, onDrag
               </View>
             );
           })}
+          </FadeOut>
         </View>
       </View>
     </GestureDetector>
@@ -201,7 +246,8 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth * 2,
     borderColor: colors.cellLine,
   },
-  rect: { position: 'absolute', borderWidth: 2.5 },
+  rect: { position: 'absolute', borderWidth: RECT_BORDER },
+  clip: { overflow: 'hidden' },
   preview: { position: 'absolute', borderWidth: 3, alignItems: 'center', justifyContent: 'center' },
   sizeTag: { position: 'absolute', top: -26, alignSelf: 'center', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10 },
   sizeText: { color: colors.white, fontFamily: FONT.round, fontSize: 14 },

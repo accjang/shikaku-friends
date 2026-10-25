@@ -1,6 +1,6 @@
-// 캐릭터 + 말풍선. mood가 바뀌면 통통 튀거나(good·clear·hint) 고개를 젓는다(bad).
+// 캐릭터 + 말풍선. 캐릭터는 움직이는 프레임 애니메이션(Sprite), mood가 바뀌면 통통 튀거나(good·clear·hint) 고개를 젓는다(bad).
 import { useEffect } from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -13,7 +13,8 @@ import Animated, {
 import type { CharacterId } from '@/core/chapters';
 import type { Mood } from '@/core/i18n';
 
-import { charImage, type Pose } from './characters';
+import { Sprite } from './Sprite';
+import type { AnimName } from './sprites';
 import { colors, FONT, shadow } from './theme';
 
 interface Props {
@@ -23,19 +24,15 @@ interface Props {
   beat: number;
   line: string | null;
   size?: number;
-  pose?: Pose;
+  /** idle(평소) 또는 cheer(기뻐하며 춤). */
+  anim?: AnimName;
   /** 말풍선 방향: 캐릭터 오른쪽(right) 또는 위(top). */
   bubble?: 'right' | 'top';
 }
 
-export function Mascot({ character, mood, beat, line, size = 96, pose = 'q', bubble = 'right' }: Props) {
+export function Mascot({ character, mood, beat, line, size = 96, anim = 'idle', bubble = 'right' }: Props) {
   const jump = useSharedValue(0);
   const tilt = useSharedValue(0);
-  const breathe = useSharedValue(1);
-
-  useEffect(() => {
-    breathe.value = withRepeat(withSequence(withTiming(1.03, { duration: 1100 }), withTiming(1, { duration: 1100 })), -1, true);
-  }, [breathe]);
 
   useEffect(() => {
     if (beat === 0) return;
@@ -54,13 +51,13 @@ export function Mascot({ character, mood, beat, line, size = 96, pose = 'q', bub
   }, [beat, mood, size, jump, tilt]);
 
   const animStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: jump.value }, { rotate: `${tilt.value}deg` }, { scaleY: breathe.value }],
+    transform: [{ translateY: jump.value }, { rotate: `${tilt.value}deg` }],
   }));
 
   return (
     <View style={[styles.row, bubble === 'top' && { flexDirection: 'column-reverse' }]}>
       <Animated.View style={[{ width: size, height: size }, animStyle]}>
-        <Image source={charImage(character, pose)} style={{ width: size, height: size }} resizeMode="contain" />
+        <Sprite character={character} anim={anim} size={size} />
       </Animated.View>
       {line ? (
         <Animated.View key={`${beat}`} style={[styles.bubble, bubble === 'top' ? styles.bubbleTop : styles.bubbleRight]}>

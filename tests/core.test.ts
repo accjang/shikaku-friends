@@ -19,6 +19,8 @@ import {
   recordLevelClear,
   sanitizeProgress,
   starsFor,
+  streakCycleDay,
+  streakReward,
 } from '../src/core/progress';
 import { isSolved, rectFromCorners, validClueIndex, type Puzzle } from '../src/core/puzzle';
 import { solve } from '../src/core/solver';
@@ -157,15 +159,32 @@ describe('진행 기록', () => {
   });
 
   test('오늘의 퍼즐 보상은 하루 한 번, 연속 일수', () => {
-    let { progress, rewarded } = recordDailyClear(INITIAL_PROGRESS, '2026-10-24', 1000);
-    expect(rewarded).toBe(true);
-    ({ progress, rewarded } = recordDailyClear(progress, '2026-10-24', 900));
-    expect(rewarded).toBe(false);
+    let { progress, reward } = recordDailyClear(INITIAL_PROGRESS, '2026-10-24', 1000);
+    expect(reward).toBe(1);
+    ({ progress, reward } = recordDailyClear(progress, '2026-10-24', 900));
+    expect(reward).toBe(0);
     expect(progress.hints).toBe(START_HINTS + 1);
     ({ progress } = recordDailyClear(progress, '2026-10-25', 900));
     expect(dailyStreak(progress, '2026-10-25', prevDateKey)).toBe(2);
     expect(dailyStreak(progress, '2026-10-26', prevDateKey)).toBe(2); // 오늘은 아직 → 어제까지
     expect(dailyStreak(progress, '2026-10-27', prevDateKey)).toBe(0);
+  });
+
+  test('연속 보상은 7일 주기(3일째 +2, 7일째 +5, 8일째 다시 +1), 하루 빠지면 처음부터', () => {
+    let p = INITIAL_PROGRESS;
+    const got: number[] = [];
+    for (let d = 1; d <= 8; d++) {
+      const out = recordDailyClear(p, `2026-11-${String(d).padStart(2, '0')}`, 1000);
+      p = out.progress;
+      got.push(out.reward);
+      expect(out.streak).toBe(d);
+    }
+    expect(got).toEqual([1, 1, 2, 1, 1, 2, 5, 1]);
+    expect(streakCycleDay(7)).toBe(7);
+    expect(streakCycleDay(8)).toBe(1);
+    const gap = recordDailyClear(p, '2026-11-10', 1000);
+    expect(gap.streak).toBe(1);
+    expect(gap.reward).toBe(streakReward(1));
   });
 
   test('날짜 키', () => {
