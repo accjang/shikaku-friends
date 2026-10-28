@@ -30,7 +30,8 @@ App Store와 Google Play에 같은 코드로 낸다.
 
 ## 실행
 ```bash
-cd shikaku
+git clone https://github.com/accjang/shikaku-friends
+cd shikaku-friends
 npm install
 npx expo start              # Expo Go로 빠르게 보기(광고·결제 없이 동작)
 npx expo run:ios            # 개발 빌드(광고·결제 모듈 포함, Xcode 필요)
