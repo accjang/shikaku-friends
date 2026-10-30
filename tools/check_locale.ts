@@ -1,3 +1,4 @@
+/// <reference types="node" />
 // 언어 파일 하나 검사: npx tsx tools/check_locale.ts <코드>  (예: th, zh-Hant)
 // 빠진 키·빈 문구·자리표시자({n} 등) 불일치·대사 비었음·이름 빠짐·스토어 글자 수를 찾는다. 문제가 있으면 종료 코드 1.
 import { existsSync, readFileSync } from 'node:fs';

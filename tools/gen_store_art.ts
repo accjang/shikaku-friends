@@ -1,3 +1,4 @@
+/// <reference types="node" />
 // 스토어 그림 생성: 언어별 스크린샷(App Store 6.9인치·Google Play 휴대전화)과 Play 그래픽 이미지, Play 512 아이콘.
 // 웹 빌드(dist/)를 Playwright로 띄워 장면마다 진행 기록을 심고 화면을 찍은 뒤, 위에 그 언어 문구를 얹어 합성한다.
 // 문구는 docs/store/listing/<코드>.md의 `- shots:`(| 로 나눈 5개)와 `- title:`.

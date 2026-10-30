@@ -1,3 +1,4 @@
+/// <reference types="node" />
 // 스테이지 퍼즐을 미리 만들어 content/levels.json에 쓴다. 실행: npx tsx tools/gen_levels.ts
 // 스테이지마다 후보 LEVEL_POOL개를 만들고 풀이기 갈림길 수(난이도)로 줄 세운 뒤,
 // 챕터 안 위치에 맞는 순위(LEVEL_DIFFICULTY_RAMP)의 후보를 고른다 → 챕터 안에서 점점 어려워진다.

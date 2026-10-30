@@ -47,6 +47,8 @@ npx expo run:ios --configuration Release      # 또는 Xcode에서 Archive → A
 cd android && ./gradlew bundleRelease          # 업로드 키스토어 필요(*.jks는 git에 올리지 않음)
 ```
 
+Expo SDK를 올린 뒤나 `ios/`가 옛 SDK로 만들어져 있으면 `npx expo prebuild --clean`으로 네이티브 폴더를 새로 만든다(안 그러면 옛 AppDelegate가 남아 iOS 27에서 켜자마자 꺼진다).
+
 버전 올리기: `app.json`의 `version`(사용자에게 보이는 1.0.1)과 `ios.buildNumber`·`android.versionCode`(올릴 때마다 +1).
 
 ## 4. Google Play
