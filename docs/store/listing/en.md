@@ -3,6 +3,7 @@
 - subtitle: Draw boxes that match numbers
 - short: A cute logic puzzle: split the board into boxes with five animal friends!
 - keywords: puzzle,logic,shikaku,brain,sudoku,nonogram,number,relax,cute,cat,panda,bunny,daily
+- shots: A cute brain puzzle with friends | Drag once to draw a box | Solve it to reveal a picture! | Collect props, decorate the village | 200 stages, one answer each
 
 ## description
 Split the board into rectangles — one number in each, and the number tells its size!

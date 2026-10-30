@@ -3,6 +3,7 @@
 - subtitle: Gambar kotak sesuai angkanya
 - short: Puzzle logika lucu: bagi papan jadi kotak bersama lima sahabat hewan!
 - keywords: puzzle,teka-teki,logika,asah otak,sudoku,angka,kotak,shikaku,santai,lucu,kucing,panda,harian
+- shots: Teka-teki otak lucu bersama teman | Seret sekali untuk menggambar kotak | Selesaikan, gambar pun muncul! | Kumpulkan hiasan, hias desanya | 200 tahap, satu jawaban saja
 
 ## description
 Bagi papan menjadi persegi panjang — satu angka di tiap kotak, dan angkanya menunjukkan ukurannya!

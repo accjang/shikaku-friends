@@ -13,7 +13,8 @@
     "typecheck": "tsc --noEmit",
     "render:chars": "node tools/render_chars.mjs",
     "render:props": "node tools/render_props.mjs",
-    "render:anims": "node tools/render_anims.mjs"
+    "render:anims": "node tools/render_anims.mjs",
+    "store:art": "expo export -p web && tsx tools/gen_store_art.ts all"
   },
   "dependencies": {
     "@expo-google-fonts/jua": "^0.4.1",
@@ -50,11 +51,26 @@
     "zustand": "^5.0.15"
   },
   "devDependencies": {
+    "@fontsource/noto-sans-arabic": "^5.3.0",
+    "@fontsource/noto-sans-bengali": "^5.3.0",
+    "@fontsource/noto-sans-devanagari": "^5.3.0",
+    "@fontsource/noto-sans-gujarati": "^5.3.0",
+    "@fontsource/noto-sans-gurmukhi": "^5.3.0",
+    "@fontsource/noto-sans-hebrew": "^5.3.0",
+    "@fontsource/noto-sans-jp": "^5.3.1",
+    "@fontsource/noto-sans-kannada": "^5.3.0",
+    "@fontsource/noto-sans-malayalam": "^5.3.0",
+    "@fontsource/noto-sans-sc": "^5.3.1",
+    "@fontsource/noto-sans-tamil": "^5.3.0",
+    "@fontsource/noto-sans-tc": "^5.3.1",
+    "@fontsource/noto-sans-telugu": "^5.3.0",
+    "@fontsource/noto-sans-thai": "^5.3.0",
     "@testing-library/react-native": "^14.0.1",
     "@types/react": "~19.2.2",
     "eslint": "^9.0.0",
     "eslint-config-expo": "~57.0.2",
     "jest-expo": "~57.0.5",
+    "playwright": "^1.63.0",
     "three": "^0.169.0",
     "tsx": "^4.23.15",
     "typescript": "~6.0.3"

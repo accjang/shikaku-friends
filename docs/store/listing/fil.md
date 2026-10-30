@@ -3,6 +3,7 @@
 - subtitle: Mga kahong tugma sa numero
 - short: Cute na logic puzzle: hatiin ang board sa mga kahon kasama ang 5 hayop!
 - keywords: puzzle,logic,palaisipan,utak,sudoku,numero,kahon,shikaku,relax,cute,pusa,panda,daily
+- shots: Cute na brain puzzle kasama ang friends | I-drag para gumuhit ng kahon | Lutasin at may larawang lilitaw! | Mangolekta at palamutian ang village | 200 stage, iisa ang sagot
 
 ## description
 Hatiin ang board sa mga rectangle — isang numero sa bawat isa, at sinasabi ng numero ang laki nito!

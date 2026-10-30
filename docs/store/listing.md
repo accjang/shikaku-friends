@@ -54,10 +54,5 @@ Shikaku Friends brings the classic Japanese logic puzzle "Shikaku" to life with 
 · No timers to stress you out, plays offline
 ```
 
-## 스크린샷 순서(제안)
-1. 홈(다섯 친구 + 제목) — "귀여운 친구들과 두뇌 퍼즐"
-2. 드래그 중(3×2=6 표시) — "드래그 한 번으로 네모 그리기"
-3. 거의 다 푼 판 + 판다 말풍선 — "친구들이 칭찬해 줘요"
-4. 클리어 창(별 3개) — "별 3개에 도전"
-5. 스테이지 목록 — "200개 스테이지"
-6. 오늘의 퍼즐 — "매일 새로운 퍼즐"
+## 스크린샷
+언어별 문구는 `docs/store/listing/<코드>.md`의 `- shots:`, 그림은 `docs/store/art/`(`npm run store:art`). 순서: 홈 → 드래그 → 그림 공개 → 마을 → 스테이지 목록.

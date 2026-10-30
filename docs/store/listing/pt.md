@@ -3,6 +3,7 @@
 - subtitle: Desenhe caixas pelos números
 - short: Um jogo de lógica fofo: divida o tabuleiro em caixas com 5 amigos animais!
 - keywords: quebra-cabeça,lógica,shikaku,cérebro,sudoku,nonograma,números,relaxar,fofo,gato,panda,diário
+- shots: Um quebra-cabeça fofo com amigos | Arraste para desenhar um retângulo | Resolva e revele uma imagem! | Junte itens e decore a vila | 200 fases, uma só resposta
 
 ## description
 Divida o tabuleiro em retângulos: um número em cada um, e o número diz o tamanho!

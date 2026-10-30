@@ -3,6 +3,7 @@
 - subtitle: Lukis kotak ikut nombornya
 - short: Teka-teki logik comel: bahagikan papan kepada kotak bersama lima kawan haiwan!
 - keywords: teka-teki,puzzle,logik,minda,sudoku,nombor,kotak,shikaku,santai,comel,kucing,panda,harian
+- shots: Teka-teki otak comel bersama kawan | Seret sekali untuk lukis kotak | Selesaikan, gambar pun muncul! | Kumpul hiasan, hias kampung | 200 peringkat, satu jawapan sahaja
 
 ## description
 Bahagikan papan kepada segi empat tepat — satu nombor dalam setiap kotak, dan nombor itu menunjukkan saiznya!

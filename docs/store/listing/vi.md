@@ -3,6 +3,7 @@
 - subtitle: Vẽ ô vuông khớp với con số
 - short: Câu đố logic dễ thương: chia bảng thành các ô cùng năm người bạn thú cưng!
 - keywords: câu đố,giải đố,trí tuệ,logic,sudoku,nonogram,con số,shikaku,dễ thương,mèo,gấu trúc,thỏ,hằng ngày
+- shots: Câu đố trí tuệ dễ thương cùng bạn bè | Kéo một lần để vẽ hình chữ nhật | Giải xong, bức tranh hiện ra! | Sưu tầm đồ, trang trí ngôi làng | 200 màn, mỗi màn một đáp án
 
 ## description
 Chia bảng thành các hình chữ nhật — mỗi hình có một con số, và con số cho biết kích thước của nó!

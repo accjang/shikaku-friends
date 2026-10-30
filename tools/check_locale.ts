@@ -49,6 +49,10 @@ async function main(): Promise<void> {
       if (!v) errors.push(`listing ${name} 없음`);
       else if ([...v].length > max) errors.push(`listing ${name} ${[...v].length}자 > ${max}자`);
     }
+    // 스크린샷 문구(tools/gen_store_art.ts): 장면 5개, 한 줄~두 줄에 들어가게
+    const shots = field('shots')?.split('|').map((s) => s.trim()) ?? [];
+    if (shots.length !== 5 || shots.some((s) => !s)) errors.push(`listing shots 문구 ${shots.length}개(5개여야 함)`);
+    for (const s of shots) if ([...s].length > 40) errors.push(`listing shots "${s}" ${[...s].length}자 > 40자`);
   }
   if (errors.length) {
     console.error(`${code}: 문제 ${errors.length}개\n` + errors.map((e) => ' - ' + e).join('\n'));

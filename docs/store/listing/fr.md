@@ -3,6 +3,7 @@
 - subtitle: Des boîtes selon les nombres
 - short: Un jeu de logique mignon : divise la grille en boîtes avec 5 amis animaux !
 - keywords: puzzle,logique,shikaku,cerveau,sudoku,nonogramme,nombres,détente,mignon,chat,panda,lapin
+- shots: Un puzzle mignon entre amis | Glisse pour tracer un rectangle | Résous-le, une image apparaît ! | Collecte des objets, décore le village | 200 niveaux, une seule solution
 
 ## description
 Divise la grille en rectangles : un nombre dans chacun, et ce nombre donne sa taille !

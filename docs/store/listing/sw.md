@@ -3,6 +3,7 @@
 - subtitle: Chora visanduku kwa namba
 - short: Fumbo la mantiki la kupendeza: gawa ubao kuwa visanduku na marafiki 5!
 - keywords: fumbo,mantiki,shikaku,akili,sudoku,namba,mchezo,tulia,paka,panda,sungura,kila siku
+- shots: Fumbo zuri la akili na marafiki | Buruta mara moja kuchora kisanduku | Litatue, picha iliyofichwa itaonekana! | Kusanya vitu, pamba kijiji | Hatua 200, jibu moja tu
 
 ## description
 Gawa ubao kuwa mistatili: namba moja katika kila mmoja, na namba hiyo inaonyesha ukubwa wake!

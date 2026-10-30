@@ -3,6 +3,7 @@
 - subtitle: Sayılara uyan kutular çiz
 - short: Sevimli bir mantık bulmacası: beş hayvan dostla tahtayı kutulara böl!
 - keywords: bulmaca,mantık,zeka,sudoku,shikaku,nonogram,sayı,beyin,rahatlatıcı,sevimli,kedi,panda,tavşan
+- shots: Dostlarla sevimli bir zekâ bulmacası | Bir kez sürükle, kutu çiz | Çöz, gizli resim ortaya çıksın! | Eşya topla, köyü süsle | 200 bölüm, tek bir çözüm
 
 ## description
 Tahtayı dikdörtgenlere böl — her birinde bir sayı var ve sayı boyutunu söylüyor!
