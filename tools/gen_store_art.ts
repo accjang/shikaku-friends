@@ -44,16 +44,19 @@ const REVEAL_SETTLE_MS = CLEAR_DELAY_MS - 300;
 const SCENE_BG = ['#FFD6E2', '#D7F0E0', '#FFE3C2', '#DCEBFF', '#E9E1FF'];
 
 // ── 글꼴: 앱의 Jua/Nunito 위에, 기기에 있을 문자(인도계·아랍·히브리·태국·한자)를 Noto로 채운다(웹 빌드 미리보기용) ──
-const NOTO = ['thai', 'devanagari', 'bengali', 'tamil', 'telugu', 'gujarati', 'kannada', 'malayalam', 'gurmukhi', 'arabic', 'hebrew', 'jp', 'sc', 'tc'];
+const NOTO = ['thai', 'devanagari', 'bengali', 'tamil', 'telugu', 'gujarati', 'kannada', 'malayalam', 'gurmukhi', 'arabic', 'hebrew'];
+// 한자 글꼴은 문장부호·기호 범위까지 덮어 다른 언어의 Jua·Nunito를 가리므로 그 언어에만 넣는다
+const NOTO_CJK: Partial<Record<Locale, string>> = { ja: 'jp', zh: 'sc', 'zh-Hant': 'tc' };
 const SKIP_SUBSETS = /-(latin|latin-ext|cyrillic|cyrillic-ext|greek|greek-ext|vietnamese)-700-normal$/;
 
 /** family 이름으로 Noto 글자 묶음(@font-face, unicode-range)을 만든다. 주소는 정적 서버의 /__fonts/. */
-function notoFaces(family: string): string {
+function notoFaces(family: string, locale: Locale): string {
   const out: string[] = [];
-  for (const s of NOTO) {
+  const cjk = NOTO_CJK[locale];
+  for (const s of cjk ? [...NOTO, cjk] : NOTO) {
     const dir = `@fontsource/noto-sans-${s}`;
     const css = readFileSync(join(ROOT, 'node_modules', dir, '700.css'), 'utf8');
-    for (const m of css.matchAll(/\/\* ([\w-]+) \*\/\s*@font-face \{([^}]*)\}/g)) {
+    for (const m of css.matchAll(/\/\* ([^*]+?) \*\/\s*@font-face \{([^}]*)\}/g)) {
       if (SKIP_SUBSETS.test(m[1])) continue;
       const body = m[2]
         .replace(/font-family: '[^']+';/, `font-family: '${family}';`)
@@ -185,7 +188,7 @@ const SCENES: Scene[] = [
 ];
 
 async function shootScenes(browser: Browser, base: string, locale: Locale): Promise<Buffer[]> {
-  const fontCss = notoFaces('Round');
+  const fontCss = notoFaces('Round', locale);
   const shots: Buffer[] = [];
   for (const scene of SCENES) {
     const ctx = await browser.newContext({
@@ -244,7 +247,7 @@ function esc(s: string): string {
 function pageHead(locale: Locale, w: number, h: number): string {
   return `<!doctype html><html lang="${locale}" dir="${RTL_LOCALES.includes(locale) ? 'rtl' : 'ltr'}"><head><meta charset="utf-8"><style>
 @font-face { font-family: 'Cap'; src: url(${roundFontFile(locale)}); }
-${notoFaces('Cap')}
+${notoFaces('Cap', locale)}
 html, body { margin: 0; width: ${w}px; height: ${h}px; overflow: hidden; }
 body { font-family: 'Cap', sans-serif; color: ${colors.ink}; }
 </style></head>`;
@@ -259,7 +262,7 @@ function shotHtml(locale: Locale, target: { width: number; height: number }, sho
   const fs = Math.round(W * 0.07);
   return `${pageHead(locale, W, H)}<body style="background:${bg}">
 <div style="height:${top}px;display:flex;align-items:center;justify-content:center;padding:0 ${Math.round(W * 0.06)}px;box-sizing:border-box">
-  <div style="font-size:${fs}px;line-height:1.25;text-align:center;word-break:keep-all">${esc(caption)}</div>
+  <div style="font-size:${fs}px;line-height:1.25;text-align:center;word-break:${locale === 'ko' ? 'keep-all' : 'normal'};overflow-wrap:anywhere">${esc(caption)}</div>
 </div>
 <div style="display:flex;justify-content:center">
   <div style="width:${frameW}px;height:${frameH}px;border:${border}px solid #fff;border-radius:${Math.round(W * 0.07)}px;overflow:hidden;box-shadow:0 ${Math.round(W * 0.01)}px ${Math.round(W * 0.04)}px rgba(75,63,107,0.18);background:${colors.bg}">
