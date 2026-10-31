@@ -49,6 +49,8 @@ export const pa: LocaleBundle = {
     newBest: "ਨਵਾਂ ਰਿਕਾਰਡ!",
     next: "ਅਗਲੀ ਸਟੇਜ",
     retry: "ਫਿਰ ਖੇਡੋ",
+    outOfChances: "ਮੌਕੇ ਖਤਮ ਹੋ ਗਏ!",
+    continueWithAd: "ਇਸ਼ਤਿਹਾਰ ਵੇਖੋ: +{n} ਦਿਲ ਲੈ ਕੇ ਜਾਰੀ ਰੱਖੋ",
     toStages: "ਸਟੇਜ ਸੂਚੀ",
     home: "ਹੋਮ",
     chapterUnlocked: "ਨਵਾਂ ਚੈਪਟਰ ਖੁੱਲ੍ਹ ਗਿਆ!",

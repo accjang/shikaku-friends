@@ -49,6 +49,8 @@ export const ml: LocaleBundle = {
     newBest: "പുതിയ റെക്കോർഡ്!",
     next: "അടുത്ത Stage",
     retry: "വീണ്ടും കളിക്കൂ",
+    outOfChances: "അവസരങ്ങൾ തീർന്നു!",
+    continueWithAd: "പരസ്യം കണ്ട് +{n} ഹൃദയവുമായി തുടരൂ",
     toStages: "Stage ലിസ്റ്റ്",
     home: "ഹോം",
     chapterUnlocked: "പുതിയ അധ്യായം തുറന്നു!",

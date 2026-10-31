@@ -49,6 +49,8 @@ export const ms: LocaleBundle = {
     newBest: "Rekod baharu!",
     next: "Peringkat seterusnya",
     retry: "Main lagi",
+    outOfChances: "Peluang dah habis!",
+    continueWithAd: "Tonton iklan: +{n} hati dan teruskan",
     toStages: "Senarai peringkat",
     home: "Utama",
     chapterUnlocked: "Bab baharu dibuka!",

@@ -49,6 +49,8 @@ export const tr: LocaleBundle = {
     newBest: "Yeni rekor!",
     next: "Sonraki bölüm",
     retry: "Tekrar oyna",
+    outOfChances: "Şansın kalmadı!",
+    continueWithAd: "Reklam izle: +{n} kalp al, devam et",
     toStages: "Bölüm listesi",
     home: "Ana sayfa",
     chapterUnlocked: "Yeni bir kısım açıldı!",

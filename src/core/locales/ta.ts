@@ -49,6 +49,8 @@ export const ta: LocaleBundle = {
     newBest: "புதிய சாதனை!",
     next: "அடுத்த Stage",
     retry: "மீண்டும் விளையாடு",
+    outOfChances: "வாய்ப்புகள் தீர்ந்தன!",
+    continueWithAd: "விளம்பரம் பார்த்து +{n} இதயத்துடன் தொடருங்கள்",
     toStages: "Stage பட்டியல்",
     home: "முகப்பு",
     chapterUnlocked: "புதிய அத்தியாயம் திறந்தது!",

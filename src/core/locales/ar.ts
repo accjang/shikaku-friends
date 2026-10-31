@@ -49,6 +49,8 @@ export const ar: LocaleBundle = {
     newBest: "رقم قياسي جديد!",
     next: "المرحلة التالية",
     retry: "العب مجددًا",
+    outOfChances: "نفدت المحاولات!",
+    continueWithAd: "شاهد إعلانًا: +{n} قلب وتابع اللعب",
     toStages: "قائمة المراحل",
     home: "الرئيسية",
     chapterUnlocked: "فُتح فصل جديد!",

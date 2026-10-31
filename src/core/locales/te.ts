@@ -49,6 +49,8 @@ export const te: LocaleBundle = {
     newBest: "కొత్త రికార్డ్!",
     next: "తదుపరి Stage",
     retry: "మళ్ళీ ఆడు",
+    outOfChances: "అవకాశాలు అయిపోయాయి!",
+    continueWithAd: "ప్రకటన చూసి +{n} హృదయంతో కొనసాగించండి",
     toStages: "Stage లిస్ట్",
     home: "హోమ్",
     chapterUnlocked: "కొత్త చాప్టర్ తెరుచుకుంది!",

@@ -23,8 +23,8 @@ export const DAILY_OPTIONS: GenOptions = { w: 8, h: 8, minArea: 2, maxArea: 10, 
 export const PROP_EVERY = 10;
 
 // ── 진행 ──
-/** 다음 챕터를 열려면 앞 챕터에서 깨야 하는 스테이지 수. */
-export const CHAPTER_UNLOCK_CLEARS = 25;
+/** 다음 챕터를 열려면 앞 챕터에서 깨야 하는 스테이지 수(챕터 40개 중). 실기기 시험 뒤 25 → 15(2026-10-31). */
+export const CHAPTER_UNLOCK_CLEARS = 15;
 /** 처음 주는 힌트 수. */
 export const START_HINTS = 3;
 /** 오늘의 퍼즐 연속 보상(힌트): 연속 1일째~7일째, 8일째부터 다시 처음부터 반복. */
@@ -33,6 +33,12 @@ export const DAILY_STREAK_REWARDS = [1, 1, 2, 1, 1, 2, 5] as const;
 export const REWARDED_HINTS = 2;
 /** 별: 힌트를 이 수 이하로 썼으면 3개/2개, 그 위는 1개. */
 export const STAR_HINT_LIMITS = { three: 0, two: 1 } as const;
+/** 한 판에 봐주는 실수 수(하트). 이보다 더 틀리면 그 판은 실패(다시 하기). 실수 = 숫자 하나·크기는 맞지만 정답이 아닌 네모. */
+export const MISTAKE_ALLOWANCE = 3;
+/** 실패 뒤 보상형 광고로 이어할 때 돌려주는 하트. */
+export const CONTINUE_HEARTS = 1;
+/** 틀린 네모를 빨갛게 보여 주는 시간. */
+export const MISTAKE_FLASH_MS = 700;
 /** 되돌리기 기록 최대 길이. */
 export const UNDO_LIMIT = 200;
 

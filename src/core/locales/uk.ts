@@ -49,6 +49,8 @@ export const uk: LocaleBundle = {
     newBest: "Новий рекорд!",
     next: "Далі",
     retry: "Ще раз",
+    outOfChances: "Шанси закінчилися!",
+    continueWithAd: "Переглянь рекламу: +{n} серце і грай далі",
     toStages: "Список рівнів",
     home: "Головна",
     chapterUnlocked: "Відкрито новий розділ!",

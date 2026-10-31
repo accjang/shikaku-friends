@@ -49,6 +49,8 @@ export const th: LocaleBundle = {
     newBest: "สถิติใหม่!",
     next: "ด่านถัดไป",
     retry: "เล่นอีกครั้ง",
+    outOfChances: "หมดโอกาสแล้ว!",
+    continueWithAd: "ดูโฆษณารับ {n} หัวใจ แล้วเล่นต่อ",
     toStages: "รายการด่าน",
     home: "หน้าแรก",
     chapterUnlocked: "บทใหม่เปิดแล้ว!",

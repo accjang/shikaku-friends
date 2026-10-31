@@ -49,6 +49,8 @@ export const kn: LocaleBundle = {
     newBest: "ಹೊಸ ದಾಖಲೆ!",
     next: "ಮುಂದಿನ Stage",
     retry: "ಮತ್ತೆ ಆಡಿ",
+    outOfChances: "ಅವಕಾಶಗಳು ಮುಗಿದವು!",
+    continueWithAd: "ಜಾಹೀರಾತು ನೋಡಿ +{n} ಹೃದಯದೊಂದಿಗೆ ಮುಂದುವರಿಸಿ",
     toStages: "Stage ಪಟ್ಟಿ",
     home: "ಹೋಮ್",
     chapterUnlocked: "ಹೊಸ ಅಧ್ಯಾಯ ತೆರೆಯಿತು!",

@@ -49,6 +49,8 @@ export const zh: LocaleBundle = {
     newBest: "新纪录！",
     next: "下一关",
     retry: "再玩一次",
+    outOfChances: "机会用完了",
+    continueWithAd: "看广告获得{n}颗心继续",
     toStages: "关卡列表",
     home: "首页",
     chapterUnlocked: "新章节已解锁！",

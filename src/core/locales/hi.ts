@@ -49,6 +49,8 @@ export const hi: LocaleBundle = {
     newBest: "नया रिकॉर्ड!",
     next: "अगला स्टेज",
     retry: "फिर खेलें",
+    outOfChances: "मौके खत्म हो गए!",
+    continueWithAd: "विज्ञापन देखें: +{n} दिल पाएँ और जारी रखें",
     toStages: "स्टेज सूची",
     home: "होम",
     chapterUnlocked: "नया चैप्टर खुल गया!",

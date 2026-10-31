@@ -49,6 +49,8 @@ export const ja: LocaleBundle = {
     newBest: "新記録！",
     next: "次のステージ",
     retry: "もう一度",
+    outOfChances: "チャンスを使い切っちゃった",
+    continueWithAd: "広告を見てハート{n}個で続ける",
     toStages: "ステージ一覧",
     home: "ホーム",
     chapterUnlocked: "新しいチャプターが開きました！",

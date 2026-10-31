@@ -49,6 +49,8 @@ export const mr: LocaleBundle = {
     newBest: "नवा विक्रम!",
     next: "पुढचा टप्पा",
     retry: "पुन्हा खेळा",
+    outOfChances: "संधी संपल्या!",
+    continueWithAd: "जाहिरात पाहा: +{n} हृदय घेऊन पुढे खेळा",
     toStages: "टप्प्यांची यादी",
     home: "मुख्यपृष्ठ",
     chapterUnlocked: "नवा अध्याय उघडला!",

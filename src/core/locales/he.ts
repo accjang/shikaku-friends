@@ -49,6 +49,8 @@ export const he: LocaleBundle = {
     newBest: "שיא חדש!",
     next: "לשלב הבא",
     retry: "שוב",
+    outOfChances: "נגמרו הסיכויים!",
+    continueWithAd: "צפו בפרסומת: +{n} לב והמשיכו",
     toStages: "רשימת שלבים",
     home: "בית",
     chapterUnlocked: "פרק חדש נפתח!",

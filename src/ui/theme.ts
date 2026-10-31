@@ -15,6 +15,9 @@ export const colors = {
   goldDark: '#E8A20C',
   bad: '#D8D2E0',
   badLine: '#A79DBA',
+  /** 실수(정답이 아닌 네모)·잃은 하트. */
+  mistake: '#F0566E',
+  mistakeSoft: 'rgba(240,86,110,0.22)',
   overlay: 'rgba(60, 45, 80, 0.45)',
   white: '#FFFFFF',
 } as const;

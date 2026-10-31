@@ -49,6 +49,8 @@ export const zhHant: LocaleBundle = {
     newBest: "新紀錄！",
     next: "下一關",
     retry: "再玩一次",
+    outOfChances: "機會用完了",
+    continueWithAd: "看廣告獲得{n}顆心繼續",
     toStages: "關卡列表",
     home: "首頁",
     chapterUnlocked: "新章節開啟了！",

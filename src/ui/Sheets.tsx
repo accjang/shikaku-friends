@@ -5,7 +5,7 @@ import { ActivityIndicator, Image, Modal, Pressable, StyleSheet, Text, View, typ
 import Animated, { useAnimatedStyle, useSharedValue, withDelay, withRepeat, withSequence, withSpring, withTiming, ZoomIn } from 'react-native-reanimated';
 
 import type { CharacterId } from '@/core/chapters';
-import { ADFREE_BONUS_HINTS, REWARDED_HINTS } from '@/core/config';
+import { ADFREE_BONUS_HINTS, CONTINUE_HEARTS, REWARDED_HINTS } from '@/core/config';
 
 import { Button } from './Button';
 import { charImage } from './characters';
@@ -189,6 +189,48 @@ export function NoHintSheet(p: HintProps) {
   );
 }
 
+interface FailProps {
+  visible: boolean;
+  character: CharacterId;
+  /** 보상형 광고로 이어할 수 있는지(광고가 준비됨). */
+  adReady: boolean;
+  adBusy: boolean;
+  listLabel: string;
+  onContinue(): void;
+  onRetry(): void;
+  onList(): void;
+}
+
+/** 하트를 다 쓰고 또 틀렸을 때: 다시 하기 / 광고 보고 이어하기 / 목록. */
+export function FailSheet(p: FailProps) {
+  const { t } = useT();
+  return (
+    <Modal visible={p.visible} transparent animationType="fade" onRequestClose={p.onRetry} statusBarTranslucent>
+      <View style={styles.overlay}>
+        <Animated.View entering={ZoomIn.springify()} style={[styles.card, { borderColor: CHARACTER_THEME[p.character].main }]}>
+          <Image source={charImage(p.character, 'q')} style={{ width: 110, height: 110 }} resizeMode="contain" />
+          <Text style={[styles.clear, styles.failTitle]}>{t('outOfChances')}</Text>
+          <View style={styles.actions}>
+            <Button label={t('retry')} icon="refresh" onPress={p.onRetry} />
+            {p.adReady ? (
+              <Button
+                label={t('continueWithAd', { n: CONTINUE_HEARTS })}
+                icon="play-circle"
+                color={colors.gold}
+                edge={colors.goldDark}
+                disabled={p.adBusy}
+                onPress={p.onContinue}
+                sub={p.adBusy ? <ActivityIndicator color={colors.white} size="small" /> : null}
+              />
+            ) : null}
+            <Button small label={p.listLabel} color={colors.card} edge={colors.line} textColor={colors.ink} onPress={p.onList} />
+          </View>
+        </Animated.View>
+      </View>
+    </Modal>
+  );
+}
+
 const styles = StyleSheet.create({
   overlay: { flex: 1, backgroundColor: colors.overlay, alignItems: 'center', justifyContent: 'center', padding: space.xl },
   card: {
@@ -205,6 +247,7 @@ const styles = StyleSheet.create({
   charWrap: { marginTop: -100 },
   char: { width: 140, height: 140 },
   clear: { fontFamily: FONT.round, fontSize: 34, color: colors.ink, marginTop: space.md },
+  failTitle: { fontSize: 26, textAlign: 'center' },
   stars: { flexDirection: 'row', gap: space.sm, marginVertical: space.sm },
   line: { fontFamily: FONT.round, fontSize: 16, color: colors.inkSoft, textAlign: 'center', marginBottom: space.md },
   statRow: { flexDirection: 'row', gap: space.xl, marginBottom: space.sm },

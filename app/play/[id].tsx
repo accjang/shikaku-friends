@@ -1,17 +1,19 @@
 // 게임 화면. id = 스테이지("1-07") 또는 "daily"(오늘의 퍼즐).
-// 위: 머리줄(뒤로·제목·시간) → 캐릭터+말풍선 → 판 → 아래 도구(되돌리기·처음부터·힌트).
+// 위: 머리줄(뒤로·제목·시간) → 캐릭터+말풍선 → 하트 → 판 → 아래 도구(되돌리기·처음부터·힌트).
+// 정답이 아닌 네모(크기·숫자는 맞음)는 놓지 않고 하트를 깎는다. 하트를 다 쓰고 또 틀리면 실패 창(다시 하기·광고로 이어하기).
 // 다 풀면 축하 → 결과 창. "다음"을 누를 때 차례면 전면 광고(src/core/adPolicy.ts).
 import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, AppState, Platform, Share, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 
 import { CHAPTERS, chapterById, levelCount, levelId, parseLevelId, type CharacterId } from '@/core/chapters';
-import { BUBBLE_MS, CLEAR_DELAY_MS, DAILY_STREAK_REWARDS, REWARDED_HINTS } from '@/core/config';
+import { BUBBLE_MS, CLEAR_DELAY_MS, DAILY_STREAK_REWARDS, MISTAKE_ALLOWANCE, MISTAKE_FLASH_MS, REWARDED_HINTS } from '@/core/config';
 import { dailyPuzzle, dateKey } from '@/core/daily';
 import { dailyShareText, stageShareText } from '@/core/share';
 import { companionFor, newlyUnlockedProp, stagesCleared, type PropId } from '@/core/village';
-import { applyHint, clearAll, newGame, place, removeAt, undo, type GameState } from '@/core/game';
+import { applyHint, attemptPlace, clearAll, continueGame, heartsLeft, newGame, removeAt, undo, type GameState } from '@/core/game';
 import { characterLine, PROP_NAMES, type Mood } from '@/core/i18n';
 import { unpack, type PackedPuzzle } from '@/core/levelCodec';
 import { addHints, recordDailyClear, recordLevelClear, spendHint, streakCycleDay } from '@/core/progress';
@@ -29,7 +31,7 @@ import { IconButton } from '@/ui/Button';
 import { buzz, playSfx } from '@/ui/feedback';
 import { Mascot } from '@/ui/Mascot';
 import { Screen } from '@/ui/Screen';
-import { ClearSheet, formatTime, NoHintSheet } from '@/ui/Sheets';
+import { ClearSheet, FailSheet, formatTime, NoHintSheet } from '@/ui/Sheets';
 import { CHARACTER_THEME, colors, FONT, space } from '@/ui/theme';
 import { useT } from '@/ui/useT';
 
@@ -37,6 +39,8 @@ import levelsJson from '../../content/levels.json';
 
 const LEVELS = levelsJson as unknown as Record<string, PackedPuzzle>;
 const DAILY_CHARACTERS: CharacterId[] = ['cat', 'panda', 'rabbit', 'shiba', 'duck'];
+/** 하트 줄 높이(판 크기 계산에 뺀다). */
+const HEARTS_ROW = 28;
 
 interface Session {
   key: string;
@@ -139,6 +143,9 @@ function Game({ session, t, locale, onRestart }: GameProps) {
   const [noHint, setNoHint] = useState(false);
   const [adBusy, setAdBusy] = useState(false);
   const [offerAdFree, setOfferAdFree] = useState(false);
+  /** 방금 실수한 네모(잠깐 빨갛게). */
+  const [flash, setFlash] = useState<Rect | null>(null);
+  const flashTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [result, setResult] = useState<{
     stars: number | null;
     ms: number;
@@ -150,7 +157,7 @@ function Game({ session, t, locale, onRestart }: GameProps) {
     /** 오늘의 퍼즐 7일 주기 안 오늘 위치(처음 깬 날만). */
     streakDay: number | null;
   } | null>(null);
-  const ms = useStopwatch(!game.solved);
+  const ms = useStopwatch(!game.solved && !game.failed);
   const bubbleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const theme = CHARACTER_THEME[character];
@@ -169,11 +176,12 @@ function Game({ session, t, locale, onRestart }: GameProps) {
     bubbleTimer.current = setTimeout(() => setLine(null), BUBBLE_MS * 1.5);
     return () => {
       if (bubbleTimer.current) clearTimeout(bubbleTimer.current);
+      if (flashTimer.current) clearTimeout(flashTimer.current);
     };
   }, []);
 
   // 판 크기: 화면 폭과 남은 높이에 맞춘다
-  const reserved = 52 + 120 + 100 + insets.top + insets.bottom + 24;
+  const reserved = 52 + 120 + HEARTS_ROW + 100 + insets.top + insets.bottom + 24;
   const cell = Math.floor(Math.min((Math.min(width, 560) - space.lg * 2 - 12) / puzzle.w, (height - reserved) / puzzle.h, 64));
 
   const finish = useCallback(
@@ -259,7 +267,23 @@ function Game({ session, t, locale, onRestart }: GameProps) {
     [finish, game, puzzle, react],
   );
 
-  const onPlace = useCallback((r: Rect) => commit(place(game, puzzle, r), r), [commit, game, puzzle]);
+  const onPlace = useCallback(
+    (r: Rect) => {
+      const { state: next, mistake } = attemptPlace(game, puzzle, r);
+      if (!mistake) {
+        commit(next, r);
+        return;
+      }
+      setGame(next);
+      setFlash(r);
+      if (flashTimer.current) clearTimeout(flashTimer.current);
+      flashTimer.current = setTimeout(() => setFlash(null), MISTAKE_FLASH_MS);
+      playSfx('wrong');
+      buzz('error');
+      react('bad');
+    },
+    [commit, game, puzzle, react],
+  );
   const onRemove = useCallback(
     (x: number, y: number) => {
       playSfx('erase');
@@ -294,6 +318,19 @@ function Game({ session, t, locale, onRestart }: GameProps) {
     }
   };
 
+  // 실패 뒤 보상형 광고로 이어하기(하트를 돌려받는다)
+  const onContinue = async (): Promise<void> => {
+    setAdBusy(true);
+    const earned = await showRewarded();
+    setAdBusy(false);
+    if (earned) {
+      setGame((g) => continueGame(g));
+      react('start');
+    } else {
+      Alert.alert(t('adNotReady'));
+    }
+  };
+
   const onBuy = async (): Promise<void> => {
     const r = await buyAdFree();
     if (r === 'success') {
@@ -322,6 +359,7 @@ function Game({ session, t, locale, onRestart }: GameProps) {
   };
 
   const pct = Math.round(coverage(puzzle, game.rects) * 100);
+  const hearts = heartsLeft(game);
 
   return (
     <Screen
@@ -338,13 +376,20 @@ function Game({ session, t, locale, onRestart }: GameProps) {
         <Mascot character={character} mood={mood} beat={beat} line={line} size={96} anim={game.solved ? 'cheer' : 'idle'} />
       </View>
 
+      <View style={styles.hearts} accessibilityLabel={`♥ ${hearts}/${MISTAKE_ALLOWANCE}`}>
+        {Array.from({ length: MISTAKE_ALLOWANCE }, (_, i) => (
+          <Ionicons key={i} name={i < hearts ? 'heart' : 'heart-outline'} size={22} color={i < hearts ? colors.mistake : colors.inkSoft} />
+        ))}
+      </View>
+
       <View style={styles.boardWrap}>
         <Board
           puzzle={puzzle}
           rects={game.rects}
           cell={cell}
-          disabled={game.solved}
+          disabled={game.solved || game.failed}
           celebrate={game.solved}
+          flash={flash}
           picture={postcard(character)}
           onPlace={onPlace}
           onRemove={onRemove}
@@ -356,11 +401,11 @@ function Game({ session, t, locale, onRestart }: GameProps) {
       </View>
 
       <View style={styles.tools}>
-        <IconButton icon="arrow-undo" label={t('undo')} onPress={() => setGame(undo(game))} disabled={game.history.length === 0 || game.solved} />
+        <IconButton icon="arrow-undo" label={t('undo')} onPress={() => setGame(undo(game))} disabled={game.history.length === 0 || game.solved || game.failed} />
         <IconButton
           icon="trash-outline"
           label={t('reset')}
-          disabled={game.rects.length === 0 || game.solved}
+          disabled={game.rects.length === 0 || game.solved || game.failed}
           onPress={() =>
             Platform.OS === 'web'
               ? setGame(clearAll(game, puzzle))
@@ -370,7 +415,7 @@ function Game({ session, t, locale, onRestart }: GameProps) {
                 ])
           }
         />
-        <IconButton icon="bulb" label={t('hints')} badge={progress.hints} color={colors.gold} onPress={onHint} disabled={game.solved} />
+        <IconButton icon="bulb" label={t('hints')} badge={progress.hints} color={colors.gold} onPress={onHint} disabled={game.solved || game.failed} />
       </View>
 
       <Celebration active={game.solved} />
@@ -399,6 +444,16 @@ function Game({ session, t, locale, onRestart }: GameProps) {
           router.replace(session.kind === 'daily' ? '/stages' : (`/stages?chapter=${session.chapter}` as never));
         }}
       />
+      <FailSheet
+        visible={game.failed}
+        character={character}
+        adReady={rewardedLoaded}
+        adBusy={adBusy}
+        listLabel={session.kind === 'daily' ? t('home') : t('toStages')}
+        onContinue={() => void onContinue()}
+        onRetry={restart}
+        onList={() => router.replace(session.kind === 'daily' ? '/' : (`/stages?chapter=${session.chapter}` as never))}
+      />
       <NoHintSheet
         visible={noHint}
         character={character}
@@ -418,6 +473,7 @@ const styles = StyleSheet.create({
   timer: { backgroundColor: colors.card, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 5, borderWidth: 2, borderColor: colors.line },
   timerText: { fontFamily: FONT.round, fontSize: 16, color: colors.ink, fontVariant: ['tabular-nums'] },
   mascotRow: { height: 120, justifyContent: 'center', paddingHorizontal: space.lg },
+  hearts: { height: HEARTS_ROW, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 6 },
   boardWrap: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   progressTrack: { width: 160, height: 8, borderRadius: 4, backgroundColor: 'rgba(75,63,107,0.1)', marginTop: space.md, overflow: 'hidden' },
   progressFill: { height: 8, borderRadius: 4 },

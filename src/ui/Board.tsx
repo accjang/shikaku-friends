@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Image, StyleSheet, Text, View, type ImageSourcePropType, type StyleProp, type ViewStyle } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, { useAnimatedStyle, useSharedValue, withDelay, withSequence, withSpring, withTiming, ZoomIn } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeOut as FadeOutAnim, useAnimatedStyle, useSharedValue, withDelay, withSequence, withSpring, withTiming, ZoomIn } from 'react-native-reanimated';
 
 import { PICTURE_REVEAL_DELAY_MS, PICTURE_REVEAL_MS, RECT_WAVE_STEP_MS } from '@/core/config';
 
@@ -24,6 +24,8 @@ interface Props {
   celebrate?: boolean;
   /** 다 풀면 네모마다 창문처럼 드러나는 그림(판 전체 크기로 맞춤). */
   picture?: ImageSourcePropType;
+  /** 실수로 놓으려던 네모(놓이지 않음). 잠깐 빨갛게 보여 준다. */
+  flash?: Rect | null;
 }
 
 const GAP = 2;
@@ -75,7 +77,7 @@ function FadeOut({ active, children }: { active: boolean; children: React.ReactN
   return <Animated.View style={[StyleSheet.absoluteFill, style]}>{children}</Animated.View>;
 }
 
-export function Board({ puzzle, rects, cell, disabled, onPlace, onRemove, onDragStep, celebrate, picture }: Props) {
+export function Board({ puzzle, rects, cell, disabled, onPlace, onRemove, onDragStep, celebrate, picture, flash }: Props) {
   const W = puzzle.w * cell;
   const H = puzzle.h * cell;
   const [preview, setPreview] = useState<Rect | null>(null);
@@ -175,6 +177,28 @@ export function Board({ puzzle, rects, cell, disabled, onPlace, onRemove, onDrag
             );
           })}
 
+          {/* 실수한 네모(놓이지 않고 잠깐 보였다 사라짐) */}
+          {flash ? (
+            <Animated.View
+              key={`f${flash.x},${flash.y},${flash.w},${flash.h}`}
+              pointerEvents="none"
+              entering={FadeIn.duration(120)}
+              exiting={FadeOutAnim.duration(250)}
+              style={[
+                styles.flash,
+                {
+                  left: flash.x * cell + GAP,
+                  top: flash.y * cell + GAP,
+                  width: flash.w * cell - GAP * 2,
+                  height: flash.h * cell - GAP * 2,
+                  borderRadius: Math.min(cell * 0.28, 14),
+                },
+              ]}
+            >
+              <Text style={[styles.flashMark, { fontSize: Math.max(16, Math.round(cell * 0.6)) }]}>✕</Text>
+            </Animated.View>
+          ) : null}
+
           {/* 드래그 미리보기 */}
           {preview ? (
             <View
@@ -249,6 +273,15 @@ const styles = StyleSheet.create({
   rect: { position: 'absolute', borderWidth: RECT_BORDER },
   clip: { overflow: 'hidden' },
   preview: { position: 'absolute', borderWidth: 3, alignItems: 'center', justifyContent: 'center' },
+  flash: {
+    position: 'absolute',
+    borderWidth: 3,
+    borderColor: colors.mistake,
+    backgroundColor: colors.mistakeSoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  flashMark: { fontFamily: FONT.round, color: colors.mistake },
   sizeTag: { position: 'absolute', top: -26, alignSelf: 'center', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10 },
   sizeText: { color: colors.white, fontFamily: FONT.round, fontSize: 14 },
   clueWrap: { position: 'absolute', alignItems: 'center', justifyContent: 'center' },

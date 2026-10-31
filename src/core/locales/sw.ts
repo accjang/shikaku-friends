@@ -49,6 +49,8 @@ export const sw: LocaleBundle = {
     newBest: "Rekodi mpya!",
     next: "Hatua inayofuata",
     retry: "Cheza tena",
+    outOfChances: "Nafasi zimekwisha!",
+    continueWithAd: "Tazama tangazo: +{n} moyo na uendelee",
     toStages: "Orodha ya hatua",
     home: "Nyumbani",
     chapterUnlocked: "Sura mpya imefunguliwa!",

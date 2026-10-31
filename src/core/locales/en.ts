@@ -49,6 +49,8 @@ export const en: LocaleBundle = {
     newBest: "New record!",
     next: "Next stage",
     retry: "Play again",
+    outOfChances: "Out of chances!",
+    continueWithAd: "Watch an ad: +{n} heart and keep going",
     toStages: "Stage list",
     home: "Home",
     chapterUnlocked: "A new chapter is open!",

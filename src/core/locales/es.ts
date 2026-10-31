@@ -49,6 +49,8 @@ export const es: LocaleBundle = {
     newBest: "¡Nuevo récord!",
     next: "Siguiente nivel",
     retry: "Jugar de nuevo",
+    outOfChances: "¡Sin oportunidades!",
+    continueWithAd: "Mira un anuncio: +{n} corazón y sigue",
     toStages: "Niveles",
     home: "Inicio",
     chapterUnlocked: "¡Nuevo capítulo abierto!",

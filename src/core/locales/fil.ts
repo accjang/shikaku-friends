@@ -49,6 +49,8 @@ export const fil: LocaleBundle = {
     newBest: "Bagong record!",
     next: "Susunod na stage",
     retry: "Laro ulit",
+    outOfChances: "Ubos na ang tsansa!",
+    continueWithAd: "Manood ng ad: +{n} puso at ituloy",
     toStages: "Listahan ng stage",
     home: "Home",
     chapterUnlocked: "May bagong chapter na!",

@@ -49,6 +49,8 @@ export const id: LocaleBundle = {
     newBest: "Rekor baru!",
     next: "Stage berikutnya",
     retry: "Main lagi",
+    outOfChances: "Kesempatan habis!",
+    continueWithAd: "Tonton iklan: +{n} hati dan lanjutkan",
     toStages: "Daftar stage",
     home: "Beranda",
     chapterUnlocked: "Bab baru terbuka!",

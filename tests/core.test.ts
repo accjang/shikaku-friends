@@ -3,9 +3,9 @@ import { describe, expect, test } from '@jest/globals';
 import levelsJson from '../content/levels.json';
 import { shouldOfferAdFree, shouldShowInterstitial } from '../src/core/adPolicy';
 import { CHAPTERS, levelCount, levelId, levelOptions, parseLevelId } from '../src/core/chapters';
-import { LEVEL_MAX_BRANCHES, AD_FREE_FIRST_CLEARS, AD_FREE_OFFER_AFTER_INTERSTITIALS, AD_INTERSTITIAL_EVERY, CHAPTER_UNLOCK_CLEARS, START_HINTS } from '../src/core/config';
+import { LEVEL_MAX_BRANCHES, AD_FREE_FIRST_CLEARS, AD_FREE_OFFER_AFTER_INTERSTITIALS, AD_INTERSTITIAL_EVERY, CHAPTER_UNLOCK_CLEARS, CONTINUE_HEARTS, MISTAKE_ALLOWANCE, START_HINTS } from '../src/core/config';
 import { dailyPuzzle, dateKey, prevDateKey } from '../src/core/daily';
-import { applyHint, clearAll, newGame, place, removeAt, undo } from '../src/core/game';
+import { applyHint, attemptPlace, clearAll, continueGame, heartsLeft, isMistake, newGame, place, removeAt, undo } from '../src/core/game';
 import { generate } from '../src/core/generator';
 import { characterLine, fontKindFor, LOCALES, missingKeys, pickLocale, translate, translateKeys } from '../src/core/i18n';
 import { unpack, type PackedPuzzle } from '../src/core/levelCodec';
@@ -119,6 +119,53 @@ describe('한 판 진행', () => {
     expect(h.rects).toHaveLength(1);
     h = clearAll(h, tiny);
     expect(h.rects).toEqual([]);
+  });
+
+  test('실수: 크기·숫자는 맞는데 정답 자리가 아닌 네모만 세고, 놓지 않는다', () => {
+    const wrong = { x: 0, y: 0, w: 2, h: 1 }; // 숫자 2 하나, 넓이 2 — 하지만 답은 세로
+    expect(isMistake(tiny, wrong)).toBe(true);
+    expect(isMistake(tiny, { x: 0, y: 0, w: 1, h: 2 })).toBe(false); // 정답
+    expect(isMistake(tiny, { x: 0, y: 0, w: 1, h: 1 })).toBe(false); // 크기 틀림(회색) = 잘못 누름
+    expect(isMistake(tiny, { x: 0, y: 0, w: 2, h: 2 })).toBe(false); // 숫자 두 개(회색)
+
+    let g = newGame();
+    const r = attemptPlace(g, tiny, wrong);
+    expect(r.mistake).toBe(true);
+    expect(r.state.rects).toEqual([]);
+    expect(r.state.mistakes).toBe(1);
+    expect(heartsLeft(r.state)).toBe(MISTAKE_ALLOWANCE - 1);
+
+    // 회색 네모는 그냥 놓이고 하트는 그대로
+    g = attemptPlace(g, tiny, { x: 0, y: 0, w: 1, h: 1 }).state;
+    expect(g.rects).toHaveLength(1);
+    expect(g.mistakes).toBe(0);
+  });
+
+  test('봐주는 수를 넘으면 실패, 광고로 이어하면 하트를 돌려받는다', () => {
+    let g = newGame();
+    const wrong = { x: 0, y: 0, w: 2, h: 1 };
+    for (let i = 0; i < MISTAKE_ALLOWANCE; i++) g = attemptPlace(g, tiny, wrong).state;
+    expect(g.failed).toBe(false);
+    expect(heartsLeft(g)).toBe(0);
+    g = attemptPlace(g, tiny, wrong).state;
+    expect(g.failed).toBe(true);
+    // 실패한 판은 더 놓을 수 없다
+    expect(attemptPlace(g, tiny, { x: 0, y: 0, w: 1, h: 2 }).state).toBe(g);
+    expect(place(g, tiny, { x: 0, y: 0, w: 1, h: 2 })).toBe(g);
+
+    g = continueGame(g);
+    expect(g.failed).toBe(false);
+    expect(heartsLeft(g)).toBe(CONTINUE_HEARTS);
+    g = attemptPlace(g, tiny, { x: 0, y: 0, w: 1, h: 2 }).state;
+    g = attemptPlace(g, tiny, { x: 1, y: 0, w: 1, h: 2 }).state;
+    expect(g.solved).toBe(true);
+  });
+
+  test('모든 스테이지의 정답 네모는 실수로 세지 않는다', () => {
+    for (const packed of Object.values(levels)) {
+      const p = unpack(packed);
+      for (const s of p.solution) expect(isMistake(p, s)).toBe(false);
+    }
   });
 
   test('힌트로 끝까지 풀린다', () => {

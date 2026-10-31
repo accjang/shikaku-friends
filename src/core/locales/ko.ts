@@ -48,6 +48,8 @@ export const KO_UI = {
   newBest: "신기록!",
   next: "다음 스테이지",
   retry: "다시 하기",
+  outOfChances: "기회를 다 썼어요",
+  continueWithAd: "광고 보고 하트 {n}개 받고 이어하기",
   toStages: "스테이지 목록",
   home: "홈",
   chapterUnlocked: "새 챕터가 열렸어요!",

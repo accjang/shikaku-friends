@@ -49,6 +49,8 @@ export const gu: LocaleBundle = {
     newBest: "નવો રેકોર્ડ!",
     next: "આગળનું સ્ટેજ",
     retry: "ફરી રમો",
+    outOfChances: "તકો પૂરી થઈ ગઈ!",
+    continueWithAd: "જાહેરાત જુઓ: +{n} હૃદય સાથે ચાલુ રાખો",
     toStages: "સ્ટેજની યાદી",
     home: "હોમ",
     chapterUnlocked: "નવું પ્રકરણ ખૂલ્યું!",

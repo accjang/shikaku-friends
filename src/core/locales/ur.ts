@@ -49,6 +49,8 @@ export const ur: LocaleBundle = {
     newBest: "نیا ریکارڈ!",
     next: "اگلا اسٹیج",
     retry: "دوبارہ کھیلیں",
+    outOfChances: "مواقع ختم ہو گئے!",
+    continueWithAd: "اشتہار دیکھیں: +{n} دل لے کر جاری رکھیں",
     toStages: "اسٹیج لسٹ",
     home: "ہوم",
     chapterUnlocked: "نیا چیپٹر کھل گیا!",

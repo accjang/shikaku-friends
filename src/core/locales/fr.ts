@@ -49,6 +49,8 @@ export const fr: LocaleBundle = {
     newBest: "Nouveau record !",
     next: "Niveau suivant",
     retry: "Rejouer",
+    outOfChances: "Plus de chances !",
+    continueWithAd: "Regarde une pub : +{n} cœur pour continuer",
     toStages: "Liste des niveaux",
     home: "Accueil",
     chapterUnlocked: "Un nouveau chapitre est ouvert !",

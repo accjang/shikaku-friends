@@ -49,6 +49,8 @@ export const vi: LocaleBundle = {
     newBest: "Kỷ lục mới!",
     next: "Màn tiếp",
     retry: "Chơi lại",
+    outOfChances: "Hết lượt rồi!",
+    continueWithAd: "Xem quảng cáo: +{n} tim để chơi tiếp",
     toStages: "Danh sách màn",
     home: "Trang chủ",
     chapterUnlocked: "Chương mới đã mở!",

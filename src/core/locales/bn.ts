@@ -49,6 +49,8 @@ export const bn: LocaleBundle = {
     newBest: "নতুন রেকর্ড!",
     next: "পরের স্টেজ",
     retry: "আবার খেলো",
+    outOfChances: "সুযোগ শেষ!",
+    continueWithAd: "বিজ্ঞাপন দেখে +{n}টি হার্ট নিয়ে চালিয়ে যাও",
     toStages: "স্টেজ তালিকা",
     home: "হোম",
     chapterUnlocked: "নতুন চ্যাপ্টার খুলেছে!",
