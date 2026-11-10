@@ -110,10 +110,10 @@ export const ADFREE_BONUS_HINTS = 10;
 /** 개발 빌드 가상 결제 가격 표시(실제 가격은 스토어에서). */
 export const MOCK_ADFREE_PRICE = '₩1,900';
 
-// ── 링크(출시 전에 채운다 — docs/RELEASE.md) ──
-/** 개인정보처리방침 주소(docs/store/privacy-policy.md를 올린 곳). 비어 있으면 설정에서 줄을 숨긴다. */
-export const PRIVACY_POLICY_URL = env(process.env.EXPO_PUBLIC_PRIVACY_POLICY_URL);
+// ── 링크 ──
+/** 개인정보처리방침 주소(tools/build_privacy_site.py → accjang/relo-privacy의 shikaku/, GitHub Pages). .env로 바꿀 수 있다. */
+export const PRIVACY_POLICY_URL = env(process.env.EXPO_PUBLIC_PRIVACY_POLICY_URL) || 'https://accjang.github.io/relo-privacy/shikaku/';
 /** 공유 문구 끝에 붙는 스토어 주소(출시 뒤 채운다). 비어 있으면 붙이지 않는다. */
 export const STORE_URL = env(process.env.EXPO_PUBLIC_STORE_URL);
-/** 문의 메일 주소. 비어 있으면 설정에서 줄을 숨긴다. */
-export const SUPPORT_EMAIL = env(process.env.EXPO_PUBLIC_SUPPORT_EMAIL);
+/** 문의 메일 주소(2026-11-10 사용자 결정, 렐로와 같음). .env로 바꿀 수 있다. */
+export const SUPPORT_EMAIL = env(process.env.EXPO_PUBLIC_SUPPORT_EMAIL) || 'gpawod2@gmail.com';
