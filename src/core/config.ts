@@ -111,8 +111,8 @@ export const ADFREE_BONUS_HINTS = 10;
 export const MOCK_ADFREE_PRICE = '₩1,900';
 
 // ── 링크 ──
-/** 개인정보처리방침 주소(tools/build_privacy_site.py → accjang/relo-privacy의 shikaku/, GitHub Pages). .env로 바꿀 수 있다. */
-export const PRIVACY_POLICY_URL = env(process.env.EXPO_PUBLIC_PRIVACY_POLICY_URL) || 'https://accjang.github.io/relo-privacy/shikaku/';
+/** 개인정보처리방침 주소(tools/build_privacy_site.py → accjang/shikaku-privacy, GitHub Pages). .env로 바꿀 수 있다. */
+export const PRIVACY_POLICY_URL = env(process.env.EXPO_PUBLIC_PRIVACY_POLICY_URL) || 'https://accjang.github.io/shikaku-privacy/';
 /** 공유 문구 끝에 붙는 스토어 주소(출시 뒤 채운다). 비어 있으면 붙이지 않는다. */
 export const STORE_URL = env(process.env.EXPO_PUBLIC_STORE_URL);
 /** 문의 메일 주소(2026-11-10 사용자 결정, 렐로와 같음). .env로 바꿀 수 있다. */

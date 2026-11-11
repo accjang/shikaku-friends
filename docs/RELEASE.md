@@ -7,14 +7,14 @@
 - 앱 이름: "시카쿠 프렌즈" / "Shikaku Friends", 번들 ID `app.shikakufriends.mobile`(스토어에 한 번 올리면 못 바꾼다) — 2026-10-25
 - 광고 제거 가격: **US$1.99 / ₩1,900**(가격표에 ₩1,900이 없으면 $1.99에 가장 가까운 원화 값) — 2026-10-25
 - 운영 주체: **주식회사 청림정원(`CHUNGLIMJUNGWON Co.,Ltd.`** — D&B 표기, 쉼표 뒤 띄어쓰기 없음), D-U-N-S 697129275 — 렐로와 같음
-- 문의 메일 `gpawod2@gmail.com`(2026-11-10), 처리방침 https://accjang.github.io/relo-privacy/shikaku/ , 지원 URL https://accjang.github.io/relo-privacy/shikaku/support/ (원본 `tools/build_privacy_site.py`, `docs/store/privacy-policy.md`)
+- 문의 메일 `gpawod2@gmail.com`(2026-11-10), 처리방침 https://accjang.github.io/shikaku-privacy/ , 지원 URL https://accjang.github.io/shikaku-privacy/support/ (원본 `tools/build_privacy_site.py`, `docs/store/privacy-policy.md`)
 - 출시 국가: 렐로와 같게 **중국 본토, EU 27개국·EEA·영국 제외**(28개 언어도 이 시장 기준)
 - 스토어 그림: `docs/store/art/`(`npm run store:art`)
 
-## 계정 현황(2026-11-10, 렐로 세션 기록 기준)
+## 계정 현황(2026-11-11)
 | 계정 | 상태 | 시카쿠에 필요한 것 |
 |---|---|---|
-| Apple Developer | 개인 멤버십(팀 `MGRS7K5M43`) → **조직 계정 전환 신청함, Apple 승인 대기** | 승인 뒤 유료 앱 계약·세금(W-8BEN-E)·계좌 → 앱 등록·인앱 상품(5장, 2장) |
+| Apple Developer | **조직 계정 전환 승인(2026-11-11)** | 유료 앱 계약·세금(W-8BEN-E)·계좌 → 앱 등록·인앱 상품 — 칸별 값은 **`docs/store/asc-setup.md`** |
 | AdMob | 회사 계정 가입 완료(게시자 `pub-3027332696680312`), 렐로 iOS 앱만 있음 | 시카쿠 앱 2개(iOS·Android)·광고 단위 4개 추가(1장) |
 | RevenueCat | 회사 계정·렐로 프로젝트 완료 | 시카쿠 프로젝트·`ad_free` 권한·상품 추가(2장) |
 | Google Play Console | **없음**(렐로는 iOS만) | 조직 계정으로 새로 가입(4장) |

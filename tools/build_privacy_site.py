@@ -1,5 +1,5 @@
-# 개인정보 처리방침·지원 페이지(정적 HTML)를 만든다. 렐로와 같은 GitHub Pages 저장소(accjang/relo-privacy)의 shikaku/ 아래에 올린다.
-# 실행: python3 tools/build_privacy_site.py <출력 폴더>   (예: ../relo-privacy/shikaku)
+# 개인정보 처리방침·지원 페이지(정적 HTML)를 만든다. 시카쿠 전용 GitHub Pages 저장소(accjang/shikaku-privacy, 렐로와 분리 — 2026-11-11 사용자 결정)에 올린다.
+# 실행: python3 tools/build_privacy_site.py <출력 폴더>   (예: ../shikaku-privacy)
 # 결과: <출력>/index.html(처리방침) · <출력>/support/index.html(지원). 주소는 config 아래 PRIVACY_URL·SUPPORT_URL.
 # 언어: ko·en·ja·zh-Hant. 다른 언어 브라우저는 영어. 문구를 바꾸면 시행일(EFFECTIVE)도 바꾼다.
 import html
@@ -10,8 +10,8 @@ EFFECTIVE = '2026-11-10'
 EMAIL = 'gpawod2@gmail.com'
 COMPANY_KO = '주식회사 청림정원'
 COMPANY_EN = 'CHUNGLIMJUNGWON Co.,Ltd.'  # D&B·Apple 판매자 이름과 같은 표기
-PRIVACY_URL = 'https://accjang.github.io/relo-privacy/shikaku/'
-SUPPORT_URL = 'https://accjang.github.io/relo-privacy/shikaku/support/'
+PRIVACY_URL = 'https://accjang.github.io/shikaku-privacy/'
+SUPPORT_URL = 'https://accjang.github.io/shikaku-privacy/support/'
 LANGS = [('ko', '한국어'), ('en', 'English'), ('ja', '日本語'), ('zh-Hant', '繁體中文')]
 
 GOOGLE_PARTNER = 'https://policies.google.com/technologies/partner-sites'
@@ -493,6 +493,8 @@ def main() -> None:
         sys.exit('사용법: python3 tools/build_privacy_site.py <출력 폴더>')
     out = sys.argv[1]
     os.makedirs(os.path.join(out, 'support'), exist_ok=True)
+    # Jekyll 처리 없이 그대로 올리게
+    open(os.path.join(out, '.nojekyll'), 'w').close()
     with open(os.path.join(out, 'index.html'), 'w', encoding='utf-8') as f:
         f.write(build_policy())
     with open(os.path.join(out, 'support', 'index.html'), 'w', encoding='utf-8') as f:
