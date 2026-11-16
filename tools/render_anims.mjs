@@ -32,7 +32,7 @@ for (const [name, anims] of Object.entries(ANIMS)) {
   if (name.startsWith('_')) continue;
   for (const [anim, a] of Object.entries(anims)) {
     const ts = Array.from({ length: a.frames }, (_, i) => a.from + ((a.to - a.from) * i) / (a.frames - 1));
-    const urls = await page.evaluate(([m, t, y]) => window.renderSeq(m, t, y), [a.model, ts, YAW]);
+    const urls = await page.evaluate(([m, t, y, f]) => window.renderSeq(m, t, y, 0.12, f ? window.LEG_BONES : []), [a.model, ts, YAW, !!a.freezeLegs]);
     urls.forEach((u, i) => writeFileSync(join(out, `${name}_${anim}_${String(i).padStart(2, '0')}.png`), Buffer.from(u.split(',')[1], 'base64')));
     console.log(name, anim, urls.length);
   }
