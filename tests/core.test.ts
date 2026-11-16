@@ -179,6 +179,17 @@ describe('한 판 진행', () => {
     expect(explainHint(g, tiny)).toEqual({ rect: tiny.solution[1], reason: { kind: 'onlyFit', n: 2 } });
     g = place(g, tiny, tiny.solution[1]);
     expect(explainHint(g, tiny)).toBeNull();
+    // 숫자 1은 다른 숫자가 남아 있는 동안에는 힌트로 주지 않는다
+    const withOne: Puzzle = {
+      w: 3,
+      h: 1,
+      clues: [{ x: 0, y: 0, n: 1 }, { x: 1, y: 0, n: 2 }],
+      solution: [{ x: 0, y: 0, w: 1, h: 1 }, { x: 1, y: 0, w: 2, h: 1 }],
+    };
+    let o = newGame();
+    expect(explainHint(o, withOne)).toEqual({ rect: withOne.solution[1], reason: { kind: 'onlyFit', n: 2 } });
+    o = place(o, withOne, withOne.solution[1]);
+    expect(explainHint(o, withOne)).toEqual({ rect: withOne.solution[0], reason: { kind: 'onlyFit', n: 1 } });
     // 모든 스테이지: 힌트 네모는 언제나 정답 네모
     for (const packed of Object.values(levels)) {
       const p = unpack(packed);

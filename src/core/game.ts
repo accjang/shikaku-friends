@@ -91,20 +91,22 @@ export interface Hint {
 /**
  * 힌트: 아직 정확히 놓이지 않은 정답 네모 하나와 그 이유.
  * 이미 맞게 놓인 네모를 피하면 후보가 하나뿐인 숫자가 있으면 그것을(이유 onlyFit) — 사람이 따라 배울 수 있는 수.
- * 없으면 작은 것부터(초반에 판을 여는 데 도움이 되는 순서) 권한다(이유 try). 다 놓였으면 null.
+ * 없으면 작은 것부터(초반에 판을 여는 데 도움이 되는 순서) 권한다(이유 try). 숫자 1은 나머지가 다 놓인 뒤에만. 다 놓였으면 null.
  */
 export function explainHint(state: GameState, puzzle: Puzzle): Hint | null {
   const placed = (s: Rect): boolean => state.rects.some((r) => sameRect(r, s));
   const missing = puzzle.solution.map((s, i) => ({ s, i })).filter(({ s }) => !placed(s));
   if (missing.length === 0) return null;
-  // 넓이가 작고 위쪽에 있는 것부터
+  // 넓이가 작고 위쪽에 있는 것부터. 한 칸짜리(숫자 1)는 누구나 아는 수라 힌트가 아까우니 맨 뒤로 — 다른 것이 다 놓인 뒤에만 준다
   missing.sort((a, b) => a.s.w * a.s.h - b.s.w * b.s.h || a.s.y - b.s.y || a.s.x - b.s.x);
+  const big = missing.filter(({ i }) => puzzle.clues[i].n > 1);
+  if (big.length === 0) return { rect: missing[0].s, reason: { kind: 'onlyFit', n: 1 } };
   const correct = puzzle.solution.filter(placed);
-  for (const { s, i } of missing) {
+  for (const { s, i } of big) {
     const open = candidatesFor(puzzle, i).filter((c) => !correct.some((r) => overlaps(r, c)));
     if (open.length === 1) return { rect: s, reason: { kind: 'onlyFit', n: puzzle.clues[i].n } };
   }
-  return { rect: missing[0].s, reason: { kind: 'try' } };
+  return { rect: big[0].s, reason: { kind: 'try' } };
 }
 
 /** 힌트로 놓을 정답 직사각형(explainHint의 네모). 없으면 null. */
