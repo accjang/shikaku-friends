@@ -1,5 +1,5 @@
 {
-  "_comment": "캐릭터 자세표(tools/render_chars.mjs). model은 assets/source/models/ 아래 경로, t는 애니메이션 위치(0~1). 리깅·애니메이션은 Higgsfield 3D rigging(2026-10-12) 결과. 오리는 리깅이 없어 원본 모델 그대로. freezeLegs: 다리·골반 회전을 리깅 기본 자세로 묶는다(리깅 애니메이션이 다리를 꼬거나 붙여 발이 어색해서, 2026-11-16).",
+  "_comment": "캐릭터 자세표(tools/render_chars.mjs). model은 assets/source/models/ 아래 경로, t는 애니메이션 위치(0~1). 리깅·애니메이션은 Higgsfield 3D rigging(2026-10-12) 결과. 오리는 애니메이션 없이 원본 모델을 쓴다. freezeLegs: 다리 회전을 리깅 기본 자세로 묶는다(리깅 애니메이션이 다리를 꼬거나 붙여 발이 어색해서, 2026-11-16). bind 값은 메시를 만든 자세(바인드 포즈)로 — 오리 모델은 걷는 중 자세로 저장돼 두 발이 한쪽에 몰려 있었다.",
   "cat": {
     "calm": {
       "model": "rigged/cat_hand_on_hip.glb",
@@ -47,11 +47,13 @@
   "duck": {
     "calm": {
       "model": "duck.glb",
-      "t": 0
+      "t": 0,
+      "freezeLegs": "bind"
     },
     "cheer": {
       "model": "duck.glb",
-      "t": 0
+      "t": 0,
+      "freezeLegs": "bind"
     }
   }
 }

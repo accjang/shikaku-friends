@@ -13,25 +13,34 @@ scene.add(new THREE.HemisphereLight(0xffffff, 0xb0a8c0, 2.2));
 const sun = new THREE.DirectionalLight(0xffffff, 1.6); sun.position.set(2, 3, 4); scene.add(sun);
 const cam = new THREE.PerspectiveCamera(30, 1, 0.01, 100);
 // freeze: 원래 자세(리깅 기본 자세)로 묶어 둘 뼈 이름. 리깅 애니메이션이 다리를 꼬거나 붙여 발이 어색할 때 다리·골반 회전만 원래대로 둔다.
-// 다리 묶기(freezeLegs)에 쓰는 뼈: 골반 회전과 양 다리. 상체·팔·머리 움직임은 그대로 둔다.
-window.LEG_BONES = ['Hips', 'LeftUpLeg', 'LeftLeg', 'LeftFoot', 'LeftToeBase', 'RightUpLeg', 'RightLeg', 'RightFoot', 'RightToeBase'];
-function freezer(m, names) {
+// 다리 묶기(freezeLegs)에 쓰는 뼈: 양 다리만. 골반(Hips)까지 묶으면 판다·토끼 얼굴이 옆으로 돌아가서 뺐다. 상체·팔·머리 움직임은 그대로.
+window.LEG_BONES = ['LeftUpLeg', 'LeftLeg', 'LeftFoot', 'LeftToeBase', 'RightUpLeg', 'RightLeg', 'RightFoot', 'RightToeBase'];
+// fromBind: 파일에 저장된 자세 대신 메시를 만든 기본 자세(바인드 포즈)를 쓴다 — 오리처럼 걷는 중인 자세로 저장된 모델용.
+function freezer(m, names, fromBind = false) {
   const bones = [];
-  m.traverse((o) => { if (o.isBone && names.includes(o.name)) bones.push([o, o.quaternion.clone()]); });
-  return () => bones.forEach(([b, q]) => b.quaternion.copy(q));
+  m.traverse((o) => { if (o.isBone && names.includes(o.name)) bones.push(o); });
+  let saved = bones.map((b) => [b.quaternion.clone(), b.position.clone()]);
+  if (fromBind) {
+    const all = [];
+    m.traverse((o) => { if (o.isBone) all.push([o, o.quaternion.clone(), o.position.clone(), o.scale.clone()]); });
+    m.traverse((o) => { if (o.isSkinnedMesh) o.skeleton.pose(); });
+    saved = bones.map((b) => [b.quaternion.clone(), b.position.clone()]);
+    all.forEach(([o, q, p, sc]) => { o.quaternion.copy(q); o.position.copy(p); o.scale.copy(sc); });
+  }
+  return () => bones.forEach((b, i) => { b.quaternion.copy(saved[i][0]); if (fromBind) b.position.copy(saved[i][1]); });
 }
 // model: assets/source/models/ 아래 경로, t: 애니메이션 위치(0~1, 리깅 모델만)
-window.render = async (model, t, yaw, pitch = 0.12, freeze = []) => {
+window.render = async (model, t, yaw, pitch = 0.12, freeze = [], fromBind = false) => {
   const g = await new GLTFLoader().loadAsync('/assets/source/models/' + model);
   const m = g.scene; scene.add(m);
+  const hold = freezer(m, freeze, fromBind);
   if (g.animations.length) {
-    const hold = freezer(m, freeze);
     const mixer = new THREE.AnimationMixer(m);
     const clip = g.animations[0];
     mixer.clipAction(clip).play();
     mixer.setTime(clip.duration * t);
-    hold();
   }
+  hold();
   m.updateMatrixWorld(true);
   const box = new THREE.Box3().setFromObject(m, true);
   const size = box.getSize(new THREE.Vector3());

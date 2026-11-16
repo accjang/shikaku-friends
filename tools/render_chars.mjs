@@ -24,7 +24,7 @@ const server = createServer((req, res) => {
 }).listen(0);
 const port = server.address().port;
 
-// 자세표(tools/char_poses.json): 캐릭터마다 calm(서 있는 자세)·cheer(기뻐하는 자세). freezeLegs면 다리·골반은 리깅 기본 자세로(발이 꼬이거나 붙지 않게)
+// 자세표(tools/char_poses.json): 캐릭터마다 calm(서 있는 자세)·cheer(기뻐하는 자세). freezeLegs면 다리는 리깅 기본 자세로(발이 꼬이거나 붙지 않게), "bind"면 메시를 만든 자세(바인드 포즈)로
 const POSES = JSON.parse(readFileSync(join(root, 'tools', 'char_poses.json'), 'utf8'));
 // 출력 이름 → [자세, 좌우 각도]
 const VIEWS = { front: ['calm', 0], q: ['calm', 0.55], ql: ['calm', -0.55], cheer: ['cheer', 0.2] };
@@ -37,7 +37,7 @@ await page.waitForFunction('window.ready');
 for (const name of ['cat', 'panda', 'rabbit', 'shiba', 'duck']) {
   for (const [view, [pose, yaw]] of Object.entries(VIEWS)) {
     const { model, t, freezeLegs } = POSES[name][pose];
-    const url = await page.evaluate(([m, tt, y, f]) => window.render(m, tt, y, 0.12, f ? window.LEG_BONES : []), [model, t, yaw, !!freezeLegs]);
+    const url = await page.evaluate(([m, tt, y, f]) => window.render(m, tt, y, 0.12, f ? window.LEG_BONES : [], f === 'bind'), [model, t, yaw, freezeLegs ?? false]);
     writeFileSync(join(out, `${name}_${view}.png`), Buffer.from(url.split(',')[1], 'base64'));
     console.log(name, view);
   }

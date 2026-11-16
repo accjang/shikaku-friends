@@ -1,5 +1,5 @@
 {
-  "_comment": "캐릭터 움직임(프레임 애니메이션, tools/render_anims.mjs). from~to 구간을 frames장으로 나눠 렌더하고 앱은 왕복(핑퐁)으로 재생한다. 오리는 리깅이 없어 없음(통통 튀는 효과만). freezeLegs: 다리·골반 회전은 리깅 기본 자세로(리깅 애니메이션이 다리를 꼬거나 붙여 발이 어색해서, 2026-11-16).",
+  "_comment": "캐릭터 움직임(프레임 애니메이션, tools/render_anims.mjs). from~to 구간을 frames장으로 나눠 렌더하고 앱은 왕복(핑퐁)으로 재생한다. 오리는 리깅이 없어 없음(통통 튀는 효과만). freezeLegs: 다리 회전은 리깅 기본 자세로(리깅 애니메이션이 다리를 꼬거나 붙여 발이 어색해서, 2026-11-16).",
   "cat": {
     "idle": { "model": "rigged/cat_hand_on_hip.glb", "from": 0, "to": 0.95, "frames": 12, "freezeLegs": true },
     "cheer": { "model": "rigged/cat_joyful_dance.glb", "from": 0, "to": 0.9, "frames": 12 }
