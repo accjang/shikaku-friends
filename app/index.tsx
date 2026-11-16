@@ -9,7 +9,7 @@ import { levelId, type CharacterId } from '@/core/chapters';
 import { letterTileFriendly, RTL_LOCALES } from '@/core/i18n';
 import { PROP_EVERY } from '@/core/config';
 import { nextProp, PROP_IDS, stagesCleared, unlockedPropCount } from '@/core/village';
-import { dailyStreak, nextUnplayed, starCount, streakReward } from '@/core/progress';
+import { dailyStreakInfo, nextUnplayed, starCount, streakReward } from '@/core/progress';
 import { dateKey, prevDateKey } from '@/core/daily';
 import { useProgressStore } from '@/data/progressStore';
 import { Button } from '@/ui/Button';
@@ -79,7 +79,7 @@ export default function Home() {
   const next = nextUnplayed(progress);
   const today = dateKey(new Date());
   const doneToday = today in progress.daily;
-  const streak = dailyStreak(progress, today, prevDateKey);
+  const { streak, savedYesterday } = dailyStreakInfo(progress, today, prevDateKey);
   const started = Object.keys(progress.levels).length > 0;
   const cleared = stagesCleared(progress);
   const havePropCount = unlockedPropCount(cleared);
@@ -150,11 +150,14 @@ export default function Home() {
           sub={
             <Text style={styles.sub}>
               {doneToday
-                ? `✓ ${t('dailyDone')}${streak > 1 ? ` · 🔥 ${t('streak', { n: streak })}` : ''}`
-                : `${streak > 0 ? `🔥 ${t('streak', { n: streak })} · ` : ''}${t('dailyNext', { n: streakReward(streak + 1) })}`}
+                ? `✓ ${t('dailyDone')}${streak > 1 ? ` · 🔥 ${t('streak', { n: streak })}` : ''} · ${t('dailyArchive')}`
+                : savedYesterday
+                  ? `🛡 ${t('streakSaved')} · 🔥 ${t('streak', { n: streak })}`
+                  : `${streak > 0 ? `🔥 ${t('streak', { n: streak })} · ` : ''}${t('dailyNext', { n: streakReward(streak + 1) })}`}
             </Text>
           }
-          onPress={() => router.push('/play/daily')}
+          // 오늘 것을 풀었으면 지난 퍼즐 달력으로
+          onPress={() => router.push(doneToday ? '/daily' : '/play/daily')}
         />
       </View>
     </Screen>

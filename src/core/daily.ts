@@ -17,6 +17,16 @@ export function prevDateKey(key: string): string {
   return dateKey(new Date(y, m - 1, d - 1));
 }
 
+/** 달력 한 달: 주(일요일 시작)마다 7칸, 그 달이 아닌 칸은 null. month는 1~12. */
+export function monthWeeks(year: number, month: number): (string | null)[][] {
+  const first = new Date(year, month - 1, 1).getDay();
+  const days = new Date(year, month, 0).getDate();
+  const cells: (string | null)[] = Array.from({ length: first }, () => null);
+  for (let d = 1; d <= days; d++) cells.push(`${year}-${pad(month)}-${pad(d)}`);
+  while (cells.length % 7 !== 0) cells.push(null);
+  return Array.from({ length: cells.length / 7 }, (_, w) => cells.slice(w * 7, w * 7 + 7));
+}
+
 export function isDateKey(key: string): boolean {
   return /^\d{4}-\d{2}-\d{2}$/.test(key);
 }

@@ -1,6 +1,6 @@
 // 진행 기록(UI 없음): 깬 스테이지·별·기록, 힌트 수, 오늘의 퍼즐. 저장은 src/data/progressStore.ts.
 import { CHAPTERS, chapterById, levelCount, levelId, type Chapter } from './chapters';
-import { CHAPTER_UNLOCK_CLEARS, DAILY_STREAK_REWARDS, START_HINTS, STAR_HINT_LIMITS } from './config';
+import { CHAPTER_UNLOCK_CLEARS, DAILY_EPOCH, DAILY_STREAK_REWARDS, START_HINTS, STAR_HINT_LIMITS, STREAK_FREEZE_EVERY_DAYS } from './config';
 import { prevDateKey } from './daily';
 
 export interface LevelRecord {
@@ -12,13 +12,15 @@ export interface Progress {
   levels: Record<string, LevelRecord>;
   /** 오늘의 퍼즐: 날짜 키(YYYY-MM-DD) → 걸린 시간. */
   daily: Record<string, number>;
+  /** 지난 오늘의 퍼즐을 나중에 푼 기록: 날짜 키 → 걸린 시간. 연속 일수·보상에는 들어가지 않는다. */
+  dailyLate: Record<string, number>;
   hints: number;
   /** 지금까지 깬 횟수(같은 스테이지 반복 포함, 광고 빈도에 쓴다). */
   totalClears: number;
   tutorialDone: boolean;
 }
 
-export const INITIAL_PROGRESS: Progress = { levels: {}, daily: {}, hints: START_HINTS, totalClears: 0, tutorialDone: false };
+export const INITIAL_PROGRESS: Progress = { levels: {}, daily: {}, dailyLate: {}, hints: START_HINTS, totalClears: 0, tutorialDone: false };
 
 /** 저장소에서 읽은 값을 믿지 않고 모양을 맞춘다. */
 export function sanitizeProgress(raw: unknown): Progress {
@@ -31,13 +33,16 @@ export function sanitizeProgress(raw: unknown): Progress {
       if (v && typeof v === 'object') levels[k] = { stars: Math.min(3, num(v.stars, 1)), bestMs: num(v.bestMs, 0) };
     }
   }
-  const daily: Record<string, number> = {};
-  if (r.daily && typeof r.daily === 'object') {
-    for (const [k, v] of Object.entries(r.daily)) daily[k] = num(v, 0);
-  }
+  const times = (raw: unknown): Record<string, number> => {
+    const out: Record<string, number> = {};
+    if (raw && typeof raw === 'object') for (const [k, v] of Object.entries(raw)) out[k] = num(v, 0);
+    return out;
+  };
+  const daily = times(r.daily);
   return {
     levels,
     daily,
+    dailyLate: times(r.dailyLate),
     hints: num(r.hints, START_HINTS),
     totalClears: num(r.totalClears, 0),
     tutorialDone: r.tutorialDone === true,
@@ -126,6 +131,25 @@ export interface DailyClearOutcome {
   reward: number;
   /** 오늘을 포함한 연속 일수. */
   streak: number;
+  /** 어제를 빠졌지만 보호로 이어졌는지. */
+  saved: boolean;
+}
+
+/** 지난 날의 퍼즐을 나중에 풀었다: 기록만 남긴다(보상·연속 일수 없음). 제날에 푼 날이면 그 기록의 최고 시간만 고친다. */
+export function recordLateDailyClear(p: Progress, dateKey: string, ms: number): Progress {
+  if (dateKey in p.daily) return { ...p, daily: { ...p.daily, [dateKey]: Math.min(p.daily[dateKey], ms) }, totalClears: p.totalClears + 1 };
+  const best = dateKey in p.dailyLate ? Math.min(p.dailyLate[dateKey], ms) : ms;
+  return { ...p, dailyLate: { ...p.dailyLate, [dateKey]: best }, totalClears: p.totalClears + 1 };
+}
+
+export type DailyStatus = 'onTime' | 'late' | 'open' | 'future' | 'before';
+
+/** 달력 칸 상태: 제날에 풂 / 나중에 풂 / 아직 안 풂(풀 수 있음) / 아직 안 온 날 / 오늘의 퍼즐이 시작되기 전. */
+export function dailyStatus(p: Progress, key: string, todayKey: string, epochKey: string = DAILY_EPOCH): DailyStatus {
+  if (key < epochKey) return 'before';
+  if (key > todayKey) return 'future';
+  if (key in p.daily) return 'onTime';
+  return key in p.dailyLate ? 'late' : 'open';
 }
 
 /** 오늘의 퍼즐 완료. 그날 처음이면 연속 일수에 맞는 힌트 보상. */
@@ -133,24 +157,55 @@ export function recordDailyClear(p: Progress, dateKey: string, ms: number): Dail
   const first = !(dateKey in p.daily);
   const best = first ? ms : Math.min(p.daily[dateKey], ms);
   const daily = { ...p.daily, [dateKey]: best };
-  const streak = dailyStreak({ ...p, daily }, dateKey, prevDateKey);
+  const { streak, savedYesterday: saved } = dailyStreakInfo({ ...p, daily }, dateKey, prevDateKey);
   const reward = first ? streakReward(streak) : 0;
   return {
     progress: { ...p, daily, hints: p.hints + reward, totalClears: p.totalClears + 1 },
     reward,
     streak,
+    saved,
   };
 }
 
-/** 오늘의 퍼즐 연속 일수(오늘 또는 어제까지 이어진 것). */
-export function dailyStreak(p: Progress, todayKey: string, prevKey: (key: string) => string): number {
-  let key = todayKey in p.daily ? todayKey : prevKey(todayKey);
-  let n = 0;
-  while (key in p.daily) {
-    n++;
-    key = prevKey(key);
+export interface StreakInfo {
+  /** 연속으로 푼 날 수(보호받아 건너뛴 날은 세지 않는다). */
+  streak: number;
+  /** 어제를 빠졌지만 보호로 이어졌는지(홈·결과 창 안내용). */
+  savedYesterday: boolean;
+}
+
+/**
+ * 오늘의 퍼즐 연속 일수와 보호 여부. 오늘을 아직 안 풀었으면 어제까지를 본다.
+ * 하루만 빠진 날은 보호로 건너뛴다. 단 보호 사이에는 STREAK_FREEZE_EVERY_DAYS일 이상 풀어야 한다(이틀 연속 빠지면 끊김).
+ * 저장 값 없이 기록(p.daily)만으로 계산한다.
+ */
+export function dailyStreakInfo(p: Progress, todayKey: string, prevKey: (key: string) => string): StreakInfo {
+  const done = (k: string): boolean => k in p.daily;
+  let key = done(todayKey) ? todayKey : prevKey(todayKey);
+  const yesterday = prevKey(todayKey);
+  let streak = 0;
+  let savedYesterday = false;
+  // 가장 최근 보호 뒤로 푼 날 수(뒤에서부터 세므로, 다음 보호까지의 간격)
+  let sinceFreeze = Infinity;
+  for (;;) {
+    if (done(key)) {
+      streak++;
+      sinceFreeze++;
+      key = prevKey(key);
+      continue;
+    }
+    const before = prevKey(key);
+    if (!done(before) || sinceFreeze < STREAK_FREEZE_EVERY_DAYS) break;
+    if (key === yesterday) savedYesterday = true;
+    sinceFreeze = 0;
+    key = before;
   }
-  return n;
+  return { streak, savedYesterday };
+}
+
+/** 오늘의 퍼즐 연속 일수(오늘 또는 어제까지 이어진 것, 하루 빠진 날은 보호). */
+export function dailyStreak(p: Progress, todayKey: string, prevKey: (key: string) => string): number {
+  return dailyStreakInfo(p, todayKey, prevKey).streak;
 }
 
 export function addHints(p: Progress, n: number): Progress {

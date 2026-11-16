@@ -2,7 +2,8 @@
 // 실수: 숫자 하나에 크기까지 맞는데 정답 자리가 아닌 네모(답이 하나뿐이라 확실히 틀림). 놓지 않고 하트만 깎는다.
 // 크기가 틀렸거나 숫자가 없는·여러 개인 회색 네모는 잘못 누른 것으로 보고 봐준다(지우면 그만).
 import { CONTINUE_HEARTS, MISTAKE_ALLOWANCE, UNDO_LIMIT } from './config';
-import { isSolved, placeRect, rectAt, sameRect, validClueIndex, type Puzzle, type Rect } from './puzzle';
+import { isSolved, overlaps, placeRect, rectAt, sameRect, validClueIndex, type Puzzle, type Rect } from './puzzle';
+import { candidatesFor } from './solver';
 
 export interface GameState {
   rects: Rect[];
@@ -79,13 +80,36 @@ export function clearAll(state: GameState, puzzle: Puzzle): GameState {
   return push(state, puzzle, []);
 }
 
-/** 힌트로 놓을 정답 직사각형: 아직 정확히 놓이지 않은 것 중 사용자가 놓은 것과 가장 덜 겹치는 것. 없으면 null. */
-export function nextHint(state: GameState, puzzle: Puzzle): Rect | null {
-  const missing = puzzle.solution.filter((s) => !state.rects.some((r) => sameRect(r, s)));
+/** 힌트가 왜 그 네모인지: onlyFit = 그 숫자가 들어갈 자리가 하나뿐(n = 숫자), try = 이유를 한 줄로 말하기 어려워 그냥 권함. */
+export type HintReason = { kind: 'onlyFit'; n: number } | { kind: 'try' };
+
+export interface Hint {
+  rect: Rect;
+  reason: HintReason;
+}
+
+/**
+ * 힌트: 아직 정확히 놓이지 않은 정답 네모 하나와 그 이유.
+ * 이미 맞게 놓인 네모를 피하면 후보가 하나뿐인 숫자가 있으면 그것을(이유 onlyFit) — 사람이 따라 배울 수 있는 수.
+ * 없으면 작은 것부터(초반에 판을 여는 데 도움이 되는 순서) 권한다(이유 try). 다 놓였으면 null.
+ */
+export function explainHint(state: GameState, puzzle: Puzzle): Hint | null {
+  const placed = (s: Rect): boolean => state.rects.some((r) => sameRect(r, s));
+  const missing = puzzle.solution.map((s, i) => ({ s, i })).filter(({ s }) => !placed(s));
   if (missing.length === 0) return null;
-  // 작은 것부터(초반에 판을 여는 데 도움이 되는 순서): 넓이가 작고 위쪽에 있는 것
-  const sorted = [...missing].sort((a, b) => a.w * a.h - b.w * b.h || a.y - b.y || a.x - b.x);
-  return sorted[0];
+  // 넓이가 작고 위쪽에 있는 것부터
+  missing.sort((a, b) => a.s.w * a.s.h - b.s.w * b.s.h || a.s.y - b.s.y || a.s.x - b.s.x);
+  const correct = puzzle.solution.filter(placed);
+  for (const { s, i } of missing) {
+    const open = candidatesFor(puzzle, i).filter((c) => !correct.some((r) => overlaps(r, c)));
+    if (open.length === 1) return { rect: s, reason: { kind: 'onlyFit', n: puzzle.clues[i].n } };
+  }
+  return { rect: missing[0].s, reason: { kind: 'try' } };
+}
+
+/** 힌트로 놓을 정답 직사각형(explainHint의 네모). 없으면 null. */
+export function nextHint(state: GameState, puzzle: Puzzle): Rect | null {
+  return explainHint(state, puzzle)?.rect ?? null;
 }
 
 export function applyHint(state: GameState, puzzle: Puzzle): GameState {

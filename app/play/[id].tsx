@@ -1,4 +1,4 @@
-// 게임 화면. id = 스테이지("1-07") 또는 "daily"(오늘의 퍼즐).
+// 게임 화면. id = 스테이지("1-07"), "daily"(오늘의 퍼즐), "d2026-11-03"(지난 날의 퍼즐 — 기록만 남고 보상·연속 없음).
 // 위: 머리줄(뒤로·제목·시간) → 캐릭터+말풍선 → 하트 → 판 → 아래 도구(되돌리기·처음부터·힌트).
 // 정답이 아닌 네모(크기·숫자는 맞음)는 놓지 않고 하트를 깎는다. 하트를 다 쓰고 또 틀리면 실패 창(다시 하기·광고로 이어하기).
 // 다 풀면 축하 → 결과 창. "다음"을 누를 때 차례면 전면 광고(src/core/adPolicy.ts).
@@ -9,14 +9,14 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
 import { CHAPTERS, chapterById, levelCount, levelId, parseLevelId, type CharacterId } from '@/core/chapters';
-import { BUBBLE_MS, CLEAR_DELAY_MS, DAILY_STREAK_REWARDS, MISTAKE_ALLOWANCE, MISTAKE_FLASH_MS, REWARDED_HINTS } from '@/core/config';
-import { dailyPuzzle, dateKey } from '@/core/daily';
+import { BUBBLE_MS, CLEAR_DELAY_MS, DAILY_EPOCH, DAILY_STREAK_REWARDS, HINT_BUBBLE_MS, MISTAKE_ALLOWANCE, MISTAKE_FLASH_MS, REWARDED_HINTS } from '@/core/config';
+import { dailyPuzzle, dateKey, isDateKey } from '@/core/daily';
 import { dailyShareText, stageShareText } from '@/core/share';
 import { companionFor, newlyUnlockedProp, stagesCleared, type PropId } from '@/core/village';
-import { applyHint, attemptPlace, clearAll, continueGame, heartsLeft, newGame, removeAt, undo, type GameState } from '@/core/game';
+import { applyHint, attemptPlace, clearAll, continueGame, explainHint, heartsLeft, newGame, removeAt, undo, type GameState } from '@/core/game';
 import { characterLine, PROP_NAMES, type Mood } from '@/core/i18n';
 import { unpack, type PackedPuzzle } from '@/core/levelCodec';
-import { addHints, recordDailyClear, recordLevelClear, spendHint, streakCycleDay } from '@/core/progress';
+import { addHints, recordDailyClear, recordLateDailyClear, recordLevelClear, spendHint, streakCycleDay } from '@/core/progress';
 import { shouldOfferAdFree } from '@/core/adPolicy';
 import { coverage, validClueIndex, type Puzzle, type Rect } from '@/core/puzzle';
 import { maybeShowInterstitial, noteAdFreeOffered, showRewarded, useAdStore } from '@/data/ads';
@@ -47,7 +47,8 @@ interface Session {
   puzzle: Puzzle;
   character: CharacterId;
   title: string;
-  kind: 'level' | 'daily';
+  /** past = 지난 날의 오늘의 퍼즐(key는 그 날짜). */
+  kind: 'level' | 'daily' | 'past';
   chapter: number;
   level: number;
 }
@@ -58,6 +59,13 @@ function useSession(id: string, t: ReturnType<typeof useT>['t']): Session | null
       const key = dateKey(new Date());
       const day = Number(key.slice(-2));
       return { key, puzzle: dailyPuzzle(key), character: DAILY_CHARACTERS[day % DAILY_CHARACTERS.length], title: t('daily'), kind: 'daily', chapter: 0, level: 0 };
+    }
+    // 지난 날: "d" + 날짜 키. 오늘이거나 아직 안 온 날이면 없는 화면으로
+    if (id.startsWith('d') && isDateKey(id.slice(1))) {
+      const key = id.slice(1);
+      if (key >= dateKey(new Date()) || key < DAILY_EPOCH) return null;
+      const day = Number(key.slice(-2));
+      return { key, puzzle: dailyPuzzle(key), character: DAILY_CHARACTERS[day % DAILY_CHARACTERS.length], title: `${t('daily')} · ${Number(key.slice(5, 7))}/${day}`, kind: 'past', chapter: 0, level: 0 };
     }
     const parsed = parseLevelId(id);
     const packed = LEVELS[id];
@@ -205,11 +213,17 @@ function Game({ session, t, locale, onRestart }: GameProps) {
         newBest = out.newBest && !!progress.levels[session.key];
         if (out.unlockedChapter) notes.push(t('chapterUnlocked'));
         share = stageShareText(locale, { id: session.key, stars: out.stars, ms: elapsed });
+      } else if (session.kind === 'past') {
+        const next = recordLateDailyClear(progress, session.key, elapsed);
+        useProgressStore.getState().set(next);
+        best = next.daily[session.key] ?? next.dailyLate[session.key];
+        share = dailyShareText(locale, { dateKey: session.key, ms: elapsed, hintsUsed: state.hintsUsed, streak: 0 });
       } else {
         const out = recordDailyClear(progress, session.key, elapsed);
         useProgressStore.getState().set(out.progress);
         best = out.progress.daily[session.key];
         if (out.reward > 0) notes.push(t('dailyReward', { d: out.streak, n: out.reward }));
+        if (out.reward > 0 && out.saved) notes.push(`🛡 ${t('streakSaved')}`);
         streakDay = out.reward > 0 ? streakCycleDay(out.streak) : null;
         share = dailyShareText(locale, {
           dateKey: session.key,
@@ -302,7 +316,13 @@ function Game({ session, t, locale, onRestart }: GameProps) {
     }
     updateProgress(() => spent);
     playSfx('hint');
-    react('hint');
+    // 왜 이 네모인지 말풍선으로 알려 준다(자리가 하나뿐인 숫자면 그 이유, 아니면 권하는 말)
+    const hint = explainHint(game, puzzle);
+    setMood('hint');
+    setBeat((b) => b + 1);
+    setLine(hint?.reason.kind === 'onlyFit' ? t('hintOnlyFit', { n: hint.reason.n }) : t('hintTry'));
+    if (bubbleTimer.current) clearTimeout(bubbleTimer.current);
+    bubbleTimer.current = setTimeout(() => setLine(null), HINT_BUBBLE_MS);
     commit(applyHint(game, puzzle));
   };
 
@@ -346,6 +366,7 @@ function Game({ session, t, locale, onRestart }: GameProps) {
 
   const nextTarget = (): string => {
     if (session.kind === 'daily') return '/';
+    if (session.kind === 'past') return '/daily';
     const ch = chapterById(session.chapter)!;
     if (session.level < levelCount(ch)) return `/play/${levelId(ch.id, session.level + 1)}`;
     const nextCh = CHAPTERS.find((c) => c.id === ch.id + 1);
@@ -428,10 +449,10 @@ function Game({ session, t, locale, onRestart }: GameProps) {
         bestMs={result?.best ?? null}
         newBest={result?.newBest ?? false}
         notes={result?.notes ?? []}
-        primaryLabel={session.kind === 'daily' ? t('home') : t('next')}
+        primaryLabel={session.kind === 'daily' ? t('home') : session.kind === 'past' ? t('dailyArchive') : t('next')}
         onPrimary={() => void goNext()}
         onRetry={restart}
-        listLabel={session.kind === 'daily' ? t('stages') : t('toStages')}
+        listLabel={session.kind === 'level' ? t('toStages') : session.kind === 'daily' ? t('dailyArchive') : t('home')}
         reward={result?.reward ? { image: propImage(result.reward), label: t('newProp', { name: PROP_NAMES[result.reward][locale] }) } : null}
         streak={result?.streakDay ? { day: result.streakDay, rewards: [...DAILY_STREAK_REWARDS], label: t('streakTrack') } : null}
         shareLabel={t('share')}
@@ -441,7 +462,7 @@ function Game({ session, t, locale, onRestart }: GameProps) {
         offer={offerAdFree && !adFree ? { label: `${t('removeAds')}${price ? ` · ${price}` : ''}`, onPress: () => void onBuy() } : null}
         onList={() => {
           setShowClear(false);
-          router.replace(session.kind === 'daily' ? '/stages' : (`/stages?chapter=${session.chapter}` as never));
+          router.replace(session.kind === 'level' ? (`/stages?chapter=${session.chapter}` as never) : session.kind === 'daily' ? '/daily' : '/');
         }}
       />
       <FailSheet
@@ -449,10 +470,10 @@ function Game({ session, t, locale, onRestart }: GameProps) {
         character={character}
         adReady={rewardedLoaded}
         adBusy={adBusy}
-        listLabel={session.kind === 'daily' ? t('home') : t('toStages')}
+        listLabel={session.kind === 'level' ? t('toStages') : t('home')}
         onContinue={() => void onContinue()}
         onRetry={restart}
-        onList={() => router.replace(session.kind === 'daily' ? '/' : (`/stages?chapter=${session.chapter}` as never))}
+        onList={() => router.replace(session.kind === 'level' ? (`/stages?chapter=${session.chapter}` as never) : '/')}
       />
       <NoHintSheet
         visible={noHint}

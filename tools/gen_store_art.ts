@@ -113,7 +113,7 @@ function progressWith(levels: Progress['levels']): Progress {
   const daily: Record<string, number> = {};
   let k = prevDateKey(dateKey(new Date()));
   for (let i = 0; i < 4; i++, k = prevDateKey(k)) daily[k] = 60_000;
-  return { levels, daily, hints: 5, totalClears: Object.keys(levels).length + 4, tutorialDone: true };
+  return { levels, daily, dailyLate: {}, hints: 5, totalClears: Object.keys(levels).length + 4, tutorialDone: true };
 }
 
 interface Scene {

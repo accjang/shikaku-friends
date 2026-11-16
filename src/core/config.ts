@@ -29,6 +29,8 @@ export const CHAPTER_UNLOCK_CLEARS = 15;
 export const START_HINTS = 3;
 /** 오늘의 퍼즐 연속 보상(힌트): 연속 1일째~7일째, 8일째부터 다시 처음부터 반복. */
 export const DAILY_STREAK_REWARDS = [1, 1, 2, 1, 1, 2, 5] as const;
+/** 연속 기록 보호: 하루 빠져도 연속이 이어진다. 한 번 보호받은 뒤 이만큼 더 풀어야 다시 보호받는다(대략 주 1회). 빠진 날은 일수에 세지 않는다. */
+export const STREAK_FREEZE_EVERY_DAYS = 7;
 /** 보상형 광고 한 번에 주는 힌트. */
 export const REWARDED_HINTS = 2;
 /** 별: 힌트를 이 수 이하로 썼으면 3개/2개, 그 위는 1개. */
@@ -43,6 +45,8 @@ export const MISTAKE_FLASH_MS = 700;
 export const UNDO_LIMIT = 200;
 
 // ── 연출 ──
+/** 힌트 이유 말풍선이 떠 있는 시간(읽을 시간을 넉넉히). */
+export const HINT_BUBBLE_MS = 4000;
 /** 캐릭터 말풍선이 떠 있는 시간. */
 export const BUBBLE_MS = 1800;
 /** 완료 후 결과 창을 띄우기까지(축하 연출: 판 물결 → 색종이 → 별 풍선이 다 터질 때까지). */

@@ -4,18 +4,21 @@ import levelsJson from '../content/levels.json';
 import { shouldOfferAdFree, shouldShowInterstitial } from '../src/core/adPolicy';
 import { CHAPTERS, levelCount, levelId, levelOptions, parseLevelId } from '../src/core/chapters';
 import { LEVEL_MAX_BRANCHES, AD_FREE_FIRST_CLEARS, AD_FREE_OFFER_AFTER_INTERSTITIALS, AD_INTERSTITIAL_EVERY, CHAPTER_UNLOCK_CLEARS, CONTINUE_HEARTS, MISTAKE_ALLOWANCE, START_HINTS } from '../src/core/config';
-import { dailyPuzzle, dateKey, prevDateKey } from '../src/core/daily';
-import { applyHint, attemptPlace, clearAll, continueGame, heartsLeft, isMistake, newGame, place, removeAt, undo } from '../src/core/game';
+import { dailyPuzzle, dateKey, monthWeeks, prevDateKey } from '../src/core/daily';
+import { applyHint, attemptPlace, explainHint, clearAll, continueGame, heartsLeft, isMistake, newGame, place, removeAt, undo } from '../src/core/game';
 import { generate } from '../src/core/generator';
 import { characterLine, fontKindFor, LOCALES, missingKeys, pickLocale, translate, translateKeys } from '../src/core/i18n';
 import { unpack, type PackedPuzzle } from '../src/core/levelCodec';
 import {
   INITIAL_PROGRESS,
+  dailyStatus,
   dailyStreak,
+  dailyStreakInfo,
   isChapterUnlocked,
   isLevelUnlocked,
   nextUnplayed,
   recordDailyClear,
+  recordLateDailyClear,
   recordLevelClear,
   sanitizeProgress,
   starsFor,
@@ -168,6 +171,22 @@ describe('한 판 진행', () => {
     }
   });
 
+  test('힌트 이유: 자리가 하나뿐인 숫자를 먼저 알려 준다', () => {
+    // tiny: 숫자 2 두 개. 처음에는 둘 다 후보가 2개(가로·세로)라 이유 없이 권하고, 하나를 놓으면 남은 숫자는 자리가 하나뿐
+    let g = newGame();
+    expect(explainHint(g, tiny)?.reason).toEqual({ kind: 'try' });
+    g = place(g, tiny, tiny.solution[0]);
+    expect(explainHint(g, tiny)).toEqual({ rect: tiny.solution[1], reason: { kind: 'onlyFit', n: 2 } });
+    g = place(g, tiny, tiny.solution[1]);
+    expect(explainHint(g, tiny)).toBeNull();
+    // 모든 스테이지: 힌트 네모는 언제나 정답 네모
+    for (const packed of Object.values(levels)) {
+      const p = unpack(packed);
+      const h = explainHint(newGame(), p);
+      expect(p.solution).toContainEqual(h?.rect);
+    }
+  });
+
   test('힌트로 끝까지 풀린다', () => {
     const p = unpack(levels['1-01']);
     let g = newGame();
@@ -214,10 +233,52 @@ describe('진행 기록', () => {
     ({ progress } = recordDailyClear(progress, '2026-10-25', 900));
     expect(dailyStreak(progress, '2026-10-25', prevDateKey)).toBe(2);
     expect(dailyStreak(progress, '2026-10-26', prevDateKey)).toBe(2); // 오늘은 아직 → 어제까지
-    expect(dailyStreak(progress, '2026-10-27', prevDateKey)).toBe(0);
+    // 하루 빠져도 보호로 이어진다(26일을 빠지고 27일 아침), 이틀 빠지면 끊긴다
+    expect(dailyStreakInfo(progress, '2026-10-27', prevDateKey)).toEqual({ streak: 2, savedYesterday: true });
+    expect(dailyStreak(progress, '2026-10-28', prevDateKey)).toBe(0);
   });
 
-  test('연속 보상은 7일 주기(3일째 +2, 7일째 +5, 8일째 다시 +1), 하루 빠지면 처음부터', () => {
+  test('지난 퍼즐을 나중에 풀면 기록만 남고 연속 일수·힌트는 그대로', () => {
+    let p = recordDailyClear(INITIAL_PROGRESS, '2026-11-05', 1000).progress;
+    const hints = p.hints;
+    p = recordLateDailyClear(p, '2026-11-03', 2000);
+    p = recordLateDailyClear(p, '2026-11-03', 1500);
+    p = recordLateDailyClear(p, '2026-11-04', 2500);
+    expect(p.dailyLate).toEqual({ '2026-11-03': 1500, '2026-11-04': 2500 });
+    expect(p.hints).toBe(hints);
+    expect(dailyStreak(p, '2026-11-05', prevDateKey)).toBe(1);
+    expect(dailyStatus(p, '2026-11-05', '2026-11-06')).toBe('onTime');
+    expect(dailyStatus(p, '2026-11-03', '2026-11-06')).toBe('late');
+    expect(dailyStatus(p, '2026-11-06', '2026-11-06')).toBe('open');
+    expect(dailyStatus(p, '2026-11-07', '2026-11-06')).toBe('future');
+    expect(dailyStatus(p, '2026-10-31', '2026-11-06')).toBe('before');
+    // 옛 저장 값(dailyLate 없음)도 읽힌다
+    expect(sanitizeProgress({ daily: { '2026-11-05': 1 } }).dailyLate).toEqual({});
+    // 2026년 11월은 일요일에 시작해 5주
+    const weeks = monthWeeks(2026, 11);
+    expect(weeks).toHaveLength(5);
+    expect(weeks[0][0]).toBe('2026-11-01');
+    expect(weeks[4][1]).toBe('2026-11-30');
+    expect(weeks[4][2]).toBeNull();
+  });
+
+  test('연속 기록 보호: 하루 빠진 날은 건너뛰고(일수에 안 셈), 보호는 7일 풀어야 다시 생긴다', () => {
+    const day = (d: number): string => `2026-11-${String(d).padStart(2, '0')}`;
+    const solve = (days: number[]): typeof INITIAL_PROGRESS => ({ ...INITIAL_PROGRESS, daily: Object.fromEntries(days.map((d) => [day(d), 1000])) });
+    // 1~3일 풀고 4일 빠지고 5일에 풀면 4일째(보상 주기도 이어짐)
+    const out = recordDailyClear(solve([1, 2, 3]), day(5), 1000);
+    expect(out.streak).toBe(4);
+    expect(out.saved).toBe(true);
+    expect(out.reward).toBe(streakReward(4));
+    // 보호 뒤 7일을 다 못 채우고 또 빠지면 그 앞은 이어지지 않는다: 1~3, (4 빠짐), 5~7, (8 빠짐), 9
+    expect(dailyStreak(solve([1, 2, 3, 5, 6, 7, 9]), day(9), prevDateKey)).toBe(4);
+    // 7일을 채웠으면 다시 보호: 1~2, (3 빠짐), 4~10, (11 빠짐), 12
+    expect(dailyStreak(solve([1, 2, 4, 5, 6, 7, 8, 9, 10, 12]), day(12), prevDateKey)).toBe(10);
+    // 이틀 연속 빠지면 끊긴다
+    expect(dailyStreak(solve([1, 2, 3, 6]), day(6), prevDateKey)).toBe(1);
+  });
+
+  test('연속 보상은 7일 주기(3일째 +2, 7일째 +5, 8일째 다시 +1), 이틀 빠지면 처음부터', () => {
     let p = INITIAL_PROGRESS;
     const got: number[] = [];
     for (let d = 1; d <= 8; d++) {
@@ -229,7 +290,8 @@ describe('진행 기록', () => {
     expect(got).toEqual([1, 1, 2, 1, 1, 2, 5, 1]);
     expect(streakCycleDay(7)).toBe(7);
     expect(streakCycleDay(8)).toBe(1);
-    const gap = recordDailyClear(p, '2026-11-10', 1000);
+    // 이틀(9·10일) 빠지면 처음부터
+    const gap = recordDailyClear(p, '2026-11-11', 1000);
     expect(gap.streak).toBe(1);
     expect(gap.reward).toBe(streakReward(1));
   });
