@@ -20,7 +20,7 @@ export const DAILY_OPTIONS: GenOptions = { w: 8, h: 8, minArea: 2, maxArea: 10, 
 
 // ── 마을 꾸미기 ──
 /** 스테이지를 이만큼 깰 때마다 소품 하나(src/core/village.ts). */
-export const PROP_EVERY = 10;
+export const PROP_EVERY = 15;
 
 // ── 알림 ──
 /** 오늘의 퍼즐 알림 시각(기기 현지 시각, 시). */
@@ -35,7 +35,7 @@ export const REMINDER_ID_PREFIX = 'shikaku.daily.';
 export const PICTURES_PER_CHAPTER = 4;
 
 // ── 진행 ──
-/** 다음 챕터를 열려면 앞 챕터에서 깨야 하는 스테이지 수(챕터 40개 중). 실기기 시험 뒤 25 → 15(2026-10-31). */
+/** 다음 챕터를 열려면 앞 챕터에서 깨야 하는 스테이지 수(챕터 60개 중). 실기기 시험 뒤 25 → 15(2026-10-31). */
 export const CHAPTER_UNLOCK_CLEARS = 15;
 /** 처음 주는 힌트 수. */
 export const START_HINTS = 3;

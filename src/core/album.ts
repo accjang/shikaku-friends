@@ -17,7 +17,7 @@ export const ALL_PICTURES: readonly PictureId[] = CHAPTERS.flatMap((c) =>
   Array.from({ length: PICTURES_PER_CHAPTER }, (_, i) => ({ character: c.character, n: i + 1 })),
 );
 
-/** 그 스테이지를 깨면 드러나는 그림: 챕터를 PICTURES_PER_CHAPTER 구간으로 고르게 나눈다(40스테이지면 10개마다). */
+/** 그 스테이지를 깨면 드러나는 그림: 챕터를 PICTURES_PER_CHAPTER 구간으로 고르게 나눈다(60스테이지면 15개마다). */
 export function pictureForLevel(chapterId: number, level: number): PictureId | null {
   const ch = chapterById(chapterId);
   if (!ch) return null;

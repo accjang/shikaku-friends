@@ -3,7 +3,7 @@
 - subtitle: Lukis kotak ikut nombornya
 - short: Teka-teki logik comel: bahagikan papan kepada kotak bersama lima kawan haiwan!
 - keywords: teka-teki,puzzle,logik,minda,sudoku,nombor,kotak,shikaku,santai,comel,kucing,panda,harian
-- shots: Teka-teki otak comel bersama kawan | Seret sekali untuk lukis kotak | Selesaikan, gambar pun muncul! | Kumpul hiasan, hias kampung | 200 peringkat, satu jawapan sahaja
+- shots: Teka-teki otak comel bersama kawan | Seret sekali untuk lukis kotak | Selesaikan, gambar pun muncul! | Kumpul hiasan, hias kampung | 300 peringkat, satu jawapan sahaja
 
 ## description
 Bahagikan papan kepada segi empat tepat — satu nombor dalam setiap kotak, dan nombor itu menunjukkan saiznya!
@@ -17,7 +17,7 @@ Shikaku Friends membawakan teka-teki logik klasik Jepun "Shikaku" bersama kawan-
 ■ Ciri-ciri
 · Seret untuk melukis, ketik untuk memadam
 · Kitty, Panda, Bunny, Shiba dan Itik bergerak dan memberi semangat — pilih kawan anda
-· 200 peringkat, dan setiap teka-teki ada satu jawapan sahaja
+· 300 peringkat, dan setiap teka-teki ada satu jawapan sahaja
 · Kumpul hiasan setiap kali selesai peringkat dan hias kampung kawan-kawan
 · Selesaikan papan untuk mendedahkan gambar tersembunyi
 · Teka-teki Harian baharu setiap hari dengan ganjaran 7 hari berturut — kongsi keputusan anda

@@ -17,17 +17,17 @@ export interface Chapter {
   bands: LevelBand[];
 }
 
-// 5챕터 × 40 = 200스테이지. 챕터 안에서는 판 크기와 함께 난이도(풀이기 갈림길 수)도 점점 오른다(tools/gen_levels.ts).
+// 5챕터 × 60 = 300스테이지(2026-11-17 사용자 결정, 이전 40개씩 200). 챕터 안에서는 판 크기와 함께 난이도(풀이기 갈림길 수)도 점점 오른다(tools/gen_levels.ts).
 export const CHAPTERS: readonly Chapter[] = [
   {
     id: 1,
     character: 'cat',
     seedPrefix: 'cat-v2',
     bands: [
-      { count: 6, options: { w: 5, h: 5, minArea: 2, maxArea: 6, maxSide: 4 } },
-      { count: 12, options: { w: 6, h: 6, minArea: 2, maxArea: 8, maxSide: 4 } },
-      { count: 12, options: { w: 7, h: 7, minArea: 2, maxArea: 9, maxSide: 5 } },
-      { count: 10, options: { w: 7, h: 8, minArea: 2, maxArea: 10, maxSide: 5 } },
+      { count: 9, options: { w: 5, h: 5, minArea: 2, maxArea: 6, maxSide: 4 } },
+      { count: 18, options: { w: 6, h: 6, minArea: 2, maxArea: 8, maxSide: 4 } },
+      { count: 18, options: { w: 7, h: 7, minArea: 2, maxArea: 9, maxSide: 5 } },
+      { count: 15, options: { w: 7, h: 8, minArea: 2, maxArea: 10, maxSide: 5 } },
     ],
   },
   {
@@ -35,9 +35,9 @@ export const CHAPTERS: readonly Chapter[] = [
     character: 'panda',
     seedPrefix: 'panda-v2',
     bands: [
-      { count: 14, options: { w: 8, h: 8, minArea: 2, maxArea: 10, maxSide: 5 } },
-      { count: 13, options: { w: 8, h: 9, minArea: 2, maxArea: 12, maxSide: 6 } },
-      { count: 13, options: { w: 9, h: 9, minArea: 2, maxArea: 12, maxSide: 6 } },
+      { count: 20, options: { w: 8, h: 8, minArea: 2, maxArea: 10, maxSide: 5 } },
+      { count: 20, options: { w: 8, h: 9, minArea: 2, maxArea: 12, maxSide: 6 } },
+      { count: 20, options: { w: 9, h: 9, minArea: 2, maxArea: 12, maxSide: 6 } },
     ],
   },
   {
@@ -45,9 +45,9 @@ export const CHAPTERS: readonly Chapter[] = [
     character: 'rabbit',
     seedPrefix: 'rabbit-v2',
     bands: [
-      { count: 14, options: { w: 9, h: 10, minArea: 3, maxArea: 12, maxSide: 6 } },
-      { count: 13, options: { w: 10, h: 10, minArea: 3, maxArea: 12, maxSide: 6 } },
-      { count: 13, options: { w: 10, h: 11, minArea: 3, maxArea: 14, maxSide: 6 } },
+      { count: 20, options: { w: 9, h: 10, minArea: 3, maxArea: 12, maxSide: 6 } },
+      { count: 20, options: { w: 10, h: 10, minArea: 3, maxArea: 12, maxSide: 6 } },
+      { count: 20, options: { w: 10, h: 11, minArea: 3, maxArea: 14, maxSide: 6 } },
     ],
   },
   {
@@ -55,9 +55,9 @@ export const CHAPTERS: readonly Chapter[] = [
     character: 'shiba',
     seedPrefix: 'shiba-v1',
     bands: [
-      { count: 13, options: { w: 10, h: 11, minArea: 3, maxArea: 16, maxSide: 7 } },
-      { count: 14, options: { w: 10, h: 12, minArea: 3, maxArea: 16, maxSide: 7 } },
-      { count: 13, options: { w: 10, h: 12, minArea: 4, maxArea: 18, maxSide: 7 } },
+      { count: 20, options: { w: 10, h: 11, minArea: 3, maxArea: 16, maxSide: 7 } },
+      { count: 20, options: { w: 10, h: 12, minArea: 3, maxArea: 16, maxSide: 7 } },
+      { count: 20, options: { w: 10, h: 12, minArea: 4, maxArea: 18, maxSide: 7 } },
     ],
   },
   {
@@ -65,9 +65,9 @@ export const CHAPTERS: readonly Chapter[] = [
     character: 'duck',
     seedPrefix: 'duck-v1',
     bands: [
-      { count: 13, options: { w: 10, h: 12, minArea: 4, maxArea: 20, maxSide: 8 } },
-      { count: 14, options: { w: 10, h: 13, minArea: 4, maxArea: 20, maxSide: 8 } },
-      { count: 13, options: { w: 10, h: 14, minArea: 4, maxArea: 24, maxSide: 8 } },
+      { count: 20, options: { w: 10, h: 12, minArea: 4, maxArea: 20, maxSide: 8 } },
+      { count: 20, options: { w: 10, h: 13, minArea: 4, maxArea: 20, maxSide: 8 } },
+      { count: 20, options: { w: 10, h: 14, minArea: 4, maxArea: 24, maxSide: 8 } },
     ],
   },
 ];

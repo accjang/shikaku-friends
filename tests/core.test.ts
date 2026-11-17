@@ -70,7 +70,7 @@ describe('생성기', () => {
     expect(isSolved(a!, a!.solution)).toBe(true);
   });
 
-  test('스테이지 200개: 크기가 챕터 정의와 같고, 정답이 맞고, 답이 하나뿐', () => {
+  test('스테이지 300개: 크기가 챕터 정의와 같고, 정답이 맞고, 답이 하나뿐', () => {
     let n = 0;
     for (const ch of CHAPTERS) {
       for (let lv = 1; lv <= levelCount(ch); lv++) {
@@ -84,7 +84,7 @@ describe('생성기', () => {
         n++;
       }
     }
-    expect(n).toBe(200);
+    expect(n).toBe(300);
     expect(CHAPTERS.map((c) => c.character)).toEqual(['cat', 'panda', 'rabbit', 'shiba', 'duck']);
   });
 
@@ -324,18 +324,18 @@ describe('진행 기록', () => {
 });
 
 describe('그림 앨범', () => {
-  test('챕터마다 4장, 10스테이지마다 다음 그림, 깬 구간의 그림만 모인다', () => {
+  test('챕터마다 4장, 15스테이지마다 다음 그림, 깬 구간의 그림만 모인다', () => {
     expect(ALL_PICTURES).toHaveLength(CHAPTERS.length * PICTURES_PER_CHAPTER);
     expect(pictureForLevel(1, 1)).toEqual({ character: 'cat', n: 1 });
-    expect(pictureForLevel(1, 10)).toEqual({ character: 'cat', n: 1 });
-    expect(pictureForLevel(1, 11)).toEqual({ character: 'cat', n: 2 });
-    expect(pictureForLevel(5, 40)).toEqual({ character: 'duck', n: 4 });
+    expect(pictureForLevel(1, 15)).toEqual({ character: 'cat', n: 1 });
+    expect(pictureForLevel(1, 16)).toEqual({ character: 'cat', n: 2 });
+    expect(pictureForLevel(5, 60)).toEqual({ character: 'duck', n: 4 });
     const a = recordLevelClear(INITIAL_PROGRESS, '1-01', 0, 1000).progress;
     expect([...collectedPictures(a)]).toEqual(['cat_1']);
     expect(newlyCollectedPicture(INITIAL_PROGRESS, a)).toEqual({ character: 'cat', n: 1 });
     const b = recordLevelClear(a, '1-02', 0, 1000).progress;
     expect(newlyCollectedPicture(a, b)).toBeNull();
-    const c = recordLevelClear(b, '1-11', 0, 1000).progress;
+    const c = recordLevelClear(b, '1-16', 0, 1000).progress;
     expect(newlyCollectedPicture(b, c)).toEqual({ character: 'cat', n: 2 });
     // 오늘의 퍼즐 그림은 날마다 바뀌고 앨범 전체를 돈다
     expect(pictureForDay('2026-11-17')).not.toEqual(pictureForDay('2026-11-18'));

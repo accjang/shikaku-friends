@@ -8,21 +8,21 @@ import { dailyNumber, dailyShareText, hintStrip, stageShareText } from '../src/c
 import { companionFor, newlyUnlockedProp, nextProp, PROP_IDS, stagesCleared, unlockedProps, villageFriends } from '../src/core/village';
 
 describe('마을 꾸미기', () => {
-  test('스테이지 10개마다 소품 하나, 200개에 20개(마지막은 집)', () => {
+  test('스테이지 15개마다 소품 하나, 300개에 20개(마지막은 집)', () => {
     expect(PROP_IDS).toHaveLength(20);
     expect(unlockedProps(0)).toEqual([]);
     expect(unlockedProps(PROP_EVERY - 1)).toEqual([]);
     expect(unlockedProps(PROP_EVERY)).toEqual(['flowers']);
-    expect(unlockedProps(200)).toHaveLength(20);
-    expect(unlockedProps(200)[19]).toBe('house');
-    expect(nextProp(13)).toEqual({ id: 'bunting', remaining: 7 });
-    expect(nextProp(200)).toBeNull();
+    expect(unlockedProps(300)).toHaveLength(20);
+    expect(unlockedProps(300)[19]).toBe('house');
+    expect(nextProp(PROP_EVERY + 3)).toEqual({ id: 'bunting', remaining: PROP_EVERY - 3 });
+    expect(nextProp(300)).toBeNull();
   });
 
   test('이번 클리어로 새로 얻은 소품', () => {
-    expect(newlyUnlockedProp(9, 10)).toBe('flowers');
-    expect(newlyUnlockedProp(10, 11)).toBeNull();
-    expect(newlyUnlockedProp(19, 20)).toBe('bunting');
+    expect(newlyUnlockedProp(PROP_EVERY - 1, PROP_EVERY)).toBe('flowers');
+    expect(newlyUnlockedProp(PROP_EVERY, PROP_EVERY + 1)).toBeNull();
+    expect(newlyUnlockedProp(PROP_EVERY * 2 - 1, PROP_EVERY * 2)).toBe('bunting');
   });
 
   test('깬 스테이지 수는 같은 스테이지를 한 번만 센다(오늘의 퍼즐 제외)', () => {

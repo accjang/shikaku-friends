@@ -1,4 +1,4 @@
-// 마을 꾸미기(UI 없음): 스테이지를 PROP_EVERY개 깰 때마다 술래잡기 게임 소품을 하나씩 얻는다. 200스테이지 → 20개, 마지막은 집.
+// 마을 꾸미기(UI 없음): 스테이지를 PROP_EVERY개 깰 때마다 술래잡기 게임 소품을 하나씩 얻는다. 300스테이지 → 20개, 마지막은 집.
 // 친구(캐릭터)는 그 캐릭터의 챕터가 열리면 마을에 온다. 배치(좌표)는 화면 쪽(src/ui/villageLayout.ts).
 import { CHAPTERS, levelCount, levelId, type CharacterId } from './chapters';
 import { PROP_EVERY } from './config';

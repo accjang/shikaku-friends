@@ -3,7 +3,7 @@
 - subtitle: Chora visanduku kwa namba
 - short: Fumbo la mantiki la kupendeza: gawa ubao kuwa visanduku na marafiki 5!
 - keywords: fumbo,mantiki,shikaku,akili,sudoku,namba,mchezo,tulia,paka,panda,sungura,kila siku
-- shots: Fumbo zuri la akili na marafiki | Buruta mara moja kuchora kisanduku | Litatue, picha iliyofichwa itaonekana! | Kusanya vitu, pamba kijiji | Hatua 200, jibu moja tu
+- shots: Fumbo zuri la akili na marafiki | Buruta mara moja kuchora kisanduku | Litatue, picha iliyofichwa itaonekana! | Kusanya vitu, pamba kijiji | Hatua 300, jibu moja tu
 
 ## description
 Gawa ubao kuwa mistatili: namba moja katika kila mmoja, na namba hiyo inaonyesha ukubwa wake!
@@ -17,7 +17,7 @@ Shikaku Friends inaleta fumbo maarufu la mantiki la Kijapani "Shikaku" pamoja na
 ■ Vipengele
 · Buruta kuchora, gusa kufuta
 · Kipaka, Panda, Kisungura, Shiba na Kibata wanacheza na kukushangilia: chagua rafiki yako
-· Hatua 200, na kila fumbo lina jibu moja tu
+· Hatua 300, na kila fumbo lina jibu moja tu
 · Pata mapambo kila unapomaliza hatua na ujenge kijiji cha marafiki
 · Maliza ubao ufichue picha iliyofichwa
 · Fumbo la Leo jipya kila siku na zawadi za siku 7 mfululizo: shiriki matokeo yako
