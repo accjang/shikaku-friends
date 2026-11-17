@@ -9,6 +9,7 @@ import { ADFREE_BONUS_HINTS, PRIVACY_POLICY_URL, SUPPORT_EMAIL } from '@/core/co
 import { LOCALE_NAMES } from '@/core/i18n';
 import { refreshAdPrivacyOptions, showAdPrivacyOptions, useAdStore } from '@/data/ads';
 import { buyAdFree, restorePurchases, usePurchaseStore } from '@/data/purchases';
+import { disableReminders, enableReminders, remindersSupported } from '@/data/reminders';
 import { useSettingsStore } from '@/data/settingsStore';
 import { playSfx } from '@/ui/feedback';
 import { Screen } from '@/ui/Screen';
@@ -36,7 +37,7 @@ export default function Settings() {
   const { t } = useT();
   const locale = useLocale();
   const chosenLocale = useSettingsStore((st) => st.locale);
-  const { sound, haptics, patch } = useSettingsStore();
+  const { sound, haptics, reminders, patch } = useSettingsStore();
   const { adFree, mode, price, busy } = usePurchaseStore();
   const privacyOptions = useAdStore((s) => s.privacyOptionsRequired);
 
@@ -50,6 +51,22 @@ export default function Settings() {
         <View style={styles.card}>
           <Row icon="musical-notes" label={t('sound')} right={<Switch value={sound} onValueChange={(v) => patch({ sound: v })} trackColor={{ true: colors.primary }} />} />
           <Row icon="phone-portrait" label={t('haptics')} right={<Switch value={haptics} onValueChange={(v) => patch({ haptics: v })} trackColor={{ true: colors.primary }} />} />
+          {remindersSupported() ? (
+            <Row
+              icon="notifications"
+              label={t('reminders')}
+              right={
+                <Switch
+                  value={reminders}
+                  onValueChange={async (v) => {
+                    if (!v) return void disableReminders();
+                    if (!(await enableReminders())) Alert.alert(t('reminderDenied'));
+                  }}
+                  trackColor={{ true: colors.primary }}
+                />
+              }
+            />
+          ) : null}
         </View>
 
         <View style={styles.card}>

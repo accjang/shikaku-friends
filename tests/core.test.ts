@@ -4,7 +4,7 @@ import levelsJson from '../content/levels.json';
 import { shouldOfferAdFree, shouldShowInterstitial } from '../src/core/adPolicy';
 import { ALL_PICTURES, collectedPictures, newlyCollectedPicture, pictureForDay, pictureForLevel } from '../src/core/album';
 import { CHAPTERS, levelCount, levelId, levelOptions, parseLevelId } from '../src/core/chapters';
-import { LEVEL_MAX_BRANCHES, AD_FREE_FIRST_CLEARS, AD_FREE_OFFER_AFTER_INTERSTITIALS, AD_INTERSTITIAL_EVERY, CHAPTER_UNLOCK_CLEARS, CONTINUE_HEARTS, MISTAKE_ALLOWANCE, PICTURES_PER_CHAPTER, START_HINTS } from '../src/core/config';
+import { LEVEL_MAX_BRANCHES, AD_FREE_FIRST_CLEARS, AD_FREE_OFFER_AFTER_INTERSTITIALS, AD_INTERSTITIAL_EVERY, CHAPTER_UNLOCK_CLEARS, CONTINUE_HEARTS, MISTAKE_ALLOWANCE, PICTURES_PER_CHAPTER, REMINDER_HOUR, REMINDER_PLAN_DAYS, START_HINTS } from '../src/core/config';
 import { dailyPuzzle, dateKey, monthWeeks, prevDateKey } from '../src/core/daily';
 import { applyHint, attemptPlace, explainHint, clearAll, continueGame, heartsLeft, isMistake, newGame, place, removeAt, undo } from '../src/core/game';
 import { generate } from '../src/core/generator';
@@ -26,6 +26,7 @@ import {
   streakCycleDay,
   streakReward,
 } from '../src/core/progress';
+import { planReminders } from '../src/core/reminderPlan';
 import { isSolved, rectFromCorners, validClueIndex, type Puzzle } from '../src/core/puzzle';
 import { solve } from '../src/core/solver';
 
@@ -339,6 +340,28 @@ describe('그림 앨범', () => {
     // 오늘의 퍼즐 그림은 날마다 바뀌고 앨범 전체를 돈다
     expect(pictureForDay('2026-11-17')).not.toEqual(pictureForDay('2026-11-18'));
     expect(pictureForDay('2026-11-17')).toEqual(pictureForDay('2026-12-07'));
+  });
+});
+
+describe('알림 계획', () => {
+  test('7일치, 19시, 오늘 풀었거나 시각이 지났으면 오늘은 건너뛰고, 첫 알림에만 연속 일수', () => {
+    const noon = new Date(2026, 10, 17, 12, 0, 0);
+    const fresh = planReminders(INITIAL_PROGRESS, noon, 'ko');
+    expect(fresh).toHaveLength(REMINDER_PLAN_DAYS);
+    expect(fresh[0].id).toBe('shikaku.daily.2026-11-17');
+    expect(fresh[0].fireAt.getHours()).toBe(REMINDER_HOUR);
+    expect(fresh[0].body).toBe(translate('ko', 'reminderBody'));
+    // 어제까지 2일 연속 → 첫 알림에 연속 일수
+    const p = { ...INITIAL_PROGRESS, daily: { '2026-11-15': 1, '2026-11-16': 1 } };
+    const streaky = planReminders(p, noon, 'ko');
+    expect(streaky[0].body).toBe(translate('ko', 'reminderStreakBody', { n: 2 }));
+    expect(streaky[1].body).toBe(translate('ko', 'reminderBody'));
+    // 오늘 풀었으면 내일부터
+    const done = planReminders({ ...p, daily: { ...p.daily, '2026-11-17': 1 } }, noon, 'ko');
+    expect(done[0].id).toBe('shikaku.daily.2026-11-18');
+    expect(done).toHaveLength(REMINDER_PLAN_DAYS - 1);
+    // 19시가 지났으면 내일부터
+    expect(planReminders(INITIAL_PROGRESS, new Date(2026, 10, 17, 20, 0, 0), 'en')[0].id).toBe('shikaku.daily.2026-11-18');
   });
 });
 

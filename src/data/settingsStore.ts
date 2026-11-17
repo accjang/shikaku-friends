@@ -14,9 +14,13 @@ export interface Settings {
   locale: Locale | null;
   /** 모든 스테이지에 함께 다닐 친구(마을에서 고름). null이면 챕터마다 그 챕터 친구. */
   companion: CharacterId | null;
+  /** 오늘의 퍼즐 알림(기본 꺼짐 — 켤 때 권한을 묻는다). */
+  reminders: boolean;
+  /** 알림을 켤지 한 번 물어봤는지(첫 오늘의 퍼즐 클리어 뒤 한 번만 묻는다). */
+  reminderAsked: boolean;
 }
 
-const DEFAULTS: Settings = { sound: true, haptics: true, locale: null, companion: null };
+const DEFAULTS: Settings = { sound: true, haptics: true, locale: null, companion: null, reminders: false, reminderAsked: false };
 const CHARACTERS: readonly CharacterId[] = CHAPTERS.map((c) => c.character);
 
 interface SettingsStore extends Settings {
@@ -32,6 +36,8 @@ function sanitize(raw: unknown): Settings {
     haptics: typeof r.haptics === 'boolean' ? r.haptics : DEFAULTS.haptics,
     locale: r.locale && (LOCALES as readonly string[]).includes(r.locale) ? r.locale : null,
     companion: r.companion && CHARACTERS.includes(r.companion) ? r.companion : null,
+    reminders: r.reminders === true,
+    reminderAsked: r.reminderAsked === true,
   };
 }
 
@@ -44,8 +50,8 @@ export const useSettingsStore = create<SettingsStore>()((set, get) => ({
   },
   patch: (p) => {
     set(p);
-    const { sound, haptics, locale, companion } = get();
-    void saveJson<Settings>(STORAGE_KEYS.settings, { sound, haptics, locale, companion });
+    const { sound, haptics, locale, companion, reminders, reminderAsked } = get();
+    void saveJson<Settings>(STORAGE_KEYS.settings, { sound, haptics, locale, companion, reminders, reminderAsked });
   },
 }));
 

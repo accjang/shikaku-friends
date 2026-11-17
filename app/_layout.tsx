@@ -4,12 +4,14 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
+import { AppState } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { hydrateAdState, initAds } from '@/data/ads';
 import { useProgressStore } from '@/data/progressStore';
 import { initPurchases } from '@/data/purchases';
+import { syncReminders } from '@/data/reminders';
 import { deviceLocale, useSettingsStore } from '@/data/settingsStore';
 import { loadRoundFont } from '@/ui/fonts';
 import { colors } from '@/ui/theme';
@@ -56,6 +58,19 @@ export default function RootLayout() {
   useEffect(() => {
     if (ready && tutorialDone) void initAds();
   }, [ready, tutorialDone]);
+
+  // 알림은 앱을 열 때·앞으로 돌아올 때·오늘의 퍼즐 기록이나 설정(켬/끔·언어)이 바뀔 때 다시 계획한다
+  const daily = useProgressStore((s) => s.progress.daily);
+  const reminders = useSettingsStore((s) => s.reminders);
+  const locale = useSettingsStore((s) => s.locale);
+  useEffect(() => {
+    if (!ready) return;
+    void syncReminders();
+    const sub = AppState.addEventListener('change', (st) => {
+      if (st === 'active') void syncReminders();
+    });
+    return () => sub.remove();
+  }, [ready, daily, reminders, locale]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.bg }}>

@@ -22,6 +22,14 @@ export const DAILY_OPTIONS: GenOptions = { w: 8, h: 8, minArea: 2, maxArea: 10, 
 /** 스테이지를 이만큼 깰 때마다 소품 하나(src/core/village.ts). */
 export const PROP_EVERY = 10;
 
+// ── 알림 ──
+/** 오늘의 퍼즐 알림 시각(기기 현지 시각, 시). */
+export const REMINDER_HOUR = 19;
+/** 앞으로 며칠치를 미리 예약할지(앱을 열 때마다 다시 계획한다). */
+export const REMINDER_PLAN_DAYS = 7;
+/** 알림 id 접두어(뒤에 날짜 키). */
+export const REMINDER_ID_PREFIX = 'shikaku.daily.';
+
 // ── 그림 앨범 ──
 /** 챕터(캐릭터)마다 모으는 그림 수(src/core/album.ts, tools/gen_postcards.py가 같은 수만큼 만든다). */
 export const PICTURES_PER_CHAPTER = 4;

@@ -24,6 +24,7 @@ import { maybeShowInterstitial, noteAdFreeOffered, showRewarded, useAdStore } fr
 import { useProgressStore } from '@/data/progressStore';
 import { useSettingsStore } from '@/data/settingsStore';
 import { buyAdFree, usePurchaseStore } from '@/data/purchases';
+import { enableReminders, remindersSupported } from '@/data/reminders';
 import { Board } from '@/ui/Board';
 import { Celebration } from '@/ui/Celebration';
 import { postcard } from '@/ui/postcards';
@@ -377,8 +378,20 @@ function Game({ session, t, locale, onRestart }: GameProps) {
     return nextCh ? `/stages?chapter=${nextCh.id}` : '/stages';
   };
 
+  // 오늘의 퍼즐을 처음 깬 뒤 한 번만: 내일도 알려 줄지 묻는다(권한 창은 "좋아요"를 누른 뒤에만)
+  const offerReminder = (): void => {
+    const st = useSettingsStore.getState();
+    if (session.kind !== 'daily' || st.reminders || st.reminderAsked || !remindersSupported()) return;
+    st.patch({ reminderAsked: true });
+    Alert.alert(t('reminderAsk'), undefined, [
+      { text: t('cancel'), style: 'cancel' },
+      { text: t('ok'), onPress: () => void enableReminders() },
+    ]);
+  };
+
   const goNext = async (): Promise<void> => {
     setShowClear(false);
+    offerReminder();
     await maybeShowInterstitial({ adFree, totalClears: useProgressStore.getState().progress.totalClears });
     router.replace(nextTarget() as never);
   };
