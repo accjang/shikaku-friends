@@ -285,8 +285,8 @@ function featureHtml(locale: Locale): string {
   // 캐릭터 그림은 384 정사각형(좌우 여백 있음) → 겹쳐 세운다
   const charImgs = chars
     .map((c, i) => {
-      const size = i === 2 ? 230 : 175;
-      return `<img src="/__assets/chars/${c}_front.png" style="width:${size}px;height:${size}px;margin:0 -34px;position:relative;z-index:${i === 2 ? 1 : 0}">`;
+      const size = i === 2 ? 200 : 150;
+      return `<img src="/__assets/chars/${c}_front.png" style="width:${size}px;height:${size}px;margin:0 -30px;position:relative;z-index:${i === 2 ? 1 : 0}">`;
     })
     .join('');
   const side = rtl ? 'right' : 'left';
