@@ -93,6 +93,9 @@ export default function Home() {
         <Pill icon="star" text={String(starCount(progress))} />
         <Pill icon="bulb" text={String(progress.hints)} color={colors.primary} />
         <View style={{ flex: 1 }} />
+        <Pressable accessibilityLabel={t('album')} onPress={() => router.push('/album')} style={styles.gear} hitSlop={8}>
+          <Ionicons name="images" size={21} color={colors.ink} />
+        </Pressable>
         <Pressable accessibilityLabel={t('settings')} onPress={() => router.push('/settings')} style={styles.gear} hitSlop={8}>
           <Ionicons name="settings-sharp" size={22} color={colors.ink} />
         </Pressable>

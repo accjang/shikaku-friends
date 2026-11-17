@@ -22,6 +22,10 @@ export const DAILY_OPTIONS: GenOptions = { w: 8, h: 8, minArea: 2, maxArea: 10, 
 /** 스테이지를 이만큼 깰 때마다 소품 하나(src/core/village.ts). */
 export const PROP_EVERY = 10;
 
+// ── 그림 앨범 ──
+/** 챕터(캐릭터)마다 모으는 그림 수(src/core/album.ts, tools/gen_postcards.py가 같은 수만큼 만든다). */
+export const PICTURES_PER_CHAPTER = 4;
+
 // ── 진행 ──
 /** 다음 챕터를 열려면 앞 챕터에서 깨야 하는 스테이지 수(챕터 40개 중). 실기기 시험 뒤 25 → 15(2026-10-31). */
 export const CHAPTER_UNLOCK_CLEARS = 15;

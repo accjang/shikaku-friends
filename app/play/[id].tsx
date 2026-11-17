@@ -18,6 +18,7 @@ import { characterLine, PROP_NAMES, type Mood } from '@/core/i18n';
 import { unpack, type PackedPuzzle } from '@/core/levelCodec';
 import { addHints, recordDailyClear, recordLateDailyClear, recordLevelClear, spendHint, streakCycleDay } from '@/core/progress';
 import { shouldOfferAdFree } from '@/core/adPolicy';
+import { newlyCollectedPicture, pictureForDay, pictureForLevel, type PictureId } from '@/core/album';
 import { coverage, validClueIndex, type Puzzle, type Rect } from '@/core/puzzle';
 import { maybeShowInterstitial, noteAdFreeOffered, showRewarded, useAdStore } from '@/data/ads';
 import { useProgressStore } from '@/data/progressStore';
@@ -51,6 +52,8 @@ interface Session {
   kind: 'level' | 'daily' | 'past';
   chapter: number;
   level: number;
+  /** 다 풀면 드러나는 그림. */
+  picture: PictureId;
 }
 
 function useSession(id: string, t: ReturnType<typeof useT>['t']): Session | null {
@@ -58,20 +61,20 @@ function useSession(id: string, t: ReturnType<typeof useT>['t']): Session | null
     if (id === 'daily') {
       const key = dateKey(new Date());
       const day = Number(key.slice(-2));
-      return { key, puzzle: dailyPuzzle(key), character: DAILY_CHARACTERS[day % DAILY_CHARACTERS.length], title: t('daily'), kind: 'daily', chapter: 0, level: 0 };
+      return { key, puzzle: dailyPuzzle(key), character: DAILY_CHARACTERS[day % DAILY_CHARACTERS.length], title: t('daily'), kind: 'daily', chapter: 0, level: 0, picture: pictureForDay(key) };
     }
     // 지난 날: "d" + 날짜 키. 오늘이거나 아직 안 온 날이면 없는 화면으로
     if (id.startsWith('d') && isDateKey(id.slice(1))) {
       const key = id.slice(1);
       if (key >= dateKey(new Date()) || key < DAILY_EPOCH) return null;
       const day = Number(key.slice(-2));
-      return { key, puzzle: dailyPuzzle(key), character: DAILY_CHARACTERS[day % DAILY_CHARACTERS.length], title: `${t('daily')} · ${Number(key.slice(5, 7))}/${day}`, kind: 'past', chapter: 0, level: 0 };
+      return { key, puzzle: dailyPuzzle(key), character: DAILY_CHARACTERS[day % DAILY_CHARACTERS.length], title: `${t('daily')} · ${Number(key.slice(5, 7))}/${day}`, kind: 'past', chapter: 0, level: 0, picture: pictureForDay(key) };
     }
     const parsed = parseLevelId(id);
     const packed = LEVELS[id];
     const ch = parsed ? chapterById(parsed.chapter) : undefined;
     if (!parsed || !packed || !ch) return null;
-    return { key: id, puzzle: unpack(packed), character: ch.character, title: t('stage', { id }), kind: 'level', chapter: ch.id, level: parsed.level };
+    return { key: id, puzzle: unpack(packed), character: ch.character, title: t('stage', { id }), kind: 'level', chapter: ch.id, level: parsed.level, picture: pictureForLevel(ch.id, parsed.level) ?? { character: ch.character, n: 1 } };
   }, [id, t]);
 }
 
@@ -212,6 +215,7 @@ function Game({ session, t, locale, onRestart }: GameProps) {
         best = out.progress.levels[session.key].bestMs;
         newBest = out.newBest && !!progress.levels[session.key];
         if (out.unlockedChapter) notes.push(t('chapterUnlocked'));
+        if (newlyCollectedPicture(progress, out.progress)) notes.push(`🖼 ${t('newPicture')}`);
         share = stageShareText(locale, { id: session.key, stars: out.stars, ms: elapsed });
       } else if (session.kind === 'past') {
         const next = recordLateDailyClear(progress, session.key, elapsed);
@@ -411,7 +415,7 @@ function Game({ session, t, locale, onRestart }: GameProps) {
           disabled={game.solved || game.failed}
           celebrate={game.solved}
           flash={flash}
-          picture={postcard(character)}
+          picture={postcard(session.picture)}
           onPlace={onPlace}
           onRemove={onRemove}
           onDragStep={onDragStep}

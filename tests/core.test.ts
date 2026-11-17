@@ -2,8 +2,9 @@ import { describe, expect, test } from '@jest/globals';
 
 import levelsJson from '../content/levels.json';
 import { shouldOfferAdFree, shouldShowInterstitial } from '../src/core/adPolicy';
+import { ALL_PICTURES, collectedPictures, newlyCollectedPicture, pictureForDay, pictureForLevel } from '../src/core/album';
 import { CHAPTERS, levelCount, levelId, levelOptions, parseLevelId } from '../src/core/chapters';
-import { LEVEL_MAX_BRANCHES, AD_FREE_FIRST_CLEARS, AD_FREE_OFFER_AFTER_INTERSTITIALS, AD_INTERSTITIAL_EVERY, CHAPTER_UNLOCK_CLEARS, CONTINUE_HEARTS, MISTAKE_ALLOWANCE, START_HINTS } from '../src/core/config';
+import { LEVEL_MAX_BRANCHES, AD_FREE_FIRST_CLEARS, AD_FREE_OFFER_AFTER_INTERSTITIALS, AD_INTERSTITIAL_EVERY, CHAPTER_UNLOCK_CLEARS, CONTINUE_HEARTS, MISTAKE_ALLOWANCE, PICTURES_PER_CHAPTER, START_HINTS } from '../src/core/config';
 import { dailyPuzzle, dateKey, monthWeeks, prevDateKey } from '../src/core/daily';
 import { applyHint, attemptPlace, explainHint, clearAll, continueGame, heartsLeft, isMistake, newGame, place, removeAt, undo } from '../src/core/game';
 import { generate } from '../src/core/generator';
@@ -318,6 +319,26 @@ describe('진행 기록', () => {
       ...INITIAL_PROGRESS,
       levels: { '1-01': { stars: 3, bestMs: 0 } },
     });
+  });
+});
+
+describe('그림 앨범', () => {
+  test('챕터마다 4장, 10스테이지마다 다음 그림, 깬 구간의 그림만 모인다', () => {
+    expect(ALL_PICTURES).toHaveLength(CHAPTERS.length * PICTURES_PER_CHAPTER);
+    expect(pictureForLevel(1, 1)).toEqual({ character: 'cat', n: 1 });
+    expect(pictureForLevel(1, 10)).toEqual({ character: 'cat', n: 1 });
+    expect(pictureForLevel(1, 11)).toEqual({ character: 'cat', n: 2 });
+    expect(pictureForLevel(5, 40)).toEqual({ character: 'duck', n: 4 });
+    const a = recordLevelClear(INITIAL_PROGRESS, '1-01', 0, 1000).progress;
+    expect([...collectedPictures(a)]).toEqual(['cat_1']);
+    expect(newlyCollectedPicture(INITIAL_PROGRESS, a)).toEqual({ character: 'cat', n: 1 });
+    const b = recordLevelClear(a, '1-02', 0, 1000).progress;
+    expect(newlyCollectedPicture(a, b)).toBeNull();
+    const c = recordLevelClear(b, '1-11', 0, 1000).progress;
+    expect(newlyCollectedPicture(b, c)).toEqual({ character: 'cat', n: 2 });
+    // 오늘의 퍼즐 그림은 날마다 바뀌고 앨범 전체를 돈다
+    expect(pictureForDay('2026-11-17')).not.toEqual(pictureForDay('2026-11-18'));
+    expect(pictureForDay('2026-11-17')).toEqual(pictureForDay('2026-12-07'));
   });
 });
 
