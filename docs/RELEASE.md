@@ -15,7 +15,7 @@
 | 계정 | 상태 | 시카쿠에 필요한 것 |
 |---|---|---|
 | Apple Developer | **조직 계정 전환 승인(2026-11-11)** | 유료 앱 계약·세금(W-8BEN-E)·계좌 → 앱 등록·인앱 상품 — 칸별 값은 **`docs/store/asc-setup.md`** |
-| AdMob | 회사 계정 가입 완료(게시자 `pub-3027332696680312`), 렐로 iOS 앱만 있음 | 시카쿠 앱 2개(iOS·Android)·광고 단위 4개 추가(1장) |
+| AdMob | **시카쿠 앱 2개·광고 단위 4개 생성, 앱에 반영(2026-11-18)** — 앱 ID는 `app.json`, 광고 단위는 `src/core/config.ts` | 출시 뒤 스토어 연결·app-ads.txt, 내 기기를 테스트 기기로 등록(아래 1장) |
 | RevenueCat | 회사 계정·렐로 프로젝트 완료 | 시카쿠 프로젝트·`ad_free` 권한·상품 추가(2장) |
 | Google Play Console | **없음**(렐로는 iOS만) | 조직 계정으로 새로 가입(4장) |
 
@@ -25,7 +25,7 @@
 2. 앱마다 광고 단위 2개(이름 예: `Shikaku iOS interstitial`, `Shikaku iOS rewarded`):
    - **전면 광고(Interstitial)**, **보상형(Rewarded)**. "파트너 입찰" 체크·고급 설정은 건드리지 않는다(빈도는 앱 코드가 정한다).
    - 보상형의 보상 설정은 기본값(1, Reward) 그대로 — 실제 보상(힌트 2개·하트 1개)은 앱이 준다.
-3. **앱 ID 2개(`ca-app-pub-…~…`)와 광고 단위 ID 4개(`ca-app-pub-…/…`)를 Claude에게 알려 준다**(비밀 아님). 앱 ID는 `app.json`(`react-native-google-mobile-ads`의 `iosAppId`·`androidAppId`, 지금은 구글 테스트 ID), 광고 단위는 `.env`(`.env.example`)에 넣는다. 개발 빌드는 계속 테스트 광고만 나온다.
+3. (완료 2026-11-18) 앱 ID 2개는 `app.json`, 광고 단위 ID 4개는 `src/core/config.ts`에 넣었다. 개발 빌드는 계속 테스트 광고만 나온다. **Release 빌드는 실제 광고가 나오므로 자기 광고를 누르지 않는다** — AdMob → 설정 → 테스트 기기에 내 아이폰을 등록하면 Release 빌드에서도 테스트 광고가 나온다.
 4. 개인정보 보호 및 메시지: 유럽을 출시에서 뺐으니 GDPR 메시지는 건너뛰어도 된다. **IDFA 안내 메시지(iOS)**는 선택(코드가 ATT 창을 직접 띄운다).
 5. 앱이 공개되면 AdMob에서 스토어와 연결하고, `app-ads.txt`를 개발자 웹사이트에 올린다(AdMob 안내. 웹사이트는 스토어에 적은 마케팅/개발자 URL과 같은 도메인이어야 한다 — 그때 정한다).
 

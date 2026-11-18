@@ -102,15 +102,19 @@ export const AD_FREE_OFFER_AFTER_INTERSTITIALS = 2;
 // Expo는 process.env.EXPO_PUBLIC_이름 을 글자 그대로 쓴 곳만 빌드 때 값으로 바꾼다(동적 접근 금지).
 const env = (value: string | undefined): string => value ?? '';
 
-/** 릴리스 광고 단위 ID(비어 있으면 릴리스에서 광고를 끈다. 개발 빌드는 구글 테스트 ID). */
+/**
+ * 릴리스 광고 단위 ID(AdMob 게시자 pub-3027332696680312, 2026-11-18 사용자가 만든 시카쿠 앱의 광고 단위 — 비밀 값이 아니다).
+ * .env의 EXPO_PUBLIC_ADMOB_*로 바꿀 수 있다. 개발 빌드는 언제나 구글 테스트 ID를 쓴다(src/data/ads.ts) — 실제 광고를 개발 중에 누르면 계정이 정지될 수 있다.
+ * 앱 ID(~가 든 것)는 app.json의 react-native-google-mobile-ads 플러그인에 있다.
+ */
 export const ADMOB_UNIT_IDS = {
   ios: {
-    interstitial: env(process.env.EXPO_PUBLIC_ADMOB_IOS_INTERSTITIAL),
-    rewarded: env(process.env.EXPO_PUBLIC_ADMOB_IOS_REWARDED),
+    interstitial: env(process.env.EXPO_PUBLIC_ADMOB_IOS_INTERSTITIAL) || 'ca-app-pub-3027332696680312/8051470048',
+    rewarded: env(process.env.EXPO_PUBLIC_ADMOB_IOS_REWARDED) || 'ca-app-pub-3027332696680312/2799143362',
   },
   android: {
-    interstitial: env(process.env.EXPO_PUBLIC_ADMOB_ANDROID_INTERSTITIAL),
-    rewarded: env(process.env.EXPO_PUBLIC_ADMOB_ANDROID_REWARDED),
+    interstitial: env(process.env.EXPO_PUBLIC_ADMOB_ANDROID_INTERSTITIAL) || 'ca-app-pub-3027332696680312/1486061692',
+    rewarded: env(process.env.EXPO_PUBLIC_ADMOB_ANDROID_REWARDED) || 'ca-app-pub-3027332696680312/1464659208',
   },
 } as const;
 

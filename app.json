@@ -56,8 +56,8 @@
       [
         "react-native-google-mobile-ads",
         {
-          "iosAppId": "ca-app-pub-3940256099942544~1458002511",
-          "androidAppId": "ca-app-pub-3940256099942544~3347511713",
+          "iosAppId": "ca-app-pub-3027332696680312~1739991379",
+          "androidAppId": "ca-app-pub-3027332696680312~9534720913",
           "delayAppMeasurementInit": true,
           "userTrackingUsageDescription": "맞춤형 광고를 보여 드리는 데 쓰여요. 허용하지 않아도 게임은 똑같이 즐길 수 있어요.",
           "skAdNetworkItems": [
