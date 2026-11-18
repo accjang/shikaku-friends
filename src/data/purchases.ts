@@ -73,7 +73,13 @@ export async function initPurchases(): Promise<void> {
   }
   try {
     rc = loadPurchasesModule()?.default ?? null;
-    if (!rc) return;
+    if (!rc) {
+      // 결제 모듈이 없는 환경(Expo Go): 개발 중이면 가상 결제로, 아니면 끈다
+      const fallback: PurchaseMode = isDev() ? 'mock' : 'disabled';
+      usePurchaseStore.setState({ mode: fallback, price: fallback === 'mock' ? MOCK_ADFREE_PRICE : null });
+      await applyAdFree(await loadJson<boolean>(fallback === 'mock' ? STORAGE_KEYS.mockPurchases : STORAGE_KEYS.adFreeGranted, false));
+      return;
+    }
     rc.configure({ apiKey: apiKey() });
     rc.addCustomerInfoUpdateListener((info) => void applyAdFree(activeFrom(info)));
     await applyAdFree(activeFrom(await rc.getCustomerInfo()));

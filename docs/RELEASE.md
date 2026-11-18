@@ -14,9 +14,9 @@
 ## 계정 현황(2026-11-11)
 | 계정 | 상태 | 시카쿠에 필요한 것 |
 |---|---|---|
-| Apple Developer | **조직 계정 전환 승인(2026-11-11)** | 유료 앱 계약·세금(W-8BEN-E)·계좌 → 앱 등록·인앱 상품 — 칸별 값은 **`docs/store/asc-setup.md`** |
+| Apple Developer | **조직 계정 전환 승인(2026-11-11). App Store Connect: 앱 레코드·앱 정보·연령 등급·개인정보 설문·가격(무료)·국가(142개)·광고 제거 상품(₩1,900/$1.99, 가족 공유 켜짐 — 되돌릴 수 없음) 입력(2026-11-18)** | 유료 앱 계약·세금·계좌, 문구·스크린샷(fastlane), 빌드 업로드·심사 — `docs/store/asc-setup.md` |
 | AdMob | **시카쿠 앱 2개·광고 단위 4개 생성, 앱에 반영(2026-11-18)** — 앱 ID는 `app.json`, 광고 단위는 `src/core/config.ts` | 출시 뒤 스토어 연결·app-ads.txt, 내 기기를 테스트 기기로 등록(아래 1장) |
-| RevenueCat | 회사 계정·렐로 프로젝트 완료 | 시카쿠 프로젝트·`ad_free` 권한·상품 추가(2장) |
+| RevenueCat | **프로젝트 Shikaku Friends: App Store 앱(인앱 결제 키는 렐로와 같은 팀 키), 권한 `ad_free` ← 상품 `shikaku_remove_ads`, 공개 키를 `config.ts`에 반영(2026-11-18)** | 계약 활성 뒤 상품 상태 확인(Pull from store)·샌드박스 구매 시험, Android는 Play 앱 뒤 |
 | Google Play Console | **없음**(렐로는 iOS만) | 조직 계정으로 새로 가입(4장) |
 
 ## 1. AdMob (지금 가능)

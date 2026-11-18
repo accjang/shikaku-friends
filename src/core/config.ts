@@ -119,7 +119,9 @@ export const ADMOB_UNIT_IDS = {
 } as const;
 
 // ── 결제(RevenueCat) ──
-export const REVENUECAT_API_KEY_IOS = env(process.env.EXPO_PUBLIC_REVENUECAT_API_KEY_IOS);
+/** RevenueCat 공개 SDK 키(프로젝트 Shikaku Friends의 App Store 앱, 2026-11-18 — 공개 키라 코드에 둔다. 비밀 키 sk_…는 쓰지 않는다). .env로 바꿀 수 있다. */
+export const REVENUECAT_API_KEY_IOS = env(process.env.EXPO_PUBLIC_REVENUECAT_API_KEY_IOS) || 'appl_UzSmtfYVYyVWsEAsauehbsDVkXu';
+/** Android는 Play Console 앱·RevenueCat Play Store 앱을 만든 뒤(goog_…). 비어 있으면 개발 빌드는 가상 결제, 릴리스는 결제 꺼짐. */
 export const REVENUECAT_API_KEY_ANDROID = env(process.env.EXPO_PUBLIC_REVENUECAT_API_KEY_ANDROID);
 /** App Store Connect·Play Console에 같은 ID로 만든다(비소모성, 가격 ₩1,900 / US$1.99 — 2026-10-25 사용자 결정). */
 export const PRODUCT_IDS = { adFree: 'shikaku_remove_ads' } as const;
