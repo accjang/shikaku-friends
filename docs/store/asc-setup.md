@@ -111,3 +111,23 @@ App Tracking Transparency prompt appears before the first ad is loaded, after th
 
 ## 8. 순서 요약
 계약·세금·계좌(0) → 앱 만들기(1) → 앱 정보·연령(2) → 개인정보 설문(3) → 가격·국가(4) → 인앱 상품(5) → RevenueCat 키(6) → AdMob 실제 ID와 함께 Release 빌드 업로드 → TestFlight 확인 → 버전 페이지(7) → 심사 제출.
+
+## 9. 문구·스크린샷을 한 번에 올리기 (fastlane)
+웹에서 언어마다 붙여 넣는 대신, 26개 언어의 이름·부제·설명·키워드·주소·스크린샷을 명령 한 줄로 올린다(필리핀어·스와힐리어는 App Store에 없는 언어라 빠진다).
+빌드는 올리지 않고 심사 제출도 하지 않는다. 연령 등급·개인정보 설문·가격·인앱 상품은 웹에서 한다(2~5장).
+
+**처음 한 번(맥에서):**
+1. fastlane 설치: `brew install fastlane` (Homebrew가 없으면 https://brew.sh 의 한 줄 설치 먼저)
+2. API 키 만들기: App Store Connect → 사용자 및 액세스 → **통합** → App Store Connect API → **팀 키** → + → 이름 `fastlane`, 액세스 **앱 관리자(App Manager)** → 생성.
+   - **키 ID**와 위쪽의 **Issuer ID**를 적어 두고, **API 키 다운로드**(`AuthKey_….p8`, 한 번만 받을 수 있다)
+3. 저장소 폴더에서 `cp fastlane/.env.example fastlane/.env` → `fastlane/.env`를 열어 세 값을 채운다(키 ID, Issuer ID, .p8 파일 경로). 이 파일과 .p8은 git에 올라가지 않는다 — 채팅에도 붙여 넣지 않는다.
+
+**올리기(저장소 폴더에서):**
+```bash
+fastlane ios store_text    # 문구만
+fastlane ios store_all     # 문구 + 스크린샷(언어마다 5장, 약 10~20분)
+```
+- 문구는 `docs/store/listing/<코드>.md`, 스크린샷은 `docs/store/art/<코드>/ios-1~5.jpg`에서 매번 새로 만든다(`tools/build_fastlane_metadata.py`). 문구를 고친 뒤 같은 명령을 다시 실행하면 덮어쓴다.
+- 앱 레코드(1장)를 먼저 만들어 두어야 하고, 버전이 "제출 준비 중"일 때만 된다.
+- "이름이 이미 사용 중"으로 어떤 언어가 거절되면 그 언어의 `title`을 고쳐 다시 실행한다.
+- 확인한 것(2026-11-18): fastlane 2.242.0에서 설정이 읽히고 Apple 인증 단계까지 간다(가짜 키로 시험). 실제 키로 올리는 것은 사용자 맥에서 처음 해 본다.

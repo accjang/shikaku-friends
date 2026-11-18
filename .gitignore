@@ -37,3 +37,10 @@ __pycache__/
 tools/out/
 tools/out_props/
 tools/out_anims/
+
+# fastlane(스토어 문구·스크린샷 올리기): 생성물·키
+fastlane/metadata/
+fastlane/screenshots/
+fastlane/.env
+fastlane/report.xml
+fastlane/README.md
