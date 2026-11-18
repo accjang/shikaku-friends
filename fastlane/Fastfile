@@ -5,6 +5,8 @@
 #   fastlane ios store_all    문구 + 스크린샷(언어마다 5장, 기존 스크린샷은 바꿔 넣는다)
 default_platform(:ios)
 
+APP_ID = 'app.shikakufriends.mobile'
+
 platform :ios do
   private_lane :upload do |options|
     # 문구·스크린샷 폴더를 listing·art에서 새로 만든다
@@ -14,9 +16,35 @@ platform :ios do
       issuer_id: ENV.fetch('ASC_ISSUER_ID'),
       key_filepath: File.expand_path(ENV.fetch('ASC_KEY_PATH'))
     )
+    Spaceship::ConnectAPI.token = Spaceship::ConnectAPI::Token.create(**api_key)
+
+    # 새 언어의 '앱 정보'(이름·부제) 칸을 먼저 만든다. deliver는 이미 있는 언어만 비교해서, 칸이 없으면 "바뀐 것 없음"으로 건너뛴다.
+    app = Spaceship::ConnectAPI::App.find(APP_ID)
+    UI.user_error!("App Store Connect에서 앱 #{APP_ID}를 찾지 못했어요") unless app
+    app_info = app.fetch_edit_app_info
+    UI.user_error!('고칠 수 있는 앱 정보가 없어요(심사 중이면 끝난 뒤 다시)') unless app_info
+    base = File.directory?('metadata') ? '.' : 'fastlane' # 실행 위치가 fastlane 폴더든 저장소 폴더든 찾게
+    meta = File.join(base, 'metadata')
+    wanted = Dir.children(meta).select { |d| File.directory?(File.join(meta, d)) }
+    missing = wanted - app_info.get_app_info_localizations.map(&:locale)
+    missing.each do |locale|
+      UI.message("앱 정보 언어 추가: #{locale}")
+      app_info.create_app_info_localization(attributes: { locale: locale })
+    end
+
+    # 심사 정보: 메모는 항상 넣는다(첫 버전에는 심사 정보가 아직 없어, 안 넣으면 deliver가 "No data"로 멈춘다).
+    # 연락처는 fastlane/.env에 적었을 때만 넣고, 비우면 웹에서 채운다.
+    review = { notes: File.read(File.join(base, 'review_notes.txt')).strip }
+    { first_name: 'ASC_REVIEW_FIRST_NAME', last_name: 'ASC_REVIEW_LAST_NAME',
+      phone_number: 'ASC_REVIEW_PHONE', email_address: 'ASC_REVIEW_EMAIL' }.each do |key, env|
+      value = ENV[env].to_s.strip
+      review[key] = value unless value.empty?
+    end
+
     deliver(
       api_key: api_key,
-      app_identifier: 'app.shikakufriends.mobile',
+      app_identifier: APP_ID,
+      app_review_information: review,
       metadata_path: './fastlane/metadata',
       screenshots_path: './fastlane/screenshots',
       skip_binary_upload: true,

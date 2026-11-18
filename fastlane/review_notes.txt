@@ -1,0 +1,6 @@
+No account or login is needed. The game works offline.
+Ads: AdMob full-screen ads appear after the first few cleared stages, when tapping "Next".
+Rewarded ads are optional (get hints, or continue after using up 3 mistakes in a stage).
+In-app purchase "Remove Ads" (non-consumable): Settings → Remove Ads. It also grants 10 hints once.
+It can also be bought from the "out of hints" popup. Restore: Settings → Restore purchases.
+App Tracking Transparency prompt appears before the first ad is loaded, after the tutorial.

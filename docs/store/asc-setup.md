@@ -114,6 +114,7 @@ App Tracking Transparency prompt appears before the first ad is loaded, after th
 
 ## 9. 문구·스크린샷을 한 번에 올리기 (fastlane)
 웹에서 언어마다 붙여 넣는 대신, 26개 언어의 이름·부제·설명·키워드·주소·스크린샷을 명령 한 줄로 올린다(필리핀어·스와힐리어는 App Store에 없는 언어라 빠진다).
+심사 메모(`fastlane/review_notes.txt`)도 함께 올라간다. 심사 연락처는 `fastlane/.env`의 `ASC_REVIEW_*`를 채우면 같이 올라가고, 비우면 웹에서 채운다.
 빌드는 올리지 않고 심사 제출도 하지 않는다. 연령 등급·개인정보 설문·가격·인앱 상품은 웹에서 한다(2~5장).
 
 **처음 한 번(맥에서):**
